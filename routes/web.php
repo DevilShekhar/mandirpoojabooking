@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\CountryController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\RoleController;
@@ -27,6 +28,9 @@ Route::middleware('auth')->group(function () {
 
     //users
     Route::resource('users', UserController::class)->names('admin.users');
+    
+    //Country
+    Route::resource('country',CountryController::class)->names('countries');
 
 });
 
