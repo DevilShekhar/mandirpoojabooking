@@ -293,6 +293,34 @@
                                 </li>
                             </ul>
                         </li>
+                        <li class="dropdown {{ request()->routeIs('countries.*') ? 'active' : '' }}">
+                            <a href="#" class="menu-toggle nav-link has-dropdown">
+                                <i data-feather="map-pin"></i>
+                                <span>Location</span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li class="{{ request()->routeIs('countries') ? 'active' : '' }}">
+                                    <a class="nav-link" href="{{ route('countries.index') }}">
+                                        Countries
+                                    </a>
+                                </li>
+                                <li class="{{ request()->routeIs('staes') ? 'active' : '' }}">
+                                    <a class="nav-link" href="{{ route('states.index') }}">
+                                        States
+                                    </a>
+                                </li>
+                                <li class="{{ request()->routeIs('districts') ? 'active' : '' }}">
+                                    <a class="nav-link" href="{{ route('districts.index') }}">
+                                        Districts
+                                    </a>
+                                </li>
+                                <li class="{{ request()->routeIs('cities') ? 'active' : '' }}">
+                                    <a class="nav-link" href="{{ route('cities.index') }}">
+                                        Cities
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
 
                     </ul>
                 </aside>

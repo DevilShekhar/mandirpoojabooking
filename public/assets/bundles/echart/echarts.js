@@ -75524,11 +75524,11 @@
 
             // Consider case:
             // Firstly set system timezone as "Time Zone: America/Toronto",
-            // ```
+            //
             // var first = new Date(1478412000000 - 3600 * 1000 * 2.5);
             // var second = new Date(1478412000000);
             // var allDays = Math.floor(second / ONE_DAY) - Math.floor(first / ONE_DAY) + 1;
-            // ```
+            //
             // will get wrong result because of DST. So we should fix it.
             var date = new Date(range[0].time);
             var startDateNum = date.getDate();
