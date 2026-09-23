@@ -36,4 +36,13 @@ class Temple extends Model
     {
         return $this->belongsTo(City::class);
     }
+    public function templeDeities()
+    {
+        return $this->hasMany(TempleDeity::class);
+    }
+
+    public function deities()
+    {
+        return $this->belongsToMany(Deity::class,'temple_deities');
+    }
 }

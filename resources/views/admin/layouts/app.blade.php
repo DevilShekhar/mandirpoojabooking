@@ -321,6 +321,37 @@
                                 </li>
                             </ul>
                         </li>
+                        <li class="dropdown {{ request()->routeIs('temples.*') ? 'active' : '' }}">
+                            <a href="#" class="menu-toggle nav-link has-dropdown">
+                                <i data-feather="home "></i>
+                                <span>Temples</span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li class="{{ request()->routeIs('temples') ? 'active' : '' }}">
+                                    <a class="nav-link" href="{{ route('temples.index') }}">
+                                        Temples
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="dropdown {{ request()->routeIs('temples.*') ? 'active' : '' }}">
+                            <a href="#" class="menu-toggle nav-link has-dropdown">
+                                <i data-feather="sun"></i>
+                                <span>Deity</span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li class="{{ request()->routeIs('deities') ? 'active' : '' }}">
+                                    <a class="nav-link" href="{{ route('deities.index') }}">
+                                        Deity
+                                    </a>
+                                </li>
+                                <li class="{{ request()->routeIs('temple-deities') ? 'active' : '' }}">
+                                    <a class="nav-link" href="{{ route('temple-deities.index') }}">
+                                        Temple Deities
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
 
                     </ul>
                 </aside>
