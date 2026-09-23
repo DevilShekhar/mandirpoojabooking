@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\StateController;
 use App\Http\Controllers\Admin\TempleController;
+use App\Http\Controllers\Admin\TempleDeityController;
 use App\Http\Controllers\Admin\UserController;
 
 Route::get('/', function () {
@@ -50,6 +51,8 @@ Route::middleware('auth')->group(function () {
     Route::get('temples/get-cities/{district}',[TempleController::class, 'getCities'])->name('temples.get-cities');
     //Deities
     Route::resource('deities', DeityController::class);
+    //TempleDeities
+    Route::resource('temple-deities', TempleDeityController::class);
 });
 
 require __DIR__.'/auth.php';
