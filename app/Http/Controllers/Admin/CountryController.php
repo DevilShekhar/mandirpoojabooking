@@ -62,4 +62,13 @@ class CountryController extends Controller
             ->route('countries.index')
             ->with('success', 'Country updated successfully.');
     }
+
+    public function destroy(Country $country)
+    {
+        $country->update(['status' => 0]);
+
+        return redirect()
+            ->route('countries.index')
+            ->with('success', 'Country deactivated successfully.');
+    }
 }
