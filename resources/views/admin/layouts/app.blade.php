@@ -323,7 +323,7 @@
                         </li>
                         <li class="dropdown {{ request()->routeIs('temples.*') ? 'active' : '' }}">
                             <a href="#" class="menu-toggle nav-link has-dropdown">
-                                <i data-feather="home "></i>
+                                <i data-feather="home"></i>
                                 <span>Temples</span>
                             </a>
                             <ul class="dropdown-menu">
@@ -334,7 +334,7 @@
                                 </li>
                             </ul>
                         </li>
-                        <li class="dropdown {{ request()->routeIs('temples.*') ? 'active' : '' }}">
+                        <li class="dropdown {{ request()->routeIs('deities.*') ? 'active' : '' }}">
                             <a href="#" class="menu-toggle nav-link has-dropdown">
                                 <i data-feather="sun"></i>
                                 <span>Deity</span>
