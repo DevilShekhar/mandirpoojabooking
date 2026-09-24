@@ -352,6 +352,24 @@
                                 </li>
                             </ul>
                         </li>
+                        <li class="dropdown {{ request()->routeIs('puja-categories.*') ? 'active' : '' }}">
+                            <a href="#" class="menu-toggle nav-link has-dropdown">
+                                <i data-feather="heart"></i>
+                                <span>Puja Categories</span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li class="{{ request()->routeIs('puja-categories') ? 'active' : '' }}">
+                                    <a class="nav-link" href="{{ route('puja-categories.index') }}">
+                                        Puja Categories
+                                    </a>
+                                </li>
+                                <li class="{{ request()->routeIs('pujas') ? 'active' : '' }}">
+                                    <a class="nav-link" href="{{ route('pujas.index') }}">
+                                        Pujas
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
 
                     </ul>
                 </aside>
