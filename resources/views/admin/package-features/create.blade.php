@@ -7,7 +7,7 @@
 <section class="section">
     <div class="section-body">
 
-```
+
     <div class="row">
         <div class="col-12">
 
@@ -187,7 +187,7 @@
     </div>
 
 </div>
-```
+
 
 </section>
 

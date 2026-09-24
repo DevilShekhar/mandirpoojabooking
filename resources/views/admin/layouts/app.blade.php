@@ -373,6 +373,16 @@
                                         Puja Packages
                                     </a>
                                 </li>
+                                <li class="{{ request()->routeIs('package-features') ? 'active' : '' }}">
+                                    <a class="nav-link" href="{{ route('package-features.index') }}">
+                                        Package Features
+                                    </a>
+                                </li>
+                                <li class="{{ request()->routeIs('package-addons') ? 'active' : '' }}">
+                                    <a class="nav-link" href="{{ route('package-addons.index') }}">
+                                        Package Addons
+                                    </a>
+                                </li>
                             </ul>
                         </li>
 
