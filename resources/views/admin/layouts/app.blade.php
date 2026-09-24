@@ -368,6 +368,11 @@
                                         Pujas
                                     </a>
                                 </li>
+                                <li class="{{ request()->routeIs('puja-packages') ? 'active' : '' }}">
+                                    <a class="nav-link" href="{{ route('puja-packages.index') }}">
+                                        Puja Packages
+                                    </a>
+                                </li>
                             </ul>
                         </li>
 
