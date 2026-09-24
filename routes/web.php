@@ -4,10 +4,12 @@ use App\Http\Controllers\Admin\CityController;
 use App\Http\Controllers\Admin\CountryController;
 use App\Http\Controllers\Admin\DeityController;
 use App\Http\Controllers\Admin\DistrictController;
+use App\Http\Controllers\Admin\PackageAddonController;
 use App\Http\Controllers\Admin\PackageFeatureController;
 use App\Http\Controllers\Admin\PujaCategoryController;
 use App\Http\Controllers\Admin\PujaController;
 use App\Http\Controllers\Admin\PujaPackageController;
+use App\Http\Controllers\Admin\PujaScheduleController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\RoleController;
@@ -63,6 +65,8 @@ Route::middleware('auth')->group(function () {
     Route::resource('pujas',PujaController::class);
     Route::resource('puja-packages', PujaPackageController::class);
     Route::resource('package-features', PackageFeatureController::class);
+    Route::resource('package-addons', PackageAddonController::class);
+    Route::resource('puja-schedules', PujaScheduleController::class);
 });
 
 require __DIR__.'/auth.php';
