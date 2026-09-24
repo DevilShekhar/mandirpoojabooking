@@ -4,6 +4,8 @@ use App\Http\Controllers\Admin\CityController;
 use App\Http\Controllers\Admin\CountryController;
 use App\Http\Controllers\Admin\DeityController;
 use App\Http\Controllers\Admin\DistrictController;
+use App\Http\Controllers\Admin\PujaCategoryController;
+use App\Http\Controllers\Admin\PujaController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\RoleController;
@@ -53,6 +55,10 @@ Route::middleware('auth')->group(function () {
     Route::resource('deities', DeityController::class);
     //TempleDeities
     Route::resource('temple-deities', TempleDeityController::class);
+    //PujaCategories
+    Route::resource('puja-categories', PujaCategoryController::class);
+    //Puja
+    Route::resource('pujas',PujaController::class);
 });
 
 require __DIR__.'/auth.php';
