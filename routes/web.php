@@ -4,8 +4,12 @@ use App\Http\Controllers\Admin\CityController;
 use App\Http\Controllers\Admin\CountryController;
 use App\Http\Controllers\Admin\DeityController;
 use App\Http\Controllers\Admin\DistrictController;
+use App\Http\Controllers\Admin\FestivalController;
+use App\Http\Controllers\Admin\FestivalPujaController;
 use App\Http\Controllers\Admin\PackageAddonController;
 use App\Http\Controllers\Admin\PackageFeatureController;
+use App\Http\Controllers\Admin\PanditController;
+use App\Http\Controllers\Admin\PanditPujaController;
 use App\Http\Controllers\Admin\PujaCategoryController;
 use App\Http\Controllers\Admin\PujaController;
 use App\Http\Controllers\Admin\PujaPackageController;
@@ -67,6 +71,10 @@ Route::middleware('auth')->group(function () {
     Route::resource('package-features', PackageFeatureController::class);
     Route::resource('package-addons', PackageAddonController::class);
     Route::resource('puja-schedules', PujaScheduleController::class);
+    Route::resource('festivals', FestivalController::class);
+    Route::resource('festival-pujas', FestivalPujaController::class);
+    Route::resource('pandits', PanditController::class);
+    Route::resource('pandit-pujas', PanditPujaController::class);
 });
 
 require __DIR__.'/auth.php';

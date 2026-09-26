@@ -39,4 +39,8 @@ class Puja extends Model
     {
         return $this->belongsTo(PujaCategory::class);
     }
+    public function festivalPujas()
+    {
+        return $this->hasMany(FestivalPuja::class);
+    }
 }
