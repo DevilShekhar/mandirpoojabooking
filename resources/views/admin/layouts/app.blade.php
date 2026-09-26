@@ -355,7 +355,7 @@
                         <li class="dropdown {{ request()->routeIs('puja-categories.*') ? 'active' : '' }}">
                             <a href="#" class="menu-toggle nav-link has-dropdown">
                                 <i data-feather="heart"></i>
-                                <span>Puja Categories</span>
+                                <span>Puja</span>
                             </a>
                             <ul class="dropdown-menu">
                                 <li class="{{ request()->routeIs('puja-categories') ? 'active' : '' }}">
@@ -381,6 +381,29 @@
                                 <li class="{{ request()->routeIs('package-addons') ? 'active' : '' }}">
                                     <a class="nav-link" href="{{ route('package-addons.index') }}">
                                         Package Addons
+                                    </a>
+                                </li>
+                                <li class="{{ request()->routeIs('puja-schedules') ? 'active' : '' }}">
+                                    <a class="nav-link" href="{{ route('puja-schedules.index') }}">
+                                        Puja Schedules
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="dropdown {{ request()->routeIs('festivals.*') ? 'active' : '' }}">
+                            <a href="#" class="menu-toggle nav-link has-dropdown">
+                                <i data-feather="calendar"></i>
+                                <span>Festivals</span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li class="{{ request()->routeIs('festivals') ? 'active' : '' }}">
+                                    <a class="nav-link" href="{{ route('festivals.index') }}">
+                                        Festivals
+                                    </a>
+                                </li>
+                                <li class="{{ request()->routeIs('festival-pujas') ? 'active' : '' }}">
+                                    <a class="nav-link" href="{{ route('festival-pujas.index') }}">
+                                        festival-pujas
                                     </a>
                                 </li>
                             </ul>
