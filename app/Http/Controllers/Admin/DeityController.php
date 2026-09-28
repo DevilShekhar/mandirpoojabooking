@@ -11,7 +11,7 @@ use Illuminate\Support\Str;
 class DeityController extends Controller
 {
     public function index(){
-        $deities = Deity::get();
+        $deities = Deity::latest()->get();
         return view('admin.deities.index',compact('deities'));
     }
 

@@ -43,7 +43,6 @@ class DistrictController extends Controller
             'country_id' => 'required|exists:countries,id',
             'state_id' => 'required|exists:states,id',
             'name' => 'required|string|max:255',
-            'status' => 'required|boolean',
         ]);
 
         $state = State::where('id', $request->state_id)
@@ -54,7 +53,7 @@ class DistrictController extends Controller
             'state_id' => $state->id,
             'name' => $request->name,
             'slug' => Str::slug($request->name),
-            'status' => $request->status,
+            'status' => 1
         ]);
 
         return redirect()

@@ -13,6 +13,26 @@
                     </div>
 
                     <div class="card-body">
+                        {{-- Validation Errors --}}
+                        @if($errors->any())
+                            <div class="alert alert-danger">
+                                <strong>Please fix the following errors:</strong>
+
+                                <ul class="mb-0 mt-2">
+                                    @foreach($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+
+                        {{-- Success Message --}}
+                        @if(session('success'))
+                            <div class="alert alert-success">
+                                {{ session('success') }}
+                            </div>
+                        @endif
+
                         <form action="{{ route('puja-categories.store') }}"
                               method="POST"
                               enctype="multipart/form-data">
@@ -32,7 +52,9 @@
                                        placeholder="Enter category name">
 
                                 @error('name')
-                                    <div class="invalid-feedback">{{ $message }}</div>
+                                    <div class="invalid-feedback">
+                                        {{ $message }}
+                                    </div>
                                 @enderror
                             </div>
 
@@ -46,7 +68,9 @@
                                           placeholder="Enter category description">{{ old('description') }}</textarea>
 
                                 @error('description')
-                                    <div class="invalid-feedback">{{ $message }}</div>
+                                    <div class="invalid-feedback">
+                                        {{ $message }}
+                                    </div>
                                 @enderror
                             </div>
 
@@ -60,7 +84,9 @@
                                        accept="image/*">
 
                                 @error('image')
-                                    <div class="invalid-feedback">{{ $message }}</div>
+                                    <div class="invalid-feedback">
+                                        {{ $message }}
+                                    </div>
                                 @enderror
                             </div>
 
@@ -78,45 +104,30 @@
                                        placeholder="Enter sort order">
 
                                 @error('sort_order')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="form-group">
-                                <label for="status">
-                                    Status <span class="text-danger">*</span>
-                                </label>
-
-                                <select name="status"
-                                        id="status"
-                                        class="form-control @error('status') is-invalid @enderror">
-
-                                    <option value="1" {{ old('status', 1) == 1 ? 'selected' : '' }}>
-                                        Active
-                                    </option>
-
-                                    <option value="0" {{ old('status') === '0' ? 'selected' : '' }}>
-                                        Inactive
-                                    </option>
-                                </select>
-
-                                @error('status')
-                                    <div class="invalid-feedback">{{ $message }}</div>
+                                    <div class="invalid-feedback">
+                                        {{ $message }}
+                                    </div>
                                 @enderror
                             </div>
 
                             <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save"></i> Save Puja Category
+                                <i class="fas fa-save"></i>
+                                Save Puja Category
                             </button>
 
-                            <a href="{{ route('puja-categories.index') }}" class="btn btn-secondary">
+                            <a href="{{ route('puja-categories.index') }}"
+                               class="btn btn-secondary">
                                 Cancel
                             </a>
+
                         </form>
+
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
 </section>
+
 @endsection

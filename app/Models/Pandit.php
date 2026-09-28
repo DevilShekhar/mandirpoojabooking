@@ -28,4 +28,8 @@ class Pandit extends Model
     {
         return $this->hasMany(PanditPuja::class);
     }
+    public function pujaAssignments()
+    {
+        return $this->hasMany(PujaAssignment::class);
+    }
 }

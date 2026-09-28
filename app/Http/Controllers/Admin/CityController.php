@@ -60,7 +60,6 @@ class CityController extends Controller
             'pincode' => 'nullable|string|max:10',
             'latitude' => 'nullable|numeric|between:-90,90',
             'longitude' => 'nullable|numeric|between:-180,180',
-            'status' => 'required|boolean',
         ]);
 
         $state = State::where('id', $request->state_id)
@@ -80,7 +79,7 @@ class CityController extends Controller
             'pincode' => $request->pincode,
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,
-            'status' => $request->status,
+            'status' => 1
         ]);
 
         return redirect()

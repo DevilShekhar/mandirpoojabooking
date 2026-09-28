@@ -32,7 +32,6 @@ class StateController extends Controller
             'country_id' => 'required|exists:countries,id',
             'name' => 'required|string|max:255',
             'code' => 'nullable|string|max:10',
-            'status' => 'required|boolean',
         ]);
 
         State::create([
@@ -40,7 +39,7 @@ class StateController extends Controller
             'name' => $request->name,
             'code' => strtoupper($request->code),
             'slug' => Str::slug($request->name),
-            'status' => $request->status,
+            'status' => 1
         ]);
 
         return redirect()

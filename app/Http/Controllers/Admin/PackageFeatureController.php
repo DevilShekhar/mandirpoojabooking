@@ -35,7 +35,6 @@ class PackageFeatureController extends Controller
             'feature_name' => 'required|string|max:255',
             'feature_value' => 'nullable|string',
             'sort_order' => 'nullable|integer|min:0',
-            'status' => 'required|boolean',
         ]);
 
         PackageFeature::create([
@@ -43,7 +42,7 @@ class PackageFeatureController extends Controller
             'feature_name' => $request->feature_name,
             'feature_value' => $request->feature_value,
             'sort_order' => $request->sort_order ?? 0,
-            'status' => $request->status,
+            'status' => 1,
         ]);
 
         return redirect()

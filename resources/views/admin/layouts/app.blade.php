@@ -403,7 +403,7 @@
                                 </li>
                                 <li class="{{ request()->routeIs('festival-pujas') ? 'active' : '' }}">
                                     <a class="nav-link" href="{{ route('festival-pujas.index') }}">
-                                        festival-pujas
+                                        Festival Pujas
                                     </a>
                                 </li>
                             </ul>

@@ -28,7 +28,6 @@ class PujaCategoryController extends Controller
             'name' => 'required|string|max:100',
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'status' => 'required|boolean',
             'sort_order' => 'required|integer|min:0',
         ]);
 
@@ -43,7 +42,7 @@ class PujaCategoryController extends Controller
             'slug' => Str::slug($request->name),
             'description' => $request->description,
             'image' => $image,
-            'status' => $request->status,
+            'status' => 1,
             'sort_order' => $request->sort_order,
         ]);
 

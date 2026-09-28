@@ -45,7 +45,6 @@ class PujaScheduleController extends Controller
             'booked_capacity' => 'nullable|integer|min:0',
             'booking_start_date' => 'nullable|date',
             'booking_end_date' => 'nullable|date|after_or_equal:booking_start_date',
-            'status' => 'required|boolean',
         ]);
 
         $bookedCapacity = $request->booked_capacity ?? 0;
@@ -69,7 +68,7 @@ class PujaScheduleController extends Controller
             'remaining_capacity' => $request->capacity - $bookedCapacity,
             'booking_start_date' => $request->booking_start_date,
             'booking_end_date' => $request->booking_end_date,
-            'status' => $request->status,
+            'status' => 1,
         ]);
 
         return redirect()

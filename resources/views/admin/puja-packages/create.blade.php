@@ -214,18 +214,6 @@
                             <div class="form-row">
 
                                 <div class="form-group col-md-6">
-                                    <label>Status</label>
-                                    <select name="status" class="form-control">
-                                        <option value="1" {{ old('status', 1) == 1 ? 'selected' : '' }}>
-                                            Active
-                                        </option>
-                                        <option value="0" {{ old('status') == 0 ? 'selected' : '' }}>
-                                            Inactive
-                                        </option>
-                                    </select>
-                                </div>
-
-                                <div class="form-group col-md-6">
                                     <label>Featured</label>
                                     <select name="is_featured" class="form-control">
                                         <option value="0" {{ old('is_featured', 0) == 0 ? 'selected' : '' }}>

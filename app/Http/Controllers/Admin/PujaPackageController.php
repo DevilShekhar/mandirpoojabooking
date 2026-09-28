@@ -66,7 +66,7 @@ class PujaPackageController extends Controller
             'includes_certificate' => $request->has('includes_certificate'),
             'is_featured' => $request->has('is_featured'),
             'sort_order' => $request->sort_order ?? 0,
-            'status' => $request->status ?? 1,
+            'status' => 1,  
         ]);
 
         return redirect()
