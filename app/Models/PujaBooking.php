@@ -94,4 +94,5 @@ class PujaBooking extends Model
     {
         return $this->hasMany(PujaAssignment::class);
     }
+
 }

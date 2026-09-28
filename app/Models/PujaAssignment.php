@@ -23,6 +23,11 @@ class PujaAssignment extends Model
         'completed_at' => 'datetime',
     ];
 
+    public function booking()
+    {
+        return $this->belongsTo(Booking::class);
+    }
+
     public function pandit()
     {
         return $this->belongsTo(Pandit::class);
