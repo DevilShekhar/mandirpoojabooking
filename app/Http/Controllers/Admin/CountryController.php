@@ -23,7 +23,6 @@ class CountryController extends Controller
            'name' => 'required|string|unique:countries,name',
            'code' => 'required|string|unique:countries,code',
            'phone_code' => 'required|string',
-           'status'=>'required'
         ]);
 
         Country::create([

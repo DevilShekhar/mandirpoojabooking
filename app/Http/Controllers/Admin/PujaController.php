@@ -54,7 +54,6 @@ class PujaController extends Controller
             'banner_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
             'is_online' => 'required|boolean',
             'is_offline' => 'required|boolean',
-            'status' => 'required|boolean',
         ]);
 
         $image = null;
@@ -84,7 +83,7 @@ class PujaController extends Controller
             'banner_image' => $bannerImage,
             'is_online' => $request->is_online,
             'is_offline' => $request->is_offline,
-            'status' => $request->status,
+            'status' => 1,
         ]);
 
         return redirect()

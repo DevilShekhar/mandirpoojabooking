@@ -36,7 +36,6 @@ class PackageAddonController extends Controller
             'price' => 'required|numeric|min:0',
             'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'max_quantity' => 'required|integer|min:1',
-            'status' => 'required|boolean',
         ]);
 
         $image = null;
@@ -52,7 +51,7 @@ class PackageAddonController extends Controller
             'price' => $request->price,
             'image' => $image,
             'max_quantity' => $request->max_quantity,
-            'status' => $request->status,
+            'status' => 1,
         ]);
 
         return redirect()

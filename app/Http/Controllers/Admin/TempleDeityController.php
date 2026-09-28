@@ -34,7 +34,6 @@ class TempleDeityController extends Controller
             'deity_id' => 'required|exists:deities,id',
             'is_primary' => 'required|boolean',
             'display_order' => 'required|integer|min:0',
-            'status' => 'required|boolean',
         ]);
 
         TempleDeity::create([
@@ -42,7 +41,7 @@ class TempleDeityController extends Controller
             'deity_id' => $request->deity_id,
             'is_primary' => $request->is_primary,
             'display_order' => $request->display_order,
-            'status' => $request->status,
+            'status' => 1
         ]);
 
         return redirect()

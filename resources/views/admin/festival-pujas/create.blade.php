@@ -148,37 +148,6 @@
 
                                 </div>
 
-                                <div class="form-group col-md-6">
-
-                                    <label for="status">
-                                        Status <span class="text-danger">*</span>
-                                    </label>
-
-                                    <select name="status"
-                                        id="status"
-                                        class="form-control @error('status') is-invalid @enderror"
-                                        required>
-
-                                        <option value="1"
-                                            {{ old('status', 1) == 1 ? 'selected' : '' }}>
-                                            Active
-                                        </option>
-
-                                        <option value="0"
-                                            {{ old('status') == 0 ? 'selected' : '' }}>
-                                            Inactive
-                                        </option>
-
-                                    </select>
-
-                                    @error('status')
-                                        <div class="invalid-feedback">
-                                            {{ $message }}
-                                        </div>
-                                    @enderror
-
-                                </div>
-
                             </div>
 
                         </div>

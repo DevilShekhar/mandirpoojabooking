@@ -40,7 +40,6 @@ class FestivalPujaController extends Controller
             'puja_id' => 'required|exists:pujas,id',
             'special_price' => 'nullable|numeric|min:0',
             'sort_order' => 'nullable|integer|min:0',
-            'status' => 'required|boolean',
         ]);
 
         $exists = FestivalPuja::where('festival_id', $request->festival_id)
@@ -58,7 +57,7 @@ class FestivalPujaController extends Controller
             'puja_id' => $request->puja_id,
             'special_price' => $request->special_price,
             'sort_order' => $request->sort_order ?? 0,
-            'status' => $request->status,
+            'status' => 1,
         ]);
 
         return redirect()

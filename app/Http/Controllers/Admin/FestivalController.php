@@ -11,10 +11,7 @@ class FestivalController extends Controller
 {
     public function index()
     {
-        $festivals = Festival::orderBy('festival_date', 'asc')
-            ->orderBy('created_at', 'desc')
-            ->get();
-
+        $festivals = Festival::latest()->get();
         return view('admin.festivals.index', compact('festivals'));
     }
 
@@ -33,7 +30,6 @@ class FestivalController extends Controller
             'end_date' => 'nullable|date|after_or_equal:start_date',
             'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'banner_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
-            'status' => 'required|boolean',
         ]);
 
         $slug = Str::slug($request->name);
@@ -65,17 +61,12 @@ class FestivalController extends Controller
             'end_date' => $request->end_date,
             'image' => $image,
             'banner_image' => $bannerImage,
-            'status' => $request->status,
+            'status' => 1,
         ]);
 
         return redirect()
             ->route('festivals.index')
             ->with('success', 'Festival created successfully.');
-    }
-
-    public function show(Festival $festival)
-    {
-        return view('admin.festivals.show', compact('festival'));
     }
 
     public function edit(Festival $festival)

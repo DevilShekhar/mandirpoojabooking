@@ -59,7 +59,6 @@ class TempleController extends Controller
             'main_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'banner_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
             'is_verified' => 'required|boolean',
-            'status' => 'required|boolean',
         ]);
 
         $district = District::where('id', $request->district_id)
@@ -94,7 +93,7 @@ class TempleController extends Controller
             'main_image' => $mainImage,
             'banner_image' => $bannerImage,
             'is_verified' => $request->is_verified,
-            'status' => $request->status,
+            'status' => 1   
         ]);
 
         return redirect()
