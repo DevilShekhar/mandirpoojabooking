@@ -388,6 +388,11 @@
                                         Puja Schedules
                                     </a>
                                 </li>
+                                <li class="{{ request()->routeIs('puja-bookings') ? 'active' : '' }}">
+                                    <a class="nav-link" href="{{ route('puja-bookings.index') }}">
+                                        Puja Bookings
+                                    </a>
+                                </li>
                             </ul>
                         </li>
                         <li class="dropdown {{ request()->routeIs('festivals.*') ? 'active' : '' }}">
@@ -404,6 +409,19 @@
                                 <li class="{{ request()->routeIs('festival-pujas') ? 'active' : '' }}">
                                     <a class="nav-link" href="{{ route('festival-pujas.index') }}">
                                         Festival Pujas
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="dropdown {{ request()->routeIs('booking-devotees.*') ? 'active' : '' }}">
+                            <a href="#" class="menu-toggle nav-link has-dropdown">
+                                <i data-feather="calendar"></i>
+                                <span>Booking Devotee</span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li class="{{ request()->routeIs('booking-devotees') ? 'active' : '' }}">
+                                    <a class="nav-link" href="{{ route('booking-devotees.index') }}">
+                                        Booking Devotee
                                     </a>
                                 </li>
                             </ul>
