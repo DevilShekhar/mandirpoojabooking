@@ -32,4 +32,8 @@ class Pandit extends Model
     {
         return $this->hasMany(PujaAssignment::class);
     }
+    public function bookingSankalps()
+    {
+        return $this->hasMany(BookingSankalp::class, 'pandit_id');
+    }
 }

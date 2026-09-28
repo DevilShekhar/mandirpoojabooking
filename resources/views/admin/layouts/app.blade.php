@@ -395,6 +395,24 @@
                                 </li>
                             </ul>
                         </li>
+                        <li class="dropdown {{ request()->routeIs('pandit-pujas.*') ? 'active' : '' }}">
+                            <a href="#" class="menu-toggle nav-link has-dropdown">
+                                <i data-feather="heart"></i>
+                                <span>Pandit</span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li class="{{ request()->routeIs('pandit-pujas') ? 'active' : '' }}">
+                                    <a class="nav-link" href="{{ route('pandit-pujas.index') }}">
+                                        Pandit Pujas
+                                    </a>
+                                </li>
+                                <li class="{{ request()->routeIs('puja-assignments') ? 'active' : '' }}">
+                                    <a class="nav-link" href="{{ route('puja-assignments.index') }}">
+                                        Pandit Puja Assignments
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
                         <li class="dropdown {{ request()->routeIs('festivals.*') ? 'active' : '' }}">
                             <a href="#" class="menu-toggle nav-link has-dropdown">
                                 <i data-feather="calendar"></i>
@@ -421,7 +439,12 @@
                             <ul class="dropdown-menu">
                                 <li class="{{ request()->routeIs('booking-devotees') ? 'active' : '' }}">
                                     <a class="nav-link" href="{{ route('booking-devotees.index') }}">
-                                        Booking Devotee
+                                        Booking Devotees
+                                    </a>
+                                </li>
+                                <li class="{{ request()->routeIs('booking-sankalps') ? 'active' : '' }}">
+                                    <a class="nav-link" href="{{ route('booking-sankalps.index') }}">
+                                        Booking Sankalps
                                     </a>
                                 </li>
                             </ul>

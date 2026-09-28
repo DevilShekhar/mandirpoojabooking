@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\BookingDevoteeController;
+use App\Http\Controllers\Admin\BookingSankalpController;
 use App\Http\Controllers\Admin\CityController;
 use App\Http\Controllers\Admin\CountryController;
 use App\Http\Controllers\Admin\DeityController;
@@ -82,6 +83,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('puja-assignments', PujaAssignmentController::class);
     Route::resource('puja-bookings', PujaBookingController::class);
     Route::resource('booking-devotees', BookingDevoteeController::class);
+    Route::resource('booking-sankalps', BookingSankalpController::class);
 });
 
 require __DIR__.'/auth.php';
