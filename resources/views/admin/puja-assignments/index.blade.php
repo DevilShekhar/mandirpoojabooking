@@ -50,12 +50,12 @@
 
                                 <tbody>
 
-                                    @forelse($pujaAssignments as $assignment)
+                                    @forelse($assignments as $assignment)
 
                                         <tr>
 
                                             <td class="text-center">
-                                                {{ $pujaAssignments->firstItem() + $loop->index }}
+                                                {{ $assignments->firstItem() }}
                                             </td>
 
                                             <td>
@@ -167,10 +167,6 @@
 
                         </div>
 
-                        <div class="mt-3">
-                            {{ $pujaAssignments->links() }}
-                        </div>
-
                     </div>
 
                 </div>
@@ -180,9 +176,7 @@
 
     </div>
 </section>
-
 @endsection
-
 @push('scripts')
 
 <script>

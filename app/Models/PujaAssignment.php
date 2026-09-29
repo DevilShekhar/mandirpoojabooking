@@ -25,7 +25,7 @@ class PujaAssignment extends Model
 
     public function booking()
     {
-        return $this->belongsTo(Booking::class);
+        return $this->belongsTo(PujaBooking::class);
     }
 
     public function pandit()

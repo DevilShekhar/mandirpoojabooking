@@ -66,7 +66,7 @@
                                             <option value="{{ $booking->id }}"
                                                 {{ old('booking_id') == $booking->id ? 'selected' : '' }}>
 
-                                                Booking #{{ $booking->id }}
+                                                {{ $booking->booking_number }} - {{ $booking->customer_name }}
 
                                             </option>
 

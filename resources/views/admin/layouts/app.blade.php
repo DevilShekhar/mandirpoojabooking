@@ -275,6 +275,19 @@
                                 </li>
                             </ul>
                         </li>
+                        <li class="dropdown {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                            <a href="#" class="menu-toggle nav-link has-dropdown">
+                                <i data-feather="users"></i>
+                                <span>Pandit</span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li class="{{ request()->routeIs('pandits.index') ? 'active' : '' }}">
+                                    <a class="nav-link" href="{{ route('pandits.index') }}">
+                                        Pandit Listing
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
                         <li class="dropdown {{ request()->routeIs('admin.roles.*') ? 'active' : '' }}">
                             <a href="#" class="menu-toggle nav-link has-dropdown">
                                 <i data-feather="shield"></i>
