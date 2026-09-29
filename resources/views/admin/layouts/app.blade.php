@@ -226,13 +226,13 @@
                             <div class="dropdown-title">
                                 Hello {{ auth()->user()->name }}
                             </div>
-                            
+
                             <a href="{{ route('admin.profile.index') }}" class="dropdown-item has-icon">
                                 <i class="fas fa-user"></i> My Profile
-                            </a>  
+                            </a>
                             <a href="{{ route('password.index') }}" class="dropdown-item has-icon">
                                 <i class="fas fa-key"></i> Change Password
-                            </a>                         
+                            </a>
                             <div class="dropdown-divider"></div>
                             <a href="{{ route('logout') }}" class="dropdown-item has-icon text-danger"
                                 onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
@@ -247,11 +247,15 @@
             </nav>
             <div class="main-sidebar sidebar-style-2">
                 <aside id="sidebar-wrapper">
+
                     <div class="sidebar-brand">
-                        <a href="{{ route('dashboard') }}"> <img alt="image" src="{{ asset('assets/img/logo.png') }}" />
+                        <a href="{{ route('dashboard') }}">
+                            <img alt="image" src="{{ asset('assets/img/logo.png') }}" />
                         </a>
                     </div>
+
                     <ul class="sidebar-menu">
+
                         <li class="menu-header">Main</li>
 
                         <li class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
@@ -260,211 +264,360 @@
                                 <span>Dashboard</span>
                             </a>
                         </li>
-                        <li class="dropdown {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
-                            <a href="#" class="menu-toggle nav-link has-dropdown">
-                                <i data-feather="users"></i>
-                                <span>Users</span>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li class="{{ request()->routeIs('admin.users.index') ? 'active' : '' }}">
-                                    <a class="nav-link" href="{{ route('admin.users.index') }}">
-                                        User Listing
-                                    </a>
-                                </li>
-                                <li class="{{ request()->routeIs('admin.users.create') ? 'active' : '' }}">
-                                    <a class="nav-link" href="{{ route('admin.users.create') }}">
-                                        Add User
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="dropdown {{ request()->routeIs('pandits.*') ? 'active' : '' }}">
-                            <a href="#" class="menu-toggle nav-link has-dropdown">
-                                <i data-feather="users"></i>
-                                <span>Pandit</span>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li class="{{ request()->routeIs('pandits.index') ? 'active' : '' }}">
-                                    <a class="nav-link" href="{{ route('pandits.index') }}">
-                                        Pandit Listing
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="dropdown {{ request()->routeIs('admin.roles.*') ? 'active' : '' }}">
-                            <a href="#" class="menu-toggle nav-link has-dropdown">
-                                <i data-feather="shield"></i>
-                                <span>Roles</span>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li class="{{ request()->routeIs('admin.roles.index') ? 'active' : '' }}">
-                                    <a class="nav-link" href="{{ route('roles.index') }}">
-                                        Role Listing
-                                    </a>
-                                </li>
-                                <li class="{{ request()->routeIs('admin.roles.create') ? 'active' : '' }}">
-                                    <a class="nav-link" href="{{ route('roles.create') }}">
-                                        Add Role
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="dropdown {{ request()->routeIs('countries.*') ? 'active' : '' }}">
-                            <a href="#" class="menu-toggle nav-link has-dropdown">
-                                <i data-feather="map-pin"></i>
-                                <span>Location</span>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li class="{{ request()->routeIs('countries') ? 'active' : '' }}">
-                                    <a class="nav-link" href="{{ route('countries.index') }}">
-                                        Countries
-                                    </a>
-                                </li>
-                                <li class="{{ request()->routeIs('staes') ? 'active' : '' }}">
-                                    <a class="nav-link" href="{{ route('states.index') }}">
-                                        States
-                                    </a>
-                                </li>
-                                <li class="{{ request()->routeIs('districts') ? 'active' : '' }}">
-                                    <a class="nav-link" href="{{ route('districts.index') }}">
-                                        Districts
-                                    </a>
-                                </li>
-                                <li class="{{ request()->routeIs('cities') ? 'active' : '' }}">
-                                    <a class="nav-link" href="{{ route('cities.index') }}">
-                                        Cities
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="dropdown {{ request()->routeIs('temples.*') ? 'active' : '' }}">
-                            <a href="#" class="menu-toggle nav-link has-dropdown">
-                                <i data-feather="home"></i>
-                                <span>Temples</span>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li class="{{ request()->routeIs('temples') ? 'active' : '' }}">
-                                    <a class="nav-link" href="{{ route('temples.index') }}">
-                                        Temples
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="dropdown {{ request()->routeIs('deities.*') ? 'active' : '' }}">
-                            <a href="#" class="menu-toggle nav-link has-dropdown">
-                                <i data-feather="sun"></i>
-                                <span>Deity</span>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li class="{{ request()->routeIs('deities') ? 'active' : '' }}">
-                                    <a class="nav-link" href="{{ route('deities.index') }}">
-                                        Deity
-                                    </a>
-                                </li>
-                                <li class="{{ request()->routeIs('temple-deities') ? 'active' : '' }}">
-                                    <a class="nav-link" href="{{ route('temple-deities.index') }}">
-                                        Temple Deities
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="dropdown {{ request()->routeIs('puja-categories.*') ? 'active' : '' }}">
-                            <a href="#" class="menu-toggle nav-link has-dropdown">
-                                <i data-feather="heart"></i>
-                                <span>Puja</span>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li class="{{ request()->routeIs('puja-categories') ? 'active' : '' }}">
-                                    <a class="nav-link" href="{{ route('puja-categories.index') }}">
-                                        Puja Categories
-                                    </a>
-                                </li>
-                                <li class="{{ request()->routeIs('pujas') ? 'active' : '' }}">
-                                    <a class="nav-link" href="{{ route('pujas.index') }}">
-                                        Pujas
-                                    </a>
-                                </li>
-                                <li class="{{ request()->routeIs('puja-packages') ? 'active' : '' }}">
-                                    <a class="nav-link" href="{{ route('puja-packages.index') }}">
-                                        Puja Packages
-                                    </a>
-                                </li>
-                                <li class="{{ request()->routeIs('package-features') ? 'active' : '' }}">
-                                    <a class="nav-link" href="{{ route('package-features.index') }}">
-                                        Package Features
-                                    </a>
-                                </li>
-                                <li class="{{ request()->routeIs('package-addons') ? 'active' : '' }}">
-                                    <a class="nav-link" href="{{ route('package-addons.index') }}">
-                                        Package Addons
-                                    </a>
-                                </li>
-                                <li class="{{ request()->routeIs('puja-schedules') ? 'active' : '' }}">
-                                    <a class="nav-link" href="{{ route('puja-schedules.index') }}">
-                                        Puja Schedules
-                                    </a>
-                                </li>
-                                <li class="{{ request()->routeIs('puja-bookings') ? 'active' : '' }}">
-                                    <a class="nav-link" href="{{ route('puja-bookings.index') }}">
-                                        Puja Bookings
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="dropdown {{ request()->routeIs('pandit-pujas.*') ? 'active' : '' }}">
-                            <a href="#" class="menu-toggle nav-link has-dropdown">
-                                <i data-feather="heart"></i>
-                                <span>Pandit</span>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li class="{{ request()->routeIs('pandit-pujas') ? 'active' : '' }}">
-                                    <a class="nav-link" href="{{ route('pandit-pujas.index') }}">
-                                        Pandit Pujas
-                                    </a>
-                                </li>
-                                <li class="{{ request()->routeIs('puja-assignments') ? 'active' : '' }}">
-                                    <a class="nav-link" href="{{ route('puja-assignments.index') }}">
-                                        Pandit Puja Assignments
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="dropdown {{ request()->routeIs('festivals.*') ? 'active' : '' }}">
-                            <a href="#" class="menu-toggle nav-link has-dropdown">
-                                <i data-feather="calendar"></i>
-                                <span>Festivals</span>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li class="{{ request()->routeIs('festivals') ? 'active' : '' }}">
-                                    <a class="nav-link" href="{{ route('festivals.index') }}">
-                                        Festivals
-                                    </a>
-                                </li>
-                                <li class="{{ request()->routeIs('festival-pujas') ? 'active' : '' }}">
-                                    <a class="nav-link" href="{{ route('festival-pujas.index') }}">
-                                        Festival Pujas
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="dropdown {{ request()->routeIs('booking-devotees.*') ? 'active' : '' }}">
-                            <a href="#" class="menu-toggle nav-link has-dropdown">
-                                <i data-feather="calendar"></i>
-                                <span>Booking Devotee</span>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li class="{{ request()->routeIs('booking-devotees') ? 'active' : '' }}">
-                                    <a class="nav-link" href="{{ route('booking-devotees.index') }}">
-                                        Booking Devotees
-                                    </a>
-                                </li>
-                                <li class="{{ request()->routeIs('booking-sankalps') ? 'active' : '' }}">
-                                    <a class="nav-link" href="{{ route('booking-sankalps.index') }}">
-                                        Booking Sankalps
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
+
+                        {{-- Users --}}
+                        @can('users.view')
+                            <li class="dropdown {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                                <a href="#" class="menu-toggle nav-link has-dropdown">
+                                    <i data-feather="users"></i>
+                                    <span>Users</span>
+                                </a>
+
+                                <ul class="dropdown-menu">
+
+                                    @can('users.view')
+                                        <li class="{{ request()->routeIs('admin.users.index') ? 'active' : '' }}">
+                                            <a class="nav-link" href="{{ route('admin.users.index') }}">
+                                                User Listing
+                                            </a>
+                                        </li>
+                                    @endcan
+
+                                    @can('users.create')
+                                        <li class="{{ request()->routeIs('admin.users.create') ? 'active' : '' }}">
+                                            <a class="nav-link" href="{{ route('admin.users.create') }}">
+                                                Add User
+                                            </a>
+                                        </li>
+                                    @endcan
+
+                                </ul>
+                            </li>
+                        @endcan
+
+
+                        {{-- Pandits --}}
+                        @can('pandits.view')
+                            <li class="dropdown {{ request()->routeIs('pandits.*') ? 'active' : '' }}">
+                                <a href="#" class="menu-toggle nav-link has-dropdown">
+                                    <i data-feather="users"></i>
+                                    <span>Pandit</span>
+                                </a>
+
+                                <ul class="dropdown-menu">
+
+                                    @can('pandits.view')
+                                        <li class="{{ request()->routeIs('pandits.index') ? 'active' : '' }}">
+                                            <a class="nav-link" href="{{ route('pandits.index') }}">
+                                                Pandit Listing
+                                            </a>
+                                        </li>
+                                    @endcan
+
+                                </ul>
+                            </li>
+                        @endcan
+
+
+                        {{-- Roles --}}
+                        @can('roles.view')
+                            <li class="dropdown {{ request()->routeIs('roles.*') ? 'active' : '' }}">
+                                <a href="#" class="menu-toggle nav-link has-dropdown">
+                                    <i data-feather="shield"></i>
+                                    <span>Roles</span>
+                                </a>
+
+                                <ul class="dropdown-menu">
+
+                                    @can('roles.view')
+                                        <li class="{{ request()->routeIs('roles.index') ? 'active' : '' }}">
+                                            <a class="nav-link" href="{{ route('roles.index') }}">
+                                                Role Listing
+                                            </a>
+                                        </li>
+                                    @endcan
+
+                                    @can('roles.create')
+                                        <li class="{{ request()->routeIs('roles.create') ? 'active' : '' }}">
+                                            <a class="nav-link" href="{{ route('roles.create') }}">
+                                                Add Role
+                                            </a>
+                                        </li>
+                                    @endcan
+
+                                </ul>
+                            </li>
+                        @endcan
+
+
+                        {{-- Location --}}
+                        @canany(['countries.view','states.view','districts.view','cities.view'])
+                            <li class="dropdown {{ request()->routeIs('countries.*', 'states.*', 'districts.*', 'cities.*') ? 'active' : '' }}">
+
+                                <a href="#" class="menu-toggle nav-link has-dropdown">
+                                    <i data-feather="map-pin"></i>
+                                    <span>Location</span>
+                                </a>
+
+                                <ul class="dropdown-menu">
+
+                                    @can('countries.view')
+                                        <li class="{{ request()->routeIs('countries.*') ? 'active' : '' }}">
+                                            <a class="nav-link" href="{{ route('countries.index') }}">
+                                                Countries
+                                            </a>
+                                        </li>
+                                    @endcan
+
+                                    @can('states.view')
+                                        <li class="{{ request()->routeIs('states.*') ? 'active' : '' }}">
+                                            <a class="nav-link" href="{{ route('states.index') }}">
+                                                States
+                                            </a>
+                                        </li>
+                                    @endcan
+
+                                    @can('districts.view')
+                                        <li class="{{ request()->routeIs('districts.*') ? 'active' : '' }}">
+                                            <a class="nav-link" href="{{ route('districts.index') }}">
+                                                Districts
+                                            </a>
+                                        </li>
+                                    @endcan
+
+                                    @can('cities.view')
+                                        <li class="{{ request()->routeIs('cities.*') ? 'active' : '' }}">
+                                            <a class="nav-link" href="{{ route('cities.index') }}">
+                                                Cities
+                                            </a>
+                                        </li>
+                                    @endcan
+
+                                </ul>
+                            </li>
+                        @endcanany
+                        {{-- Temples --}}
+                        @can('temples.view')
+                            <li class="dropdown {{ request()->routeIs('temples.*') ? 'active' : '' }}">
+
+                                <a href="#" class="menu-toggle nav-link has-dropdown">
+                                    <i data-feather="home"></i>
+                                    <span>Temples</span>
+                                </a>
+
+                                <ul class="dropdown-menu">
+
+                                    @can('temples.view')
+                                        <li class="{{ request()->routeIs('temples.*') ? 'active' : '' }}">
+                                            <a class="nav-link" href="{{ route('temples.index') }}">
+                                                Temples
+                                            </a>
+                                        </li>
+                                    @endcan
+
+                                </ul>
+                            </li>
+                        @endcan
+
+
+                        {{-- Deities --}}
+                        @canany(['deities.view','temple-deities.view'])
+                            <li class="dropdown {{ request()->routeIs('deities.*', 'temple-deities.*') ? 'active' : '' }}">
+
+                                <a href="#" class="menu-toggle nav-link has-dropdown">
+                                    <i data-feather="sun"></i>
+                                    <span>Deity</span>
+                                </a>
+
+                                <ul class="dropdown-menu">
+
+                                    @can('deities.view')
+                                        <li class="{{ request()->routeIs('deities.*') ? 'active' : '' }}">
+                                            <a class="nav-link" href="{{ route('deities.index') }}">
+                                                Deity
+                                            </a>
+                                        </li>
+                                    @endcan
+
+                                    @can('temple-deities.view')
+                                        <li class="{{ request()->routeIs('temple-deities.*') ? 'active' : '' }}">
+                                            <a class="nav-link" href="{{ route('temple-deities.index') }}">
+                                                Temple Deities
+                                            </a>
+                                        </li>
+                                    @endcan
+
+                                </ul>
+                            </li>
+                        @endcanany
+
+
+                        {{-- Puja --}}
+                        @canany(['puja-categories.view','pujas.view','puja-packages.view','package-features.view','package-addons.view','puja-schedules.view','puja-bookings.view'])
+                            <li class="dropdown {{ request()->routeIs('puja-categories.*', 'pujas.*', 'puja-packages.*', 'package-features.*', 'package-addons.*', 'puja-schedules.*', 'puja-bookings.*') ? 'active' : '' }}">
+
+                                <a href="#" class="menu-toggle nav-link has-dropdown">
+                                    <i data-feather="heart"></i>
+                                    <span>Puja</span>
+                                </a>
+
+                                <ul class="dropdown-menu">
+
+                                    @can('puja-categories.view')
+                                        <li class="{{ request()->routeIs('puja-categories.*') ? 'active' : '' }}">
+                                            <a class="nav-link" href="{{ route('puja-categories.index') }}">
+                                                Puja Categories
+                                            </a>
+                                        </li>
+                                    @endcan
+
+                                    @can('pujas.view')
+                                        <li class="{{ request()->routeIs('pujas.*') ? 'active' : '' }}">
+                                            <a class="nav-link" href="{{ route('pujas.index') }}">
+                                                Pujas
+                                            </a>
+                                        </li>
+                                    @endcan
+
+                                    @can('puja-packages.view')
+                                        <li class="{{ request()->routeIs('puja-packages.*') ? 'active' : '' }}">
+                                            <a class="nav-link" href="{{ route('puja-packages.index') }}">
+                                                Puja Packages
+                                            </a>
+                                        </li>
+                                    @endcan
+
+                                    @can('package-features.view')
+                                        <li class="{{ request()->routeIs('package-features.*') ? 'active' : '' }}">
+                                            <a class="nav-link" href="{{ route('package-features.index') }}">
+                                                Package Features
+                                            </a>
+                                        </li>
+                                    @endcan
+
+                                    @can('package-addons.view')
+                                        <li class="{{ request()->routeIs('package-addons.*') ? 'active' : '' }}">
+                                            <a class="nav-link" href="{{ route('package-addons.index') }}">
+                                                Package Addons
+                                            </a>
+                                        </li>
+                                    @endcan
+
+                                    @can('puja-schedules.view')
+                                        <li class="{{ request()->routeIs('puja-schedules.*') ? 'active' : '' }}">
+                                            <a class="nav-link" href="{{ route('puja-schedules.index') }}">
+                                                Puja Schedules
+                                            </a>
+                                        </li>
+                                    @endcan
+
+                                    @can('puja-bookings.view')
+                                        <li class="{{ request()->routeIs('puja-bookings.*') ? 'active' : '' }}">
+                                            <a class="nav-link" href="{{ route('puja-bookings.index') }}">
+                                                Puja Bookings
+                                            </a>
+                                        </li>
+                                    @endcan
+
+                                </ul>
+                            </li>
+                        @endcanany
+
+
+                        {{-- Pandit Puja --}}
+                        @canany(['pandit-pujas.view','puja-assignments.view'])
+                            <li class="dropdown {{ request()->routeIs('pandit-pujas.*', 'puja-assignments.*') ? 'active' : '' }}">
+
+                                <a href="#" class="menu-toggle nav-link has-dropdown">
+                                    <i data-feather="heart"></i>
+                                    <span>Pandit</span>
+                                </a>
+
+                                <ul class="dropdown-menu">
+
+                                    @can('pandit-pujas.view')
+                                        <li class="{{ request()->routeIs('pandit-pujas.*') ? 'active' : '' }}">
+                                            <a class="nav-link" href="{{ route('pandit-pujas.index') }}">
+                                                Pandit Pujas
+                                            </a>
+                                        </li>
+                                    @endcan
+
+                                    @can('puja-assignments.view')
+                                        <li class="{{ request()->routeIs('puja-assignments.*') ? 'active' : '' }}">
+                                            <a class="nav-link" href="{{ route('puja-assignments.index') }}">
+                                                Pandit Puja Assignments
+                                            </a>
+                                        </li>
+                                    @endcan
+
+                                </ul>
+                            </li>
+                        @endcanany
+
+
+                        {{-- Festivals --}}
+                        @canany(['festivals.view','festival-pujas.view'])
+                            <li class="dropdown {{ request()->routeIs('festivals.*', 'festival-pujas.*') ? 'active' : '' }}">
+
+                                <a href="#" class="menu-toggle nav-link has-dropdown">
+                                    <i data-feather="calendar"></i>
+                                    <span>Festivals</span>
+                                </a>
+
+                                <ul class="dropdown-menu">
+
+                                    @can('festivals.view')
+                                        <li class="{{ request()->routeIs('festivals.*') ? 'active' : '' }}">
+                                            <a class="nav-link" href="{{ route('festivals.index') }}">
+                                                Festivals
+                                            </a>
+                                        </li>
+                                    @endcan
+
+                                    @can('festival-pujas.view')
+                                        <li class="{{ request()->routeIs('festival-pujas.*') ? 'active' : '' }}">
+                                            <a class="nav-link" href="{{ route('festival-pujas.index') }}">
+                                                Festival Pujas
+                                            </a>
+                                        </li>
+                                    @endcan
+
+                                </ul>
+                            </li>
+                        @endcanany
+
+
+                        {{-- Booking Devotees --}}
+                        @canany(['booking-devotees.view','booking-sankalps.view'])
+                            <li class="dropdown {{ request()->routeIs('booking-devotees.*', 'booking-sankalps.*') ? 'active' : '' }}">
+
+                                <a href="#" class="menu-toggle nav-link has-dropdown">
+                                    <i data-feather="calendar"></i>
+                                    <span>Booking Devotee</span>
+                                </a>
+
+                                <ul class="dropdown-menu">
+
+                                    @can('booking-devotees.view')
+                                        <li class="{{ request()->routeIs('booking-devotees.*') ? 'active' : '' }}">
+                                            <a class="nav-link" href="{{ route('booking-devotees.index') }}">
+                                                Booking Devotees
+                                            </a>
+                                        </li>
+                                    @endcan
+
+                                    @can('booking-sankalps.view')
+                                        <li class="{{ request()->routeIs('booking-sankalps.*') ? 'active' : '' }}">
+                                            <a class="nav-link" href="{{ route('booking-sankalps.index') }}">
+                                                Booking Sankalps
+                                            </a>
+                                        </li>
+                                    @endcan
+
+                                </ul>
+                            </li>
+                        @endcanany
 
                     </ul>
                 </aside>
