@@ -300,6 +300,6 @@
 @endsection
 @else
     @php
-        abort(404);
+        abort(403);
     @endphp
 @endcan
