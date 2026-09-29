@@ -271,6 +271,6 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 @else
     @php
-        abort(404);
+        abort(403);
     @endphp
 @endcan
