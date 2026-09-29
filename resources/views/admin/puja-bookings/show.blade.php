@@ -1,3 +1,4 @@
+@can('puja-bookings.show')
 @extends('admin.layouts.app')
 
 @section('content')
@@ -240,3 +241,8 @@
 </div>
 
 @endsection
+@else
+    @php
+        abort(404);
+    @endphp
+@endcan

@@ -1,3 +1,4 @@
+@can('pandits.edit')
 @extends('admin.layouts.app')
 
 @section('title', 'Edit Pandit')
@@ -307,3 +308,8 @@
 </section>
 
 @endsection
+@else
+    @php
+        abort(404);
+    @endphp
+@endcan

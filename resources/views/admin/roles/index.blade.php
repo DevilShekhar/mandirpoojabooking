@@ -1,3 +1,4 @@
+@can('roles.view')
 @extends('admin.layouts.app')
 
 @section('title', 'Role Management')
@@ -176,4 +177,8 @@
     @endif
 </script>
 @endpush
-
+@else
+    @php
+        abort(404);
+    @endphp
+@endcan

@@ -1,3 +1,4 @@
+@can('puja-categories.create')
 @extends('admin.layouts.app')
 
 @section('title', 'Add Puja Category')
@@ -131,3 +132,8 @@
 </section>
 
 @endsection
+@else
+    @php
+        abort(404);
+    @endphp
+@endcan

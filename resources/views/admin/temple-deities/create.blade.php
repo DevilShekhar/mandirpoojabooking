@@ -1,3 +1,4 @@
+@can('temple-deities.create')
 @extends('admin.layouts.app')
 
 @section('title', 'Add Temple Deity')
@@ -115,3 +116,8 @@
     </div>
 </section>
 @endsection
+@else
+    @php
+        abort(404);
+    @endphp
+@endcan

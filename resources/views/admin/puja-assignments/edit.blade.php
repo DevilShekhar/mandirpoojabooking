@@ -1,3 +1,4 @@
+@can('puja-assignments.edit')
 @extends('admin.layouts.app')
 
 @section('title', 'Edit Puja Assignment')
@@ -237,3 +238,8 @@
 </section>
 
 @endsection
+@else
+    @php
+        abort(404);
+    @endphp
+@endcan

@@ -20,7 +20,7 @@ class UserController extends Controller
 
     public function create()
     {
-        $roles = Role::query() 
+        $roles = Role::query()
             ->where('name', '!=', 'Super Admin')
             ->orderBy('name')
             ->get();

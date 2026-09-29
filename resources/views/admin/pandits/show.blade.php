@@ -1,3 +1,4 @@
+@can('pandits.view')
 @extends('admin.layouts.app')
 
 @section('title', 'Pandit Details')
@@ -163,3 +164,8 @@
 </section>
 
 @endsection
+@else
+    @php
+        abort(404);
+    @endphp
+@endcan

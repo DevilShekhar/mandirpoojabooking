@@ -1,3 +1,4 @@
+@can('puja-schedules.create')
 @extends('admin.layouts.app')
 
 @section('title', 'Create Puja Schedule')
@@ -246,3 +247,8 @@
     $('#capacity, #booked_capacity').on('input', calculateRemaining);
 </script>
 @endpush
+@else
+    @php
+        abort(404);
+    @endphp
+@endcan

@@ -1,3 +1,4 @@
+@can('users.edit')
 @extends('admin.layouts.app')
 
 @section('content')
@@ -306,3 +307,8 @@
 </section>
 
 @endsection
+@else
+    @php
+        abort(404);
+    @endphp
+@endcan

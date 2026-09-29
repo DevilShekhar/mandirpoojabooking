@@ -1,3 +1,4 @@
+@can('festival-pujas.createa')
 @extends('admin.layouts.app')
 
 @section('title', 'Create Festival Puja')
@@ -183,3 +184,8 @@
 </section>
 
 @endsection
+@else
+    @php
+        abort(404);
+    @endphp
+@endcan

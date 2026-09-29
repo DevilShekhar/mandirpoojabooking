@@ -1,3 +1,5 @@
+
+@can('roles.edit')
 @extends('admin.layouts.app')
 
 @section('title', 'Edit Role')

@@ -1,3 +1,4 @@
+@can('package-addons.index')
 @extends('admin.layouts.app')
 
 @section('title', 'Package Addons')
@@ -220,3 +221,8 @@
 </script>
 
 @endpush
+@else
+    @php
+        abort(404);
+    @endphp
+@endcan

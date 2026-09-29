@@ -1,3 +1,4 @@
+@can('festivals.edit')
 @extends('admin.layouts.app')
 
 @section('title', 'Edit Festival')
@@ -212,3 +213,8 @@
 </section>
 
 @endsection
+@else
+    @php
+        abort(404);
+    @endphp
+@endcan

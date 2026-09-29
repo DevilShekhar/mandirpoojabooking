@@ -1,3 +1,4 @@
+@can('package-features')
 @extends('admin.layouts.app')
 
 @section('title', 'Package Features')
@@ -213,3 +214,8 @@
 </script>
 
 @endpush
+@else
+    @php
+        abort(404);
+    @endphp
+@endcan

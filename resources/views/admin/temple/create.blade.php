@@ -1,3 +1,4 @@
+@can('temples.create')
 @extends('admin.layouts.app')
 
 @section('title', 'Create Temple')
@@ -380,3 +381,8 @@
 </script>
 
 @endpush
+@else
+    @php
+        abort(404);
+    @endphp
+@endcan

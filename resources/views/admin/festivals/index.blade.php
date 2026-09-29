@@ -1,3 +1,4 @@
+@can('festivals.index')
 @extends('admin.layouts.app')
 
 @section('title', 'Festival Management')
@@ -245,3 +246,8 @@
 </script>
 
 @endpush
+@else
+    @php
+        abort(404);
+    @endphp
+@endcan

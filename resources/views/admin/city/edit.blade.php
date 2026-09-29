@@ -1,3 +1,4 @@
+@can('cities.edit')
 @extends('admin.layouts.app')
 
 @section('title', 'Edit City')
@@ -361,3 +362,8 @@
 
 @endif
 @endpush
+@else
+    @php
+        abort(404);
+    @endphp
+@endcan
