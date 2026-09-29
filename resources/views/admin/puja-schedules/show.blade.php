@@ -1,3 +1,4 @@
+@can('puja-schedules.show')
 @extends('admin.layouts.app')
 
 @section('title', 'Puja Schedule Details')
@@ -136,3 +137,8 @@
     </div>
 </section>
 @endsection
+@else
+    @php
+        abort(404);
+    @endphp
+@endcan

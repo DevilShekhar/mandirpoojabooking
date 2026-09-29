@@ -1,3 +1,4 @@
+@can('states.view')
 @extends('admin.layouts.app')
 
 @section('title', 'Create State')
@@ -144,3 +145,8 @@
 </section>
 
 @endsection
+@else
+    @php
+        abort(404);
+    @endphp
+@endcan

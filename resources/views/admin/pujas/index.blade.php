@@ -1,3 +1,4 @@
+@can('pujas.index')
 @extends('admin.layouts.app')
 
 @section('title', 'Pujas')
@@ -154,3 +155,8 @@ $(document).ready(function () {
 });
 </script>
 @endpush
+@else
+    @php
+        abort(404);
+    @endphp
+@endcan

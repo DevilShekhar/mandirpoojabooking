@@ -1,3 +1,4 @@
+@can('roles.create')
 @extends('admin.layouts.app')
 @section('title', 'Create Role')
 
@@ -92,4 +93,8 @@
 </section>
 
 @endsection
-
+@else
+    @php
+        abort(404);
+    @endphp
+@endcan

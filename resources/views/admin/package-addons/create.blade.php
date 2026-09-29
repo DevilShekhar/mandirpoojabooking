@@ -1,3 +1,4 @@
+@can('package-addons.create')
 @extends('admin.layouts.app')
 
 @section('title', 'Create Package Addon')
@@ -176,3 +177,8 @@
 </section>
 
 @endsection
+@else
+    @php
+        abort(404);
+    @endphp
+@endcan

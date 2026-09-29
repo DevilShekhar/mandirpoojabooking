@@ -1,3 +1,4 @@
+@can('puja-bookings.index')
 @extends('admin.layouts.app')
 
 @section('title', 'Puja Bookings')
@@ -225,3 +226,8 @@
     @endif
 </script>
 @endpush
+@else
+    @php
+        abort(404);
+    @endphp
+@endcan

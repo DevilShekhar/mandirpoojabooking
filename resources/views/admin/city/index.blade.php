@@ -1,3 +1,4 @@
+@can('cities.index')
 @extends('admin.layouts.app')
 
 @section('title', 'City Management')
@@ -163,3 +164,8 @@
     </script>
 
 @endpush
+@else
+    @php
+        abort(404);
+    @endphp
+@endcan

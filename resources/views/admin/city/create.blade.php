@@ -1,3 +1,4 @@
+@can('cities.create')
 @extends('admin.layouts.app')
 
 @section('title', 'Create City')
@@ -365,3 +366,8 @@
     });
 </script>
 @endpush
+@else
+    @php
+        abort(404);
+    @endphp
+@endcan

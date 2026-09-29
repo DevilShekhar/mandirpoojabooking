@@ -1,3 +1,4 @@
+@can('package-features.create')
 @extends('admin.layouts.app')
 
 @section('title', 'Create Package Feature')
@@ -165,3 +166,8 @@
 </section>
 
 @endsection
+@else
+    @php
+        abort(404);
+    @endphp
+@endcan

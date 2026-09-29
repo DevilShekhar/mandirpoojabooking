@@ -1,3 +1,4 @@
+@can('users.index')
 @extends('admin.layouts.app')
 @section('content')
     <section class="section">
@@ -191,3 +192,8 @@
     @endif
 @endpush
 
+@else
+    @php
+        abort(404);
+    @endphp
+@endcan

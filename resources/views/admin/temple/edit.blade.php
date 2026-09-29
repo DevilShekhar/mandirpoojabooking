@@ -1,3 +1,4 @@
+@can('temples.edit')
 @extends('admin.layouts.app')
 
 @section('title', 'Edit Temple')
@@ -473,3 +474,8 @@
 
 @endif
 @endpush
+@else
+    @php
+        abort(404);
+    @endphp
+@endcan

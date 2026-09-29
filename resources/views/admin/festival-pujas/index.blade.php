@@ -1,3 +1,4 @@
+@can('festival-pujas.index')
 @extends('admin.layouts.app')
 
 @section('title', 'Festival Puja Management')
@@ -229,3 +230,8 @@
 </script>
 
 @endpush
+@else
+    @php
+        abort(404);
+    @endphp
+@endcan

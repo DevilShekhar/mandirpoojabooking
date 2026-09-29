@@ -1,3 +1,4 @@
+@can('puja-assignments.index')
 @extends('admin.layouts.app')
 
 @section('title', 'Puja Assignments')
@@ -203,3 +204,8 @@
 </script>
 
 @endpush
+@else
+    @php
+        abort(404);
+    @endphp
+@endcan

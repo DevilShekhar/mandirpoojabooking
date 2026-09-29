@@ -1,3 +1,5 @@
+@can('booking-devotees.create')
+
 @extends('admin.layouts.app')
 
 @section('title', 'Add Booking Devotee')
@@ -407,3 +409,8 @@
 </section>
 
 @endsection
+@else
+    @php
+        abort(404);
+    @endphp
+@endcan

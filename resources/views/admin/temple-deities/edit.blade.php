@@ -1,3 +1,4 @@
+@can('temple-deities.edit')
 @extends('admin.layouts.app')
 
 @section('title', 'Edit Temple Deity')
@@ -144,3 +145,8 @@
     </div>
 </section>
 @endsection
+@else
+    @php
+        abort(404);
+    @endphp
+@endcan

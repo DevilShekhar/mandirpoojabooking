@@ -1,3 +1,4 @@
+@can('package-features.edit')
 @extends('admin.layouts.app')
 
 @section('title', 'Edit Package Feature')
@@ -193,3 +194,8 @@
 </section>
 
 @endsection
+@else
+    @php
+        abort(404);
+    @endphp
+@endcan

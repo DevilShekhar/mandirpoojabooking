@@ -1,3 +1,4 @@
+@can('countries.index')
 @extends('admin.layouts.app')
 
 @section('title', 'Country Management')
@@ -184,3 +185,8 @@
     @endif
 </script>
 @endpush
+@else
+    @php
+        abort(404);
+    @endphp
+@endcan

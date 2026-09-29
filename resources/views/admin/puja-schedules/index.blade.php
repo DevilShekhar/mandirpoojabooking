@@ -1,3 +1,4 @@
+@can('puja-schedules.index')
 @extends('admin.layouts.app')
 
 @section('title', 'Puja Schedule Management')
@@ -189,3 +190,8 @@
     @endif
 </script>
 @endpush
+@else
+    @php
+        abort(404);
+    @endphp
+@endcan

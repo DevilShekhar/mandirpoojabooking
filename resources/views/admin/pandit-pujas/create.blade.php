@@ -1,3 +1,4 @@
+@can('pandit-pujas.view')
 @extends('admin.layouts.app')
 
 @section('title', 'Assign Puja')
@@ -151,3 +152,8 @@
 </section>
 
 @endsection
+@else
+    @php
+        abort(404);
+    @endphp
+@endcan

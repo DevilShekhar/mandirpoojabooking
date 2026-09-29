@@ -1,3 +1,4 @@
+@can('countries.edit')
 @extends('admin.layouts.app')
 
 @section('title', 'Edit Country')
@@ -99,3 +100,8 @@
     </div>
 </div>
 @endsection
+@else
+    @php
+        abort(404);
+    @endphp
+@endcan

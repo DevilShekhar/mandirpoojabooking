@@ -1,3 +1,4 @@
+@can('temples.index')
 @extends('admin.layouts.app')
 
 @section('title', 'Temple Management')
@@ -187,3 +188,8 @@
 </script>
 
 @endpush
+@else
+    @php
+        abort(404);
+    @endphp
+@endcan

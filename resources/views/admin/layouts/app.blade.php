@@ -278,7 +278,7 @@
                                 </li>
                             </ul>
                         </li>
-                        <li class="dropdown {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                        <li class="dropdown {{ request()->routeIs('pandits.*') ? 'active' : '' }}">
                             <a href="#" class="menu-toggle nav-link has-dropdown">
                                 <i data-feather="users"></i>
                                 <span>Pandit</span>

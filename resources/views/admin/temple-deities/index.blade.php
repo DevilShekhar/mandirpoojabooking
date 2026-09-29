@@ -1,3 +1,4 @@
+@can('temple-deities.view')
 @extends('admin.layouts.app')
 
 @section('title', 'Temple Deities')
@@ -123,3 +124,8 @@ $(document).ready(function () {
 });
 </script>
 @endpush
+@else
+    @php
+        abort(404);
+    @endphp
+@endcan

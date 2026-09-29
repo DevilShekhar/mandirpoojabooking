@@ -1,3 +1,4 @@
+@can('districts.edit')
 @extends('admin.layouts.app')
 
 @section('title', 'Edit District')
@@ -267,3 +268,8 @@
     });
 </script>
 @endpush
+@else
+    @php
+        abort(404);
+    @endphp
+@endcan

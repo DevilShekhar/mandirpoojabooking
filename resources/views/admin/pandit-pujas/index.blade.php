@@ -1,3 +1,4 @@
+@can('pandit-pujas.index')
 @extends('admin.layouts.app')
 
 @section('title', 'Pandit Puja Management')
@@ -162,3 +163,8 @@
 </script>
 
 @endpush
+@else
+    @php
+        abort(404);
+    @endphp
+@endcan

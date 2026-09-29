@@ -1,3 +1,4 @@
+@can('booking-sankalps.index')
 @extends('admin.layouts.app')
 
 @section('title', 'Booking Sankalps')
@@ -179,3 +180,8 @@
     @endif
 </script>
 @endpush
+@else
+    @php
+        abort(404);
+    @endphp
+@endcan

@@ -1,3 +1,4 @@
+@can('puja-packages')
 @extends('admin.layouts.app')
 
 @section('title', 'View Puja Package')
@@ -254,3 +255,8 @@
 </section>
 
 @endsection
+@else
+    @php
+        abort(404);
+    @endphp
+@endcan

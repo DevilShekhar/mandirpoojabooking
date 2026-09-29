@@ -1,3 +1,4 @@
+@can('booking-sankalps.create')
 @extends('admin.layouts.app')
 
 @section('title', 'Add Booking Sankalp')
@@ -193,3 +194,8 @@
     </div>
 </section>
 @endsection
+@else
+    @php
+        abort(404);
+    @endphp
+@endcan

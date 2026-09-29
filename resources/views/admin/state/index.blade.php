@@ -1,3 +1,4 @@
+@can('states.index')
 @extends('admin.layouts.app')
 
 @section('title', 'State Management')
@@ -210,3 +211,8 @@
     @endif
 </script>
 @endpush
+@else
+    @php
+        abort(404);
+    @endphp
+@endcan

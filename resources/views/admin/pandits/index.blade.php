@@ -1,3 +1,4 @@
+@can('pandits.index')
 @extends('admin.layouts.app')
 
 @section('title', 'Pandit Management')
@@ -213,3 +214,8 @@
 </script>
 
 @endpush
+@else
+    @php
+        abort(404);
+    @endphp
+@endcan

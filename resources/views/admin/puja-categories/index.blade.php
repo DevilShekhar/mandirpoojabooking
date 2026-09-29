@@ -1,3 +1,4 @@
+@can('puja-categories.index')
 @extends('admin.layouts.app')
 
 @section('title', 'Puja Categories')
@@ -122,3 +123,8 @@ $(document).ready(function () {
 });
 </script>
 @endpush
+@else
+    @php
+        abort(404);
+    @endphp
+@endcan
