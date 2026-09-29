@@ -24,6 +24,7 @@ use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\StateController;
 use App\Http\Controllers\Admin\TempleController;
 use App\Http\Controllers\Admin\TempleDeityController;
+use App\Http\Controllers\Admin\PasswordController;
 use App\Http\Controllers\Admin\UserController;
 use App\Models\PujaAssignment;
 
@@ -36,10 +37,13 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/profile', [ProfileController::class, 'index']) ->name('admin.profile.index');
+    Route::get('/profile/edit', [ProfileController::class, 'edit']) ->name('admin.profile.edit'); 
+    Route::put('/profile', [ProfileController::class, 'update']) ->name('admin.profile.update');
+    Route::get('/change-password', [PasswordController::class, 'index'])->name('password.index');
+    Route::post('/change-password/verify', [PasswordController::class, 'verifyOldPassword'])->name('password.verify');
+    Route::get('/change-password/new', [PasswordController::class, 'newPassword'])->name('password.new');
+    Route::post('/change-password/update', [PasswordController::class, 'update'])->name('password.update');
 
     //roles
     Route::resource('roles', RoleController::class);

@@ -216,8 +216,7 @@
                     <li class="dropdown">
                         <a href="#" data-toggle="dropdown" class="nav-link dropdown-toggle nav-link-lg nav-link-user">
                             @if(auth()->user()->profile)
-                                <img alt="image" src="{{ asset('storage/' . auth()->user()->profile) }}"
-                                    class="user-img-radious-style">
+                                <img alt="image" src="{{ asset('storage/' . auth()->user()->profile) }}"  class="user-img-radious-style">
                             @else
                                 <img alt="image" src="{{ asset('assets/img/user.png') }}" class="user-img-radious-style">
                             @endif
@@ -227,9 +226,13 @@
                             <div class="dropdown-title">
                                 Hello {{ auth()->user()->name }}
                             </div>
-                            {{-- <a href="{{ route('password.index') }}" class="dropdown-item has-icon">
+                            
+                            <a href="{{ route('admin.profile.index') }}" class="dropdown-item has-icon">
+                                <i class="fas fa-user"></i> My Profile
+                            </a>  
+                            <a href="{{ route('password.index') }}" class="dropdown-item has-icon">
                                 <i class="fas fa-key"></i> Change Password
-                            </a> --}}
+                            </a>                         
                             <div class="dropdown-divider"></div>
                             <a href="{{ route('logout') }}" class="dropdown-item has-icon text-danger"
                                 onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
