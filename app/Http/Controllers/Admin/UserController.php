@@ -20,42 +20,60 @@ class UserController extends Controller
 
     public function create()
     {
-        $roles = Role::query()
-            ->where('name', '!=', 'Super Admin')
-            ->orderBy('name')
-            ->get();
+        $isPandit = auth()->user()->hasRole('Pandit');
 
-        return view('admin.users.create', compact('roles'));
+        $roles = $isPandit
+            ? collect()
+            : Role::query()
+                ->where('name', '!=', 'Super Admin')
+                ->orderBy('name')
+                ->get();
+
+        return view('admin.users.create', compact('roles', 'isPandit'));
     }
 
     public function store(Request $request)
     {
+        $isPandit = auth()->user()->hasRole('Pandit');
+
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email',
             'phone' => 'nullable|string|max:20',
             'gender' => 'nullable|string|max:20',
-            'role_id' => 'required|exists:roles,id',
             'birth_date' => 'nullable|date',
             'profile' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'password' => 'required|string|min:8|confirmed',
+
+            'role_id' => $isPandit
+                ? 'nullable'
+                : 'required|exists:roles,id',
         ]);
+
+        if ($isPandit) {
+            $role = Role::where('name', 'Customer')->firstOrFail();
+        } else {
+            $role = Role::findOrFail($request->role_id);
+        }
+
         $profile = null;
+
         if ($request->hasFile('profile')) {
             $profile = $request->file('profile')->store('users', 'public');
         }
+
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
             'gender' => $request->gender,
             'birth_date' => $request->birth_date,
-            'role_id' => $request->role_id,
+            'role_id' => $role->id,
             'profile' => $profile,
             'status' => 1,
             'password' => bcrypt($request->password),
         ]);
-        $role = Role::findOrFail($request->role_id);
+
         $user->assignRole($role);
 
         return redirect()->route('admin.users.index')->with('success', 'User created successfully.');
@@ -88,6 +106,7 @@ class UserController extends Controller
             'profile' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'status' => 'required|boolean',
         ]);
+
         $data = [
             'name' => $request->name,
             'email' => $request->email,
@@ -97,10 +116,12 @@ class UserController extends Controller
             'birth_date' => $request->birth_date,
             'status' => $request->status,
         ];
+
         if ($request->hasFile('profile')) {
             $data['profile'] = $request->file('profile')
                 ->store('users', 'public');
         }
+
         $user->update($data);
 
         return redirect()->route('admin.users.index')->with('success', 'User updated successfully.');

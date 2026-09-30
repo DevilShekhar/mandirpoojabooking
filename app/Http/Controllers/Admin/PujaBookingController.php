@@ -23,8 +23,11 @@ class PujaBookingController extends Controller
             'deity',
             'puja',
             'pujaPackage',
-            'pujaSchedule'
+            'pujaSchedule',
+            'createdBy',
+            'updatedBy'
         ])
+        ->where('created_by', auth()->id())
         ->latest()
         ->paginate(10);
 
@@ -33,7 +36,11 @@ class PujaBookingController extends Controller
 
     public function create()
     {
-        $users = User::orderBy('name')->get();
+        $users = User::whereHas('role', function ($query) {
+            $query->where('name', 'Customer');
+        })
+            ->orderBy('name')
+            ->get();
 
         $temples = Temple::where('status', 1)
             ->orderBy('name')
@@ -132,6 +139,8 @@ class PujaBookingController extends Controller
             'puja_status' => $request->puja_status,
             'video_status' => $request->video_status,
             'prasad_status' => $request->prasad_status,
+            'created_by' => auth()->id(),
+            'updated_by' => auth()->id(),
         ]);
 
         return redirect()
@@ -257,6 +266,7 @@ class PujaBookingController extends Controller
             'puja_status' => $request->puja_status,
             'video_status' => $request->video_status,
             'prasad_status' => $request->prasad_status,
+            'updated_by' => auth()->id(),
         ]);
 
         return redirect()

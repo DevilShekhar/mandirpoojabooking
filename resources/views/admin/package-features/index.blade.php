@@ -1,4 +1,4 @@
-@can('package-features')
+@can('package-features.index')
 @extends('admin.layouts.app')
 
 @section('title', 'Package Features')

@@ -121,8 +121,9 @@
         </div>
         <div class="row">
             {{-- Pooja Packages --}}
+            @can('puja-packages.view')
             <div class="col-xl-3 col-lg-6">
-                <a href="#" class="text-decoration-none">
+                <a href="{{ route('puja-packages.index') }}" class="text-decoration-none">
                     <div class="card l-bg-green">
                         <div class="card-statistic-3">
                             <div class="card-icon card-icon-large">
@@ -154,8 +155,12 @@
                     </div>
                 </a>
             </div>
+            @endcan
+
+            {{-- Temples --}}
+            @can('temples.view')
             <div class="col-xl-3 col-lg-6">
-                <a href="#" class="text-decoration-none">
+                <a href="{{ route('temples.index') }}" class="text-decoration-none">
                     <div class="card l-bg-cyan">
                         <div class="card-statistic-3">
                             <div class="card-icon card-icon-large">
@@ -187,9 +192,12 @@
                     </div>
                 </a>
             </div>
+            @endcan
+
             {{-- Categories --}}
+            @can('puja-categories.view')
             <div class="col-xl-3 col-lg-6">
-                <a href="#" class="text-decoration-none">
+                <a href="{{ route('puja-categories.index') }}" class="text-decoration-none">
                     <div class="card l-bg-purple">
                         <div class="card-statistic-3">
                             <div class="card-icon card-icon-large">
@@ -221,8 +229,12 @@
                     </div>
                 </a>
             </div>
+            @endcan
+
+            {{-- Sub Categories --}}
+            @can('puja-categories.view')
             <div class="col-xl-3 col-lg-6">
-                <a href="#" class="text-decoration-none">
+                <a href="{{ route('puja-categories.index') }}" class="text-decoration-none">
                     <div class="card l-bg-orange">
                         <div class="card-statistic-3">
                             <div class="card-icon card-icon-large">
@@ -254,8 +266,12 @@
                     </div>
                 </a>
             </div>
+            @endcan
+
+            {{-- Devotees --}}
+            @can('booking-devotees.view')
             <div class="col-xl-3 col-lg-6">
-                <a href="#" class="text-decoration-none">
+                <a href="{{ route('booking-devotees.index') }}" class="text-decoration-none">
                     <div class="card" style="background: linear-gradient(135deg, #3949ab, #5c6bc0);">
                         <div class="card-statistic-3">
                             <div class="card-icon card-icon-large">
@@ -288,8 +304,11 @@
                     </div>
                 </a>
             </div>
+            @endcan
         </div>
         <div class="row">
+            {{-- Total Reviews --}}
+            @can('reviews.view')
             <div class="col-xl-6 col-lg-6">
                 <a href="#" class="text-decoration-none">
                     <div class="card l-bg-yellow">
@@ -323,7 +342,9 @@
                     </div>
                 </a>
             </div>
+            @endcan
             {{-- Approved Reviews --}}
+            @can('reviews.view')
             <div class="col-xl-6 col-lg-6">
                 <a href="#" class="text-decoration-none">
                     <div class="card l-bg-green">
@@ -357,8 +378,10 @@
                     </div>
                 </a>
             </div>
+            @endcan
         </div>
         {{-- Booking Status wise cards --}}
+        @can('puja-bookings.view')
         <div class="mb-3">
             <div class="d-inline-flex align-items-center px-3 py-2 rounded"
                 style="background: linear-gradient(135deg, #3949ab, #5c6bc0); color: #fff;">
@@ -368,9 +391,13 @@
                 </h5>
             </div>
         </div>
+
         <div class="row">
+
+            {{-- Pending --}}
+            @can('puja-bookings.view')
             <div class="col-xl-3 col-lg-6">
-                <a href="#" class="text-decoration-none">
+                <a href="{{ route('puja-bookings.index') }}" class="text-decoration-none">
                     <div class="card">
                         <div class="card-body card-type-3">
                             <div class="row">
@@ -396,8 +423,12 @@
                     </div>
                 </a>
             </div>
+            @endcan
+
+            {{-- Confirmed --}}
+            @can('puja-bookings.view')
             <div class="col-xl-3 col-lg-6">
-                <a href="#" class="text-decoration-none">
+                <a href="{{ route('puja-bookings.index') }}" class="text-decoration-none">
                     <div class="card">
                         <div class="card-body card-type-3">
                             <div class="row">
@@ -423,8 +454,12 @@
                     </div>
                 </a>
             </div>
+            @endcan
+
+            {{-- In Progress --}}
+            @can('puja-bookings.view')
             <div class="col-xl-3 col-lg-6">
-                <a href="#" class="text-decoration-none">
+                <a href="{{ route('puja-bookings.index') }}" class="text-decoration-none">
                     <div class="card">
                         <div class="card-body card-type-3">
                             <div class="row">
@@ -450,8 +485,12 @@
                     </div>
                 </a>
             </div>
+            @endcan
+
+            {{-- Scheduled --}}
+            @can('puja-bookings.view')
             <div class="col-xl-3 col-lg-6">
-                <a href="#" class="text-decoration-none">
+                <a href="{{ route('puja-bookings.index') }}" class="text-decoration-none">
                     <div class="card">
                         <div class="card-body card-type-3">
                             <div class="row">
@@ -477,8 +516,12 @@
                     </div>
                 </a>
             </div>
+            @endcan
+
+            {{-- Completed --}}
+            @can('puja-bookings.view')
             <div class="col-xl-3 col-lg-6">
-                <a href="#" class="text-decoration-none">
+                <a href="{{ route('puja-bookings.index') }}" class="text-decoration-none">
                     <div class="card">
                         <div class="card-body card-type-3">
                             <div class="row">
@@ -504,8 +547,12 @@
                     </div>
                 </a>
             </div>
+            @endcan
+
+            {{-- Cancelled --}}
+            @can('puja-bookings.view')
             <div class="col-xl-3 col-lg-6">
-                <a href="#" class="text-decoration-none">
+                <a href="{{ route('puja-bookings.index') }}" class="text-decoration-none">
                     <div class="card">
                         <div class="card-body card-type-3">
                             <div class="row">
@@ -531,8 +578,12 @@
                     </div>
                 </a>
             </div>
+            @endcan
+
+            {{-- Failed --}}
+            @can('puja-bookings.view')
             <div class="col-xl-3 col-lg-6">
-                <a href="#" class="text-decoration-none">
+                <a href="{{ route('puja-bookings.index') }}" class="text-decoration-none">
                     <div class="card">
                         <div class="card-body card-type-3">
                             <div class="row">
@@ -558,8 +609,12 @@
                     </div>
                 </a>
             </div>
+            @endcan
+
+            {{-- Refunded --}}
+            @can('puja-bookings.view')
             <div class="col-xl-3 col-lg-6">
-                <a href="#" class="text-decoration-none">
+                <a href="{{ route('puja-bookings.index') }}" class="text-decoration-none">
                     <div class="card">
                         <div class="card-body card-type-3">
                             <div class="row">
@@ -585,497 +640,597 @@
                     </div>
                 </a>
             </div>
+            @endcan
+
         </div>
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4 class="mb-0">Most Booked Pooja Packages</h4>
-            <a href="#" class="btn btn-primary">
-                View All
-            </a>
-        </div>
-        <div class="card">
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Image</th>
-                                <th>Package</th>
-                                <th>Code</th>
-                                <th>Temple</th>
-                                <th>Price</th>
-                                <th>Total Booked</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>1</td>
-                                <td>
-                                    <img src="assets/img/default.png"
-                                        alt="Package"
-                                        width="45"
-                                        height="45"
-                                        class="rounded"
-                                        style="object-fit:cover;">
-                                </td>
-                                <td>Rudrabhishek Pooja</td>
-                                <td>RUD-001</td>
-                                <td>Mahakaleshwar Temple</td>
-                                <td>₹2,100.00</td>
-                                <td><strong>248</strong></td>
-                            </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>
-                                    <img src="assets/img/default.png"
-                                        alt="Package"
-                                        width="45"
-                                        height="45"
-                                        class="rounded"
-                                        style="object-fit:cover;">
-                                </td>
-                                <td>Special Darshan</td>
-                                <td>DAR-002</td>
-                                <td>Kashi Vishwanath</td>
-                                <td>₹501.00</td>
-                                <td><strong>412</strong></td>
-                            </tr>
-                            <tr>
-                                <td>3</td>
-                                <td>
-                                    <img src="assets/img/default.png"
-                                        alt="Package"
-                                        width="45"
-                                        height="45"
-                                        class="rounded"
-                                        style="object-fit:cover;">
-                                </td>
-                                <td>Laghu Rudra</td>
-                                <td>LRU-003</td>
-                                <td>Trimbakeshwar</td>
-                                <td>₹5,100.00</td>
-                                <td><strong>96</strong></td>
-                            </tr>
-                            <tr>
-                                <td>4</td>
-                                <td>
-                                    <img src="assets/img/default.png"
-                                        alt="Package"
-                                        width="45"
-                                        height="45"
-                                        class="rounded"
-                                        style="object-fit:cover;">
-                                </td>
-                                <td>Satyanarayan Katha</td>
-                                <td>SAT-004</td>
-                                <td>Siddhivinayak Temple</td>
-                                <td>₹1,501.00</td>
-                                <td><strong>187</strong></td>
-                            </tr>
-                            <tr>
-                                <td>5</td>
-                                <td>
-                                    <img src="assets/img/default.png"
-                                        alt="Package"
-                                        width="45"
-                                        height="45"
-                                        class="rounded"
-                                        style="object-fit:cover;">
-                                </td>
-                                <td>Maha Mrityunjaya Jaap</td>
-                                <td>MMJ-005</td>
-                                <td>Somnath Temple</td>
-                                <td>₹3,100.00</td>
-                                <td><strong>134</strong></td>
-                            </tr>
-                        </tbody>
-                    </table>
+        @endcan
+        @can('puja-packages.view')
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="mb-0">Most Booked Pooja Packages</h4>
+
+                @can('puja-packages.view')
+                    <a href="{{ route('puja-packages.index') }}" class="btn btn-primary">
+                        View All
+                    </a>
+                @endcan
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Image</th>
+                                    <th>Package</th>
+                                    <th>Code</th>
+                                    <th>Temple</th>
+                                    <th>Price</th>
+                                    <th>Total Booked</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>
+                                        <img src="{{ asset('assets/img/default.png') }}"
+                                            alt="Package"
+                                            width="45"
+                                            height="45"
+                                            class="rounded"
+                                            style="object-fit:cover;">
+                                    </td>
+                                    <td>Rudrabhishek Pooja</td>
+                                    <td>RUD-001</td>
+                                    <td>Mahakaleshwar Temple</td>
+                                    <td>₹2,100.00</td>
+                                    <td><strong>248</strong></td>
+                                </tr>
+
+                                <tr>
+                                    <td>2</td>
+                                    <td>
+                                        <img src="{{ asset('assets/img/default.png') }}"
+                                            alt="Package"
+                                            width="45"
+                                            height="45"
+                                            class="rounded"
+                                            style="object-fit:cover;">
+                                    </td>
+                                    <td>Special Darshan</td>
+                                    <td>DAR-002</td>
+                                    <td>Kashi Vishwanath</td>
+                                    <td>₹501.00</td>
+                                    <td><strong>412</strong></td>
+                                </tr>
+
+                                <tr>
+                                    <td>3</td>
+                                    <td>
+                                        <img src="{{ asset('assets/img/default.png') }}"
+                                            alt="Package"
+                                            width="45"
+                                            height="45"
+                                            class="rounded"
+                                            style="object-fit:cover;">
+                                    </td>
+                                    <td>Laghu Rudra</td>
+                                    <td>LRU-003</td>
+                                    <td>Trimbakeshwar</td>
+                                    <td>₹5,100.00</td>
+                                    <td><strong>96</strong></td>
+                                </tr>
+
+                                <tr>
+                                    <td>4</td>
+                                    <td>
+                                        <img src="{{ asset('assets/img/default.png') }}"
+                                            alt="Package"
+                                            width="45"
+                                            height="45"
+                                            class="rounded"
+                                            style="object-fit:cover;">
+                                    </td>
+                                    <td>Satyanarayan Katha</td>
+                                    <td>SAT-004</td>
+                                    <td>Siddhivinayak Temple</td>
+                                    <td>₹1,501.00</td>
+                                    <td><strong>187</strong></td>
+                                </tr>
+
+                                <tr>
+                                    <td>5</td>
+                                    <td>
+                                        <img src="{{ asset('assets/img/default.png') }}"
+                                            alt="Package"
+                                            width="45"
+                                            height="45"
+                                            class="rounded"
+                                            style="object-fit:cover;">
+                                    </td>
+                                    <td>Maha Mrityunjaya Jaap</td>
+                                    <td>MMJ-005</td>
+                                    <td>Somnath Temple</td>
+                                    <td>₹3,100.00</td>
+                                    <td><strong>134</strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-        </div>
+        @endcan
         <div class="row">
-            <div class="col-xl-6 col-lg-6">
-                <a href="#" class="text-decoration-none">
-                    <div class="card l-bg-orange">
-                        <div class="card-statistic-3">
-                            <div class="card-icon card-icon-large">
-                                <i class="fas fa-tags"></i>
-                            </div>
-                            <div class="card-content">
-                                <h4 class="card-title">Active Offers</h4>
-                                <span>9</span>
-                                <div class="progress mt-1 mb-1" data-height="8">
-                                    <div class="progress-bar l-bg-purple"
-                                        role="progressbar"
-                                        data-width="25%"
-                                        aria-valuenow="25"
-                                        aria-valuemin="0"
-                                        aria-valuemax="100">
-                                    </div>
+            @can('puja-bookings.index')
+                <div class="col-xl-6 col-lg-6">
+                    <a href="#" class="text-decoration-none">
+                        <div class="card l-bg-orange">
+                            <div class="card-statistic-3">
+                                <div class="card-icon card-icon-large">
+                                    <i class="fas fa-tags"></i>
                                 </div>
-                                <p class="mb-0 text-sm">
-                                    <span class="mr-2">
-                                        <i class="fas fa-tag"></i>
-                                        Offers
-                                    </span>
-                                    <span class="text-nowrap">
-                                        Total Active Offers
-                                    </span>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </a>
-            </div>
-            <div class="col-xl-6 col-lg-6">
-                <a href="#" class="text-decoration-none">
-                    <div class="card l-bg-red">
-                        <div class="card-statistic-3">
-                            <div class="card-icon card-icon-large">
-                                <i class="fas fa-calendar-times"></i>
-                            </div>
-                            <div class="card-content">
-                                <h4 class="card-title">Expired Offers</h4>
-                                <span>5</span>
-                                <div class="progress mt-1 mb-1" data-height="8">
-                                    <div class="progress-bar l-bg-orange"
-                                        role="progressbar"
-                                        data-width="25%"
-                                        aria-valuenow="25"
-                                        aria-valuemin="0"
-                                        aria-valuemax="100">
+                                <div class="card-content">
+                                    <h4 class="card-title">Active Offers</h4>
+                                    <span>9</span>
+                                    <div class="progress mt-1 mb-1" data-height="8">
+                                        <div class="progress-bar l-bg-purple"
+                                            role="progressbar"
+                                            data-width="25%"
+                                            aria-valuenow="25"
+                                            aria-valuemin="0"
+                                            aria-valuemax="100">
+                                        </div>
                                     </div>
+                                    <p class="mb-0 text-sm">
+                                        <span class="mr-2">
+                                            <i class="fas fa-tag"></i>
+                                            Offers
+                                        </span>
+                                        <span class="text-nowrap">
+                                            Total Active Offers
+                                        </span>
+                                    </p>
                                 </div>
-                                <p class="mb-0 text-sm">
-                                    <span class="mr-2">
-                                        <i class="fas fa-calendar-times"></i>
-                                        Offers
-                                    </span>
-                                    <span class="text-nowrap">
-                                        Total Expired Offers
-                                    </span>
-                                </p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            @endcan
+
+            @can('puja-bookings.index')
+                <div class="col-xl-6 col-lg-6">
+                    <a href="#" class="text-decoration-none">
+                        <div class="card l-bg-red">
+                            <div class="card-statistic-3">
+                                <div class="card-icon card-icon-large">
+                                    <i class="fas fa-calendar-times"></i>
+                                </div>
+                                <div class="card-content">
+                                    <h4 class="card-title">Expired Offers</h4>
+                                    <span>5</span>
+                                    <div class="progress mt-1 mb-1" data-height="8">
+                                        <div class="progress-bar l-bg-orange"
+                                            role="progressbar"
+                                            data-width="25%"
+                                            aria-valuenow="25"
+                                            aria-valuemin="0"
+                                            aria-valuemax="100">
+                                        </div>
+                                    </div>
+                                    <p class="mb-0 text-sm">
+                                        <span class="mr-2">
+                                            <i class="fas fa-calendar-times"></i>
+                                            Offers
+                                        </span>
+                                        <span class="text-nowrap">
+                                            Total Expired Offers
+                                        </span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            @endcan
+        </div>
+
+        <div class="row">
+            @can('puja-bookings.view')
+                <div class="col-12 col-sm-12 col-lg-4">
+                    <div class="card dashboard-chart-card">
+                        <div class="card-header">
+                            <h4>Booking Status</h4>
+                        </div>
+                        <div class="card-body">
+                            <div id="chart4" class="dashboard-chart"></div>
+                        </div>
+                    </div>
+                </div>
+            @endcan
+
+            @can('puja-bookings.view')
+                <div class="col-12 col-sm-12 col-lg-4">
+                    <div class="card dashboard-chart-card">
+                        <div class="card-header">
+                            <h4>Monthly Bookings</h4>
+                        </div>
+                        <div class="card-body">
+                            <div id="chart3" class="dashboard-chart"></div>
+                        </div>
+                    </div>
+                </div>
+            @endcan
+
+            @can('puja-bookings.view')
+                <div class="col-12 col-sm-12 col-lg-4">
+                    <div class="card dashboard-chart-card">
+                        <div class="card-header">
+                            <h4>Monthly Revenue</h4>
+                        </div>
+                        <div class="card-body">
+                            <div id="chart2" class="dashboard-chart"></div>
+                        </div>
+                    </div>
+                </div>
+            @endcan
+        </div>
+        @can('puja-bookings.index')
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>Latest Temple Bookings</h4>
+
+                            @can('puja-bookings.view')
+                                <div class="card-header-action">
+                                    <a href="#" class="btn btn-primary">
+                                        View All
+                                    </a>
+                                </div>
+                            @endcan
+                        </div>
+
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Booking Number</th>
+                                            <th>Devotee</th>
+                                            <th>Total</th>
+                                            <th>Payment</th>
+                                            <th>Status</th>
+                                            <th>Date</th>
+
+                                            @can('puja-bookings.view')
+                                                <th>Action</th>
+                                            @endcan
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <tr>
+                                            <td>1</td>
+                                            <td><strong>BK-20240901</strong></td>
+                                            <td>
+                                                <div>
+                                                    <strong>Rajesh Sharma</strong>
+                                                    <br>
+                                                    <small class="text-muted">rajesh@example.com</small>
+                                                </div>
+                                            </td>
+                                            <td><strong>₹2,100.00</strong></td>
+                                            <td><span class="badge badge-success">Paid</span></td>
+                                            <td><span class="badge badge-success">Completed</span></td>
+                                            <td>
+                                                15 Sep 2024
+                                                <br>
+                                                <small class="text-muted">10:30 AM</small>
+                                            </td>
+
+                                            @can('puja-bookings.view')
+                                                <td>
+                                                    <a href="#" class="btn btn-outline-primary btn-sm">
+                                                        <i class="fas fa-eye"></i>
+                                                        View
+                                                    </a>
+                                                </td>
+                                            @endcan
+                                        </tr>
+
+                                        <tr>
+                                            <td>2</td>
+                                            <td><strong>BK-20240902</strong></td>
+                                            <td>
+                                                <div>
+                                                    <strong>Priya Mehta</strong>
+                                                    <br>
+                                                    <small class="text-muted">priya@example.com</small>
+                                                </div>
+                                            </td>
+                                            <td><strong>₹501.00</strong></td>
+                                            <td><span class="badge badge-warning">Pending</span></td>
+                                            <td><span class="badge badge-warning">Pending</span></td>
+                                            <td>
+                                                16 Sep 2024
+                                                <br>
+                                                <small class="text-muted">02:15 PM</small>
+                                            </td>
+
+                                            @can('puja-bookings.view')
+                                                <td>
+                                                    <a href="#" class="btn btn-outline-primary btn-sm">
+                                                        <i class="fas fa-eye"></i>
+                                                        View
+                                                    </a>
+                                                </td>
+                                            @endcan
+                                        </tr>
+
+                                        <tr>
+                                            <td>3</td>
+                                            <td><strong>BK-20240903</strong></td>
+                                            <td>
+                                                <div>
+                                                    <strong>Amit Patel</strong>
+                                                    <br>
+                                                    <small class="text-muted">amit@example.com</small>
+                                                </div>
+                                            </td>
+                                            <td><strong>₹5,100.00</strong></td>
+                                            <td><span class="badge badge-success">Paid</span></td>
+                                            <td><span class="badge badge-primary">Scheduled</span></td>
+                                            <td>
+                                                17 Sep 2024
+                                                <br>
+                                                <small class="text-muted">11:45 AM</small>
+                                            </td>
+
+                                            @can('puja-bookings.view')
+                                                <td>
+                                                    <a href="#" class="btn btn-outline-primary btn-sm">
+                                                        <i class="fas fa-eye"></i>
+                                                        View
+                                                    </a>
+                                                </td>
+                                            @endcan
+                                        </tr>
+
+                                        <tr>
+                                            <td>4</td>
+                                            <td><strong>BK-20240904</strong></td>
+                                            <td>
+                                                <div>
+                                                    <strong>Sneha Reddy</strong>
+                                                    <br>
+                                                    <small class="text-muted">sneha@example.com</small>
+                                                </div>
+                                            </td>
+                                            <td><strong>₹1,501.00</strong></td>
+                                            <td><span class="badge badge-success">Paid</span></td>
+                                            <td><span class="badge badge-info">Confirmed</span></td>
+                                            <td>
+                                                18 Sep 2024
+                                                <br>
+                                                <small class="text-muted">09:20 AM</small>
+                                            </td>
+
+                                            @can('puja-bookings.view')
+                                                <td>
+                                                    <a href="#" class="btn btn-outline-primary btn-sm">
+                                                        <i class="fas fa-eye"></i>
+                                                        View
+                                                    </a>
+                                                </td>
+                                            @endcan
+                                        </tr>
+
+                                        <tr>
+                                            <td>5</td>
+                                            <td><strong>BK-20240905</strong></td>
+                                            <td>
+                                                <div>
+                                                    <strong>Vikram Singh</strong>
+                                                    <br>
+                                                    <small class="text-muted">vikram@example.com</small>
+                                                </div>
+                                            </td>
+                                            <td><strong>₹3,100.00</strong></td>
+                                            <td><span class="badge badge-danger">Failed</span></td>
+                                            <td><span class="badge badge-danger">Cancelled</span></td>
+                                            <td>
+                                                19 Sep 2024
+                                                <br>
+                                                <small class="text-muted">04:50 PM</small>
+                                            </td>
+
+                                            @can('puja-bookings.view')
+                                                <td>
+                                                    <a href="#" class="btn btn-outline-primary btn-sm">
+                                                        <i class="fas fa-eye"></i>
+                                                        View
+                                                    </a>
+                                                </td>
+                                            @endcan
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
-                </a>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12 col-sm-12 col-lg-4">
-                <div class="card dashboard-chart-card">
-                    <div class="card-header">
-                        <h4>Booking Status</h4>
-                    </div>
-                    <div class="card-body">
-                        <div id="chart4" class="dashboard-chart"></div>
-                    </div>
                 </div>
             </div>
-            <div class="col-12 col-sm-12 col-lg-4">
-                <div class="card dashboard-chart-card">
-                    <div class="card-header">
-                        <h4>Monthly Bookings</h4>
-                    </div>
-                    <div class="card-body">
-                        <div id="chart3" class="dashboard-chart"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-12 col-sm-12 col-lg-4">
-                <div class="card dashboard-chart-card">
-                    <div class="card-header">
-                        <h4>Monthly Revenue</h4>
-                    </div>
-                    <div class="card-body">
-                        <div id="chart2" class="dashboard-chart"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h4>Latest Temple Bookings</h4>
-                        <div class="card-header-action">
-                            <a href="#" class="btn btn-primary">
-                                View All
-                            </a>
+        @endcan
+        @can('puja-bookings.index')
+            <div class="row">
+                <div class="col-md-12 col-lg-12 col-xl-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>Pending Temple Reviews</h4>
+
+                            @can('puja-bookings.view')
+                                <div class="card-header-action">
+                                    <a href="#" class="btn btn-primary">
+                                        View All
+                                    </a>
+                                </div>
+                            @endcan
                         </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-striped mb-0">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Booking Number</th>
-                                        <th>Devotee</th>
-                                        <th>Total</th>
-                                        <th>Payment</th>
-                                        <th>Status</th>
-                                        <th>Date</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>1</td>
-                                        <td><strong>BK-20240901</strong></td>
-                                        <td>
-                                            <div>
+
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Package</th>
+                                            <th>Devotee</th>
+                                            <th>Rating</th>
+                                            <th>Review</th>
+                                            <th>Date</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <tr>
+                                            <td>1</td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <img src="assets/img/default.png"
+                                                        alt="Package"
+                                                        width="45"
+                                                        height="45"
+                                                        class="rounded mr-2"
+                                                        style="object-fit: cover;">
+                                                    <span>Rudrabhishek Pooja</span>
+                                                </div>
+                                            </td>
+                                            <td>
                                                 <strong>Rajesh Sharma</strong>
-                                                <br>
-                                                <small class="text-muted">rajesh@example.com</small>
-                                            </div>
-                                        </td>
-                                        <td><strong>₹2,100.00</strong></td>
-                                        <td><span class="badge badge-success">Paid</span></td>
-                                        <td><span class="badge badge-success">Completed</span></td>
-                                        <td>
-                                            15 Sep 2024
-                                            <br>
-                                            <small class="text-muted">10:30 AM</small>
-                                        </td>
-                                        <td>
-                                            <a href="#" class="btn btn-outline-primary btn-sm">
-                                                <i class="fas fa-eye"></i>
-                                                View
-                                            </a>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>2</td>
-                                        <td><strong>BK-20240902</strong></td>
-                                        <td>
-                                            <div>
+                                                <small class="d-block text-muted">
+                                                    rajesh@example.com
+                                                </small>
+                                            </td>
+                                            <td>
+                                                <div class="text-warning">
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="far fa-star"></i>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span title="Very peaceful experience. The priests performed the pooja with full devotion.">
+                                                    Very peaceful experience. The priests performed the pooja with full devotion.
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <small>12-09-2024</small>
+                                                <span class="badge badge-warning d-block mt-1">
+                                                    Pending
+                                                </span>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>2</td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <img src="assets/img/default.png"
+                                                        alt="Package"
+                                                        width="45"
+                                                        height="45"
+                                                        class="rounded mr-2"
+                                                        style="object-fit: cover;">
+                                                    <span>Special Darshan</span>
+                                                </div>
+                                            </td>
+                                            <td>
                                                 <strong>Priya Mehta</strong>
-                                                <br>
-                                                <small class="text-muted">priya@example.com</small>
-                                            </div>
-                                        </td>
-                                        <td><strong>₹501.00</strong></td>
-                                        <td><span class="badge badge-warning">Pending</span></td>
-                                        <td><span class="badge badge-warning">Pending</span></td>
-                                        <td>
-                                            16 Sep 2024
-                                            <br>
-                                            <small class="text-muted">02:15 PM</small>
-                                        </td>
-                                        <td>
-                                            <a href="#" class="btn btn-outline-primary btn-sm">
-                                                <i class="fas fa-eye"></i>
-                                                View
-                                            </a>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>3</td>
-                                        <td><strong>BK-20240903</strong></td>
-                                        <td>
-                                            <div>
+                                                <small class="d-block text-muted">
+                                                    priya@example.com
+                                                </small>
+                                            </td>
+                                            <td>
+                                                <div class="text-warning">
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star"></i>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span title="Smooth booking process and timely darshan. Highly recommended.">
+                                                    Smooth booking process and timely darshan. Highly recommended.
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <small>14-09-2024</small>
+                                                <span class="badge badge-warning d-block mt-1">
+                                                    Pending
+                                                </span>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>3</td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <img src="assets/img/default.png"
+                                                        alt="Package"
+                                                        width="45"
+                                                        height="45"
+                                                        class="rounded mr-2"
+                                                        style="object-fit: cover;">
+                                                    <span>Laghu Rudra</span>
+                                                </div>
+                                            </td>
+                                            <td>
                                                 <strong>Amit Patel</strong>
-                                                <br>
-                                                <small class="text-muted">amit@example.com</small>
-                                            </div>
-                                        </td>
-                                        <td><strong>₹5,100.00</strong></td>
-                                        <td><span class="badge badge-success">Paid</span></td>
-                                        <td><span class="badge badge-primary">Scheduled</span></td>
-                                        <td>
-                                            17 Sep 2024
-                                            <br>
-                                            <small class="text-muted">11:45 AM</small>
-                                        </td>
-                                        <td>
-                                            <a href="#" class="btn btn-outline-primary btn-sm">
-                                                <i class="fas fa-eye"></i>
-                                                View
-                                            </a>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>4</td>
-                                        <td><strong>BK-20240904</strong></td>
-                                        <td>
-                                            <div>
-                                                <strong>Sneha Reddy</strong>
-                                                <br>
-                                                <small class="text-muted">sneha@example.com</small>
-                                            </div>
-                                        </td>
-                                        <td><strong>₹1,501.00</strong></td>
-                                        <td><span class="badge badge-success">Paid</span></td>
-                                        <td><span class="badge badge-info">Confirmed</span></td>
-                                        <td>
-                                            18 Sep 2024
-                                            <br>
-                                            <small class="text-muted">09:20 AM</small>
-                                        </td>
-                                        <td>
-                                            <a href="#" class="btn btn-outline-primary btn-sm">
-                                                <i class="fas fa-eye"></i>
-                                                View
-                                            </a>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>5</td>
-                                        <td><strong>BK-20240905</strong></td>
-                                        <td>
-                                            <div>
-                                                <strong>Vikram Singh</strong>
-                                                <br>
-                                                <small class="text-muted">vikram@example.com</small>
-                                            </div>
-                                        </td>
-                                        <td><strong>₹3,100.00</strong></td>
-                                        <td><span class="badge badge-danger">Failed</span></td>
-                                        <td><span class="badge badge-danger">Cancelled</span></td>
-                                        <td>
-                                            19 Sep 2024
-                                            <br>
-                                            <small class="text-muted">04:50 PM</small>
-                                        </td>
-                                        <td>
-                                            <a href="#" class="btn btn-outline-primary btn-sm">
-                                                <i class="fas fa-eye"></i>
-                                                View
-                                            </a>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                                                <small class="d-block text-muted">
+                                                    amit@example.com
+                                                </small>
+                                            </td>
+                                            <td>
+                                                <div class="text-warning">
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="far fa-star"></i>
+                                                    <i class="far fa-star"></i>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span title="Good arrangement but waiting time was a bit long.">
+                                                    Good arrangement but waiting time was a bit long.
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <small>16-09-2024</small>
+                                                <span class="badge badge-warning d-block mt-1">
+                                                    Pending
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
+
+                        @can('puja-bookings.view')
+                            <a href="#" class="card-footer card-link text-center small">
+                                View All Reviews
+                            </a>
+                        @endcan
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12 col-lg-12 col-xl-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h4>Pending Temple Reviews</h4>
-                        <div class="card-header-action">
-                            <a href="#" class="btn btn-primary">View All</a>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-striped table-hover mb-0">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Package</th>
-                                        <th>Devotee</th>
-                                        <th>Rating</th>
-                                        <th>Review</th>
-                                        <th>Date</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>1</td>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <img src="assets/img/default.png" alt="Package" width="45" height="45" class="rounded mr-2" style="object-fit: cover;">
-                                                <span>Rudrabhishek Pooja</span>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <strong>Rajesh Sharma</strong>
-                                            <small class="d-block text-muted">rajesh@example.com</small>
-                                        </td>
-                                        <td>
-                                            <div class="text-warning">
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="far fa-star"></i>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <span title="Very peaceful experience. The priests performed the pooja with full devotion.">
-                                                Very peaceful experience. The priests performed the pooja with full devotion.
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <small>12-09-2024</small>
-                                            <span class="badge badge-warning d-block mt-1">Pending</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>2</td>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <img src="assets/img/default.png" alt="Package" width="45" height="45" class="rounded mr-2" style="object-fit: cover;">
-                                                <span>Special Darshan</span>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <strong>Priya Mehta</strong>
-                                            <small class="d-block text-muted">priya@example.com</small>
-                                        </td>
-                                        <td>
-                                            <div class="text-warning">
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <span title="Smooth booking process and timely darshan. Highly recommended.">
-                                                Smooth booking process and timely darshan. Highly recommended.
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <small>14-09-2024</small>
-                                            <span class="badge badge-warning d-block mt-1">Pending</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>3</td>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <img src="assets/img/default.png" alt="Package" width="45" height="45" class="rounded mr-2" style="object-fit: cover;">
-                                                <span>Laghu Rudra</span>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <strong>Amit Patel</strong>
-                                            <small class="d-block text-muted">amit@example.com</small>
-                                        </td>
-                                        <td>
-                                            <div class="text-warning">
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="far fa-star"></i>
-                                                <i class="far fa-star"></i>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <span title="Good arrangement but waiting time was a bit long.">
-                                                Good arrangement but waiting time was a bit long.
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <small>16-09-2024</small>
-                                            <span class="badge badge-warning d-block mt-1">Pending</span>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <a href="#" class="card-footer card-link text-center small">View All Reviews</a>
-                </div>
-            </div>
-        </div>
+        @endcan
     </section>
 @endsection
 @push('scripts')

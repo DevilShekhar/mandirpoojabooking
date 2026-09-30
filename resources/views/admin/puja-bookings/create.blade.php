@@ -37,10 +37,14 @@
                                 <div class="form-group col-md-6">
                                     <label>Customer/User</label>
                                     <select name="user_id"
+                                            id="user_id"
                                             class="form-control @error('user_id') is-invalid @enderror">
                                         <option value="">Select User</option>
                                         @foreach($users as $user)
                                             <option value="{{ $user->id }}"
+                                                data-name="{{ $user->name }}"
+                                                data-email="{{ $user->email }}"
+                                                data-phone="{{ $user->phone }}"
                                                 {{ old('user_id') == $user->id ? 'selected' : '' }}>
                                                 {{ $user->name }} - {{ $user->email }}
                                             </option>
@@ -54,6 +58,7 @@
                                     <label>Customer Name <span class="text-danger">*</span></label>
                                     <input type="text"
                                            name="customer_name"
+                                           id="customer_name"
                                            class="form-control @error('customer_name') is-invalid @enderror"
                                            value="{{ old('customer_name') }}"
                                            placeholder="Enter Customer Name"
@@ -66,6 +71,7 @@
                                     <label>Customer Email</label>
                                     <input type="email"
                                            name="customer_email"
+                                           id="customer_email"
                                            class="form-control @error('customer_email') is-invalid @enderror"
                                            value="{{ old('customer_email') }}"
                                            placeholder="Enter Customer Email">
@@ -77,6 +83,7 @@
                                     <label>Customer Mobile <span class="text-danger">*</span></label>
                                     <input type="text"
                                            name="customer_mobile"
+                                           id="customer_mobile"
                                            class="form-control @error('customer_mobile') is-invalid @enderror"
                                            value="{{ old('customer_mobile') }}"
                                            placeholder="Enter Customer Mobile"
@@ -139,12 +146,18 @@
                                 <div class="form-group col-md-6">
                                     <label>Puja Package <span class="text-danger">*</span></label>
                                     <select name="puja_package_id"
+                                            id="puja_package_id"
                                             class="form-control @error('puja_package_id') is-invalid @enderror"
                                             required>
                                         <option value="">Select Package</option>
                                         @foreach($pujaPackages as $package)
                                             <option value="{{ $package->id }}"
-                                                {{ old('puja_package_id') == $package->id ? 'selected' : '' }}>
+                                                    data-puja-id="{{ $package->puja_id }}"
+                                                    data-package-name="{{ $package->name }}"
+                                                    data-person-count="{{ $package->person_count }}"
+                                                    data-price="{{ $package->price }}"
+                                                    data-discount-price="{{ $package->discount_price }}"
+                                                    {{ old('puja_package_id') == $package->id ? 'selected' : '' }}>
                                                 {{ $package->name }}
                                             </option>
                                         @endforeach
@@ -156,11 +169,13 @@
                                 <div class="form-group col-md-6">
                                     <label>Package Name <span class="text-danger">*</span></label>
                                     <input type="text"
-                                           name="package_name"
-                                           class="form-control @error('package_name') is-invalid @enderror"
-                                           value="{{ old('package_name') }}"
-                                           placeholder="Enter Package Name"
-                                           required>
+                                        name="package_name"
+                                        id="package_name"
+                                        class="form-control @error('package_name') is-invalid @enderror"
+                                        value="{{ old('package_name') }}"
+                                        placeholder="Select Puja Package"
+                                        readonly
+                                        required>
                                     @error('package_name')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -386,6 +401,34 @@
         </div>
     </div>
 </section>
+
+<script>
+    document.getElementById('user_id').addEventListener('change', function () {
+        const selectedOption = this.options[this.selectedIndex];
+
+        if (!this.value) {
+            document.getElementById('customer_name').value = '';
+            document.getElementById('customer_email').value = '';
+            document.getElementById('customer_mobile').value = '';
+            return;
+        }
+
+        document.getElementById('customer_name').value = selectedOption.dataset.name || '';
+        document.getElementById('customer_email').value = selectedOption.dataset.email || '';
+        document.getElementById('customer_mobile').value = selectedOption.dataset.phone || '';
+    });
+
+    document.getElementById('user_id').dispatchEvent(new Event('change'));
+</script>
+<script>
+    document.getElementById('puja_package_id').addEventListener('change', function () {
+        const selectedOption = this.options[this.selectedIndex];
+
+        document.getElementById('package_name').value =
+            selectedOption.dataset.packageName || '';
+    });
+</script>
+
 @endsection
 @else
     @php
