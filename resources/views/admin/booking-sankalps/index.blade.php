@@ -40,6 +40,8 @@
                                         <th>Sankalp Date</th>
                                         <th>Status</th>
                                         <th>Completed At</th>
+                                        <th>Created By</th>
+                                        <th>Updated By</th>
                                         <th class="text-center">Action</th>
                                     </tr>
                                 </thead>
@@ -71,6 +73,13 @@
                                         </td>
                                         <td>
                                             {{ $sankalp->completed_at?->format('d M Y h:i A') ?? '-' }}
+                                        </td>
+                                        <td>
+                                            {{ $sankalp->createdBy?->name ?? '-' }}
+                                        </td>
+
+                                        <td>
+                                            {{ $sankalp->updatedBy?->name ?? '-' }}
                                         </td>
                                         <td>
                                             <div class="d-flex align-items-center justify-content-center">

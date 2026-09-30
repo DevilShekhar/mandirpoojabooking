@@ -58,6 +58,8 @@
                                         <th>Mobile</th>
                                         <th>Gotra</th>
                                         <th>Primary</th>
+                                        <th>Created By</th>
+                                        <th>Updated By</th>
                                         <th>Actions</th>
                                     </tr>
 
@@ -115,6 +117,13 @@
 
                                                 @endif
 
+                                            </td>
+                                            <td>
+                                                {{ $devotee->createdBy?->name ?? '-' }}
+                                            </td>
+
+                                            <td>
+                                                {{ $devotee->updatedBy?->name ?? '-' }}
                                             </td>
 
                                             <td>

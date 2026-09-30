@@ -12,12 +12,19 @@ class BookingSankalpController extends Controller
 {
     public function index()
     {
-        $bookingSankalps = BookingSankalp::with([
+        $query = BookingSankalp::with([
             'booking',
-            'pandit'
-        ])
-        ->latest()
-        ->get();
+            'pandit',
+            'createdBy',
+            'updatedBy',
+        ]);
+        if (!auth()->user()->hasAnyRole(['Super Admin', 'Admin'])) {
+            $query->where('created_by', auth()->id());
+        }
+
+        $bookingSankalps = $query
+            ->latest()
+            ->get();
 
         return view('admin.booking-sankalps.index', compact('bookingSankalps'));
     }
@@ -59,6 +66,7 @@ class BookingSankalpController extends Controller
             'completed_at' => $request->completed_at,
             'video_url' => $request->video_url,
             'remarks' => $request->remarks,
+            'created_by' => auth()->id(),
         ]);
 
         return redirect()
@@ -116,6 +124,7 @@ class BookingSankalpController extends Controller
             'completed_at' => $request->completed_at,
             'video_url' => $request->video_url,
             'remarks' => $request->remarks,
+            'updated_by' => auth()->id(),
         ]);
 
         return redirect()

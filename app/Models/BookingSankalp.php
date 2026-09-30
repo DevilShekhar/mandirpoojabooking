@@ -15,6 +15,8 @@ class BookingSankalp extends Model
         'completed_at',
         'video_url',
         'remarks',
+        'created_by',
+        'updated_by',
     ];
 
     protected $casts = [
@@ -30,5 +32,14 @@ class BookingSankalp extends Model
     public function pandit()
     {
         return $this->belongsTo(Pandit::class, 'pandit_id');
+    }
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function updatedBy()
+    {
+        return $this->belongsTo(User::class, 'updated_by');
     }
 }
