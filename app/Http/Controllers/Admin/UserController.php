@@ -86,43 +86,57 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
-        $roles = Role::query()
-            ->where('name', '!=', 'Super Admin')
-            ->orderBy('name')
-            ->get();
+        $isPandit = auth()->user()->hasRole('Pandit');
 
-        return view('admin.users.edit', compact('user', 'roles'));
+        $roles = $isPandit
+            ? collect()
+            : Role::query()
+                ->where('name', '!=', 'Super Admin')
+                ->orderBy('name')
+                ->get();
+
+        return view('admin.users.edit', compact('user', 'roles', 'isPandit'));
     }
 
     public function update(Request $request, User $user)
     {
+        $isPandit = auth()->user()->hasRole('Pandit');
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email,'.$user->id,
+            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
             'phone' => 'nullable|string|max:20',
             'gender' => 'nullable|string|max:20',
-            'role_id' => 'required|exists:roles,id',
+            'role_id' => $isPandit ? 'nullable' : 'required|exists:roles,id',
             'birth_date' => 'nullable|date',
             'profile' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'status' => 'required|boolean',
         ]);
+        if ($isPandit) {
+            $customerRoleId = Role::where('name', 'Customer')->value('id');
+        }
 
         $data = [
             'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
             'gender' => $request->gender,
-            'role_id' => $request->role_id,
+            'role_id' => $isPandit ? $customerRoleId : $request->role_id,
             'birth_date' => $request->birth_date,
             'status' => $request->status,
         ];
 
         if ($request->hasFile('profile')) {
-            $data['profile'] = $request->file('profile')
-                ->store('users', 'public');
+            $data['profile'] = $request->file('profile')->store('users', 'public');
         }
 
         $user->update($data);
+        if ($isPandit) {
+            $role = Role::findOrFail($customerRoleId);
+            $user->syncRoles([$role]);
+        } else {
+            $role = Role::findOrFail($request->role_id);
+            $user->syncRoles([$role]);
+        }
 
         return redirect()->route('admin.users.index')->with('success', 'User updated successfully.');
     }
