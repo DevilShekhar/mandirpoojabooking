@@ -1,4 +1,4 @@
-@can('puja-packages')
+@can('puja-packages.view')
 @extends('admin.layouts.app')
 
 @section('title', 'View Puja Package')

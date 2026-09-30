@@ -451,7 +451,6 @@
                             </li>
                         @endcanany
 
-
                         {{-- Puja --}}
                         @canany(['puja-categories.view','pujas.view','puja-packages.view','package-features.view','package-addons.view','puja-schedules.view','puja-bookings.view'])
                             <li class="dropdown {{ request()->routeIs('puja-categories.*', 'pujas.*', 'puja-packages.*', 'package-features.*', 'package-addons.*', 'puja-schedules.*', 'puja-bookings.*') ? 'active' : '' }}">

@@ -120,25 +120,26 @@
                                             </div>
                                         @enderror
                                     </div>
-                                    {{-- Role --}}
-                                    <div class="form-group col-md-6">
-                                        <label>
-                                            Role <span class="text-danger">*</span>
-                                        </label>
-                                        <div class="input-group">
-                                            <select name="role_id" class="form-control">
-                                                <option value="">Select Role</option>
-                                                @foreach($roles as $role)
-                                                    <option value="{{ $role->id }}" @selected(old('role_id') == $role->id)>
-                                                        {{ $role->name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
+                                    @if(!$isPandit)
+                                        <div class="form-group col-md-6">
+                                            <label>
+                                                Role <span class="text-danger">*</span>
+                                            </label>
+                                            <div class="input-group">
+                                                <select name="role_id" class="form-control">
+                                                    <option value="">Select Role</option>
+                                                    @foreach($roles as $role)
+                                                        <option value="{{ $role->id }}" @selected(old('role_id') == $role->id)>
+                                                            {{ $role->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            @error('role_id')
+                                                <small class="text-danger">{{ $message }}</small>
+                                            @enderror
                                         </div>
-                                        @error('role_id')
-                                            <small class="text-danger">{{ $message }}</small>
-                                        @enderror
-                                    </div>
+                                    @endif
                                 </div>
                                 <div class="section-title">
                                     Profile Image

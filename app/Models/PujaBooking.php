@@ -33,6 +33,8 @@ class PujaBooking extends Model
         'puja_status',
         'video_status',
         'prasad_status',
+        'created_by',
+        'updated_by',
     ];
 
     protected $casts = [
@@ -93,6 +95,15 @@ class PujaBooking extends Model
     public function assignments()
     {
         return $this->hasMany(PujaAssignment::class);
+    }
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function updatedBy()
+    {
+        return $this->belongsTo(User::class, 'updated_by');
     }
 
 }
