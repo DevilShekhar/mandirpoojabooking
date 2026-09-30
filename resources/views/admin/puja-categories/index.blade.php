@@ -30,6 +30,8 @@
                                         <th>Slug</th>
                                         <th>Sort Order</th>
                                         <th>Status</th>
+                                        <th>Created By</th>
+                                        <th>Updated By</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -64,7 +66,12 @@
                                                     <span class="badge badge-danger">Inactive</span>
                                                 @endif
                                             </td>
-
+                                            <td>
+                                                {{ $pujaCategory->createdBy?->name ?? '-' }}
+                                            </td>
+                                            <td>
+                                                {{ $pujaCategory->updatedBy->name ?? '-' }}
+                                            </td>
                                             <td>
                                                 <a href="{{ route('puja-categories.edit', $pujaCategory->id) }}"
                                                    class="btn btn-sm btn-primary">

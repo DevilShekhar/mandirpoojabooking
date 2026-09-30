@@ -12,8 +12,9 @@ class PujaCategoryController extends Controller
 {
     public function index()
     {
-        $pujaCategories = PujaCategory::latest()->get();
-
+        $pujaCategories = PujaCategory::with(['createdBy','updatedBy',])
+            ->latest()
+            ->get();
         return view('admin.puja-categories.index', compact('pujaCategories'));
     }
 
@@ -44,6 +45,8 @@ class PujaCategoryController extends Controller
             'image' => $image,
             'status' => 1,
             'sort_order' => $request->sort_order,
+            'created_by' => auth()->id(),
+            'updated_by' => auth()->id(),
         ]);
 
         return redirect()
@@ -83,6 +86,7 @@ class PujaCategoryController extends Controller
             'image' => $image,
             'status' => $request->status,
             'sort_order' => $request->sort_order,
+            'updated_by' => auth()->id(),
         ]);
 
         return redirect()
@@ -94,6 +98,7 @@ class PujaCategoryController extends Controller
     {
         $pujaCategory->update([
             'status' => 0,
+            'updated_by' => auth()->id(),
         ]);
 
         return redirect()

@@ -11,7 +11,17 @@ class BookingDevoteeController extends Controller
 {
     public function index()
     {
-        $bookingDevotees = BookingDevotee::with('booking')
+        $query = BookingDevotee::with([
+            'booking',
+            'createdBy',
+            'updatedBy',
+        ]);
+
+        if (!auth()->user()->hasAnyRole(['Super Admin', 'Admin'])) {
+            $query->where('created_by', auth()->id());
+        }
+
+        $bookingDevotees = $query
             ->latest()
             ->get();
 
@@ -21,6 +31,7 @@ class BookingDevoteeController extends Controller
     public function create()
     {
         $bookings = PujaBooking::latest()->get();
+
         return view('admin.booking-devotees.create', compact('bookings'));
     }
 
@@ -42,7 +53,9 @@ class BookingDevoteeController extends Controller
 
         if ($request->boolean('is_primary')) {
             BookingDevotee::where('booking_id', $request->booking_id)
-                ->update(['is_primary' => false]);
+                ->update([
+                    'is_primary' => false,
+                ]);
         }
 
         BookingDevotee::create([
@@ -57,6 +70,8 @@ class BookingDevoteeController extends Controller
             'mobile' => $request->mobile,
             'address' => $request->address,
             'is_primary' => $request->boolean('is_primary'),
+            'created_by' => auth()->id(),
+            'updated_by' => auth()->id(),
         ]);
 
         return redirect()
@@ -93,7 +108,9 @@ class BookingDevoteeController extends Controller
         if ($request->boolean('is_primary')) {
             BookingDevotee::where('booking_id', $request->booking_id)
                 ->where('id', '!=', $bookingDevotee->id)
-                ->update(['is_primary' => false]);
+                ->update([
+                    'is_primary' => false,
+                ]);
         }
 
         $bookingDevotee->update([
@@ -108,6 +125,7 @@ class BookingDevoteeController extends Controller
             'mobile' => $request->mobile,
             'address' => $request->address,
             'is_primary' => $request->boolean('is_primary'),
+            'updated_by' => auth()->id(),
         ]);
 
         return redirect()
@@ -117,6 +135,10 @@ class BookingDevoteeController extends Controller
 
     public function destroy(BookingDevotee $bookingDevotee)
     {
+        $bookingDevotee->update([
+            'updated_by' => auth()->id(),
+        ]);
+
         $bookingDevotee->delete();
 
         return redirect()

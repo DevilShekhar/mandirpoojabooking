@@ -18,6 +18,8 @@ class BookingDevotee extends Model
         'mobile',
         'address',
         'is_primary',
+        'created_by',
+        'updated_by',
     ];
 
     protected $casts = [
@@ -28,5 +30,15 @@ class BookingDevotee extends Model
     public function booking()
     {
         return $this->belongsTo(PujaBooking::class, 'booking_id');
+    }
+
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function updatedBy()
+    {
+        return $this->belongsTo(User::class, 'updated_by');
     }
 }
