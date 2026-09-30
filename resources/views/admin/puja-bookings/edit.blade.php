@@ -1,447 +1,652 @@
 @can('puja-bookings.edit')
 @extends('admin.layouts.app')
+@section('title', 'Edit Puja Booking')
 
 @section('content')
-<div class="block-header">
-    <div class="row">
-        <div class="col-lg-6 col-md-6 col-sm-12">
-            <h2>Edit Booking</h2>
-            <ul class="breadcrumb">
-                <li class="breadcrumb-item">
-                    <a href="{{ route('dashboard') }}">
-                        <i class="zmdi zmdi-home"></i> Dashboard
-                    </a>
-                </li>
-                <li class="breadcrumb-item">
-                    <a href="{{ route('puja-bookings.index') }}">Bookings</a>
-                </li>
-                <li class="breadcrumb-item active">Edit</li>
-            </ul>
+<section class="section">
+    <div class="section-body">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Edit Puja Booking</h4>
+                        <div class="card-header-action">
+                            <a href="{{ route('puja-bookings.index') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Back
+                            </a>
+                        </div>
+                    </div>
+
+                    <form method="POST" action="{{ route('puja-bookings.update', $pujaBooking) }}">
+                        @csrf
+                        @method('PUT')
+
+                        <div class="card-body">
+
+                            @if($errors->any())
+                                <div class="alert alert-danger">
+                                    <ul class="mb-0">
+                                        @foreach($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
+
+                            <div class="section-title mt-0">
+                                Booking Information
+                            </div>
+
+                            <div class="form-row">
+
+                                <div class="form-group col-md-6">
+                                    <label>Customer/User</label>
+                                    <select name="user_id"
+                                            id="user_id"
+                                            class="form-control @error('user_id') is-invalid @enderror">
+
+                                        <option value="">Select User</option>
+
+                                        @foreach($users as $user)
+
+                                            <option value="{{ $user->id }}"
+                                                data-name="{{ $user->name }}"
+                                                data-email="{{ $user->email }}"
+                                                data-phone="{{ $user->phone }}"
+                                                {{ old('user_id', $pujaBooking->user_id) == $user->id ? 'selected' : '' }}>
+
+                                                {{ $user->name }} - {{ $user->email }}
+
+                                            </option>
+
+                                        @endforeach
+
+                                    </select>
+
+                                    @error('user_id')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="form-group col-md-6">
+                                    <label>Customer Name <span class="text-danger">*</span></label>
+
+                                    <input type="text"
+                                           name="customer_name"
+                                           id="customer_name"
+                                           class="form-control @error('customer_name') is-invalid @enderror"
+                                           value="{{ old('customer_name', $pujaBooking->customer_name) }}"
+                                           placeholder="Enter Customer Name"
+                                           required>
+
+                                    @error('customer_name')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="form-group col-md-6">
+                                    <label>Customer Email</label>
+
+                                    <input type="email"
+                                           name="customer_email"
+                                           id="customer_email"
+                                           class="form-control @error('customer_email') is-invalid @enderror"
+                                           value="{{ old('customer_email', $pujaBooking->customer_email) }}"
+                                           placeholder="Enter Customer Email">
+
+                                    @error('customer_email')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="form-group col-md-6">
+                                    <label>Customer Mobile <span class="text-danger">*</span></label>
+
+                                    <input type="text"
+                                           name="customer_mobile"
+                                           id="customer_mobile"
+                                           class="form-control @error('customer_mobile') is-invalid @enderror"
+                                           value="{{ old('customer_mobile', $pujaBooking->customer_mobile) }}"
+                                           placeholder="Enter Customer Mobile"
+                                           required>
+
+                                    @error('customer_mobile')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="form-group col-md-6">
+                                    <label>Temple <span class="text-danger">*</span></label>
+
+                                    <select name="temple_id"
+                                            class="form-control @error('temple_id') is-invalid @enderror"
+                                            required>
+
+                                        <option value="">Select Temple</option>
+
+                                        @foreach($temples as $temple)
+
+                                            <option value="{{ $temple->id }}"
+                                                {{ old('temple_id', $pujaBooking->temple_id) == $temple->id ? 'selected' : '' }}>
+
+                                                {{ $temple->name }}
+
+                                            </option>
+
+                                        @endforeach
+
+                                    </select>
+
+                                    @error('temple_id')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="form-group col-md-6">
+                                    <label>Deity <span class="text-danger">*</span></label>
+
+                                    <select name="deity_id"
+                                            class="form-control @error('deity_id') is-invalid @enderror"
+                                            required>
+
+                                        <option value="">Select Deity</option>
+
+                                        @foreach($deities as $deity)
+
+                                            <option value="{{ $deity->id }}"
+                                                {{ old('deity_id', $pujaBooking->deity_id) == $deity->id ? 'selected' : '' }}>
+
+                                                {{ $deity->name }}
+
+                                            </option>
+
+                                        @endforeach
+
+                                    </select>
+
+                                    @error('deity_id')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="form-group col-md-6">
+                                    <label>Puja <span class="text-danger">*</span></label>
+
+                                    <select name="puja_id"
+                                            class="form-control @error('puja_id') is-invalid @enderror"
+                                            required>
+
+                                        <option value="">Select Puja</option>
+
+                                        @foreach($pujas as $puja)
+
+                                            <option value="{{ $puja->id }}"
+                                                {{ old('puja_id', $pujaBooking->puja_id) == $puja->id ? 'selected' : '' }}>
+
+                                                {{ $puja->name }}
+
+                                            </option>
+
+                                        @endforeach
+
+                                    </select>
+
+                                    @error('puja_id')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="form-group col-md-6">
+                                    <label>Puja Package <span class="text-danger">*</span></label>
+
+                                    <select name="puja_package_id"
+                                            id="puja_package_id"
+                                            class="form-control @error('puja_package_id') is-invalid @enderror"
+                                            required>
+
+                                        <option value="">Select Package</option>
+
+                                        @foreach($pujaPackages as $package)
+
+                                            <option value="{{ $package->id }}"
+                                                    data-puja-id="{{ $package->puja_id }}"
+                                                    data-package-name="{{ $package->name }}"
+                                                    data-person-count="{{ $package->person_count }}"
+                                                    data-price="{{ $package->price }}"
+                                                    data-discount-price="{{ $package->discount_price }}"
+                                                    {{ old('puja_package_id', $pujaBooking->puja_package_id) == $package->id ? 'selected' : '' }}>
+
+                                                {{ $package->name }}
+
+                                            </option>
+
+                                        @endforeach
+
+                                    </select>
+
+                                    @error('puja_package_id')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="form-group col-md-6">
+                                    <label>Package Name <span class="text-danger">*</span></label>
+
+                                    <input type="text"
+                                           name="package_name"
+                                           id="package_name"
+                                           class="form-control @error('package_name') is-invalid @enderror"
+                                           value="{{ old('package_name', $pujaBooking->package_name) }}"
+                                           placeholder="Select Puja Package"
+                                           readonly
+                                           required>
+
+                                    @error('package_name')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="form-group col-md-6">
+                                    <label>Person Count <span class="text-danger">*</span></label>
+
+                                    <input type="number"
+                                           name="person_count"
+                                           id="person_count"
+                                           class="form-control @error('person_count') is-invalid @enderror"
+                                           value="{{ old('person_count', $pujaBooking->person_count) }}"
+                                           min="1"
+                                           required>
+
+                                    @error('person_count')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="form-group col-md-12">
+                                    <label>Puja Schedule <span class="text-danger">*</span></label>
+
+                                    <select name="puja_schedule_id"
+                                            class="form-control @error('puja_schedule_id') is-invalid @enderror"
+                                            required>
+
+                                        <option value="">Select Schedule</option>
+
+                                        @foreach($pujaSchedules as $schedule)
+
+                                            <option value="{{ $schedule->id }}"
+                                                {{ old('puja_schedule_id', $pujaBooking->puja_schedule_id) == $schedule->id ? 'selected' : '' }}>
+
+                                                {{ $schedule->puja_date }}
+                                                -
+                                                {{ $schedule->start_time }}
+                                                to
+                                                {{ $schedule->end_time }}
+
+                                            </option>
+
+                                        @endforeach
+
+                                    </select>
+
+                                    @error('puja_schedule_id')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                            </div>
+
+                            <div class="section-title">
+                                Pricing
+                            </div>
+
+                            <div class="form-row">
+
+                                <div class="form-group col-md-4">
+                                    <label>Base Amount</label>
+
+                                    <input type="number"
+                                           step="0.01"
+                                           name="base_amount"
+                                           class="form-control @error('base_amount') is-invalid @enderror"
+                                           value="{{ old('base_amount', $pujaBooking->base_amount) }}"
+                                           required>
+
+                                    @error('base_amount')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="form-group col-md-4">
+                                    <label>Discount Amount</label>
+
+                                    <input type="number"
+                                           step="0.01"
+                                           name="discount_amount"
+                                           class="form-control @error('discount_amount') is-invalid @enderror"
+                                           value="{{ old('discount_amount', $pujaBooking->discount_amount) }}">
+
+                                    @error('discount_amount')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="form-group col-md-4">
+                                    <label>Coupon Discount</label>
+
+                                    <input type="number"
+                                           step="0.01"
+                                           name="coupon_discount"
+                                           class="form-control @error('coupon_discount') is-invalid @enderror"
+                                           value="{{ old('coupon_discount', $pujaBooking->coupon_discount) }}">
+
+                                    @error('coupon_discount')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="form-group col-md-4">
+                                    <label>Addon Amount</label>
+
+                                    <input type="number"
+                                           step="0.01"
+                                           name="addon_amount"
+                                           class="form-control @error('addon_amount') is-invalid @enderror"
+                                           value="{{ old('addon_amount', $pujaBooking->addon_amount) }}">
+
+                                    @error('addon_amount')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="form-group col-md-4">
+                                    <label>Shipping Amount</label>
+
+                                    <input type="number"
+                                           step="0.01"
+                                           name="shipping_amount"
+                                           class="form-control @error('shipping_amount') is-invalid @enderror"
+                                           value="{{ old('shipping_amount', $pujaBooking->shipping_amount) }}">
+
+                                    @error('shipping_amount')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="form-group col-md-4">
+                                    <label>Tax Amount</label>
+
+                                    <input type="number"
+                                           step="0.01"
+                                           name="tax_amount"
+                                           class="form-control @error('tax_amount') is-invalid @enderror"
+                                           value="{{ old('tax_amount', $pujaBooking->tax_amount) }}">
+
+                                    @error('tax_amount')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="form-group col-md-4">
+                                    <label>Total Amount <span class="text-danger">*</span></label>
+
+                                    <input type="number"
+                                           step="0.01"
+                                           name="total_amount"
+                                           class="form-control @error('total_amount') is-invalid @enderror"
+                                           value="{{ old('total_amount', $pujaBooking->total_amount) }}"
+                                           required>
+
+                                    @error('total_amount')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                            </div>
+
+                            <div class="section-title">
+                                Booking Status
+                            </div>
+
+                            <div class="form-row">
+
+                                <div class="form-group col-md-4">
+                                    <label>Payment Status</label>
+
+                                    <select name="payment_status"
+                                            class="form-control @error('payment_status') is-invalid @enderror">
+
+                                        <option value="pending"
+                                            {{ old('payment_status', $pujaBooking->payment_status) == 'pending' ? 'selected' : '' }}>
+                                            Pending
+                                        </option>
+
+                                        <option value="paid"
+                                            {{ old('payment_status', $pujaBooking->payment_status) == 'paid' ? 'selected' : '' }}>
+                                            Paid
+                                        </option>
+
+                                        <option value="failed"
+                                            {{ old('payment_status', $pujaBooking->payment_status) == 'failed' ? 'selected' : '' }}>
+                                            Failed
+                                        </option>
+
+                                        <option value="refunded"
+                                            {{ old('payment_status', $pujaBooking->payment_status) == 'refunded' ? 'selected' : '' }}>
+                                            Refunded
+                                        </option>
+
+                                    </select>
+
+                                    @error('payment_status')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="form-group col-md-4">
+                                    <label>Booking Status</label>
+
+                                    <select name="booking_status"
+                                            class="form-control @error('booking_status') is-invalid @enderror">
+
+                                        <option value="new"
+                                            {{ old('booking_status', $pujaBooking->booking_status) == 'new' ? 'selected' : '' }}>
+                                            New
+                                        </option>
+
+                                        <option value="payment_verified"
+                                            {{ old('booking_status', $pujaBooking->booking_status) == 'payment_verified' ? 'selected' : '' }}>
+                                            Payment Verified
+                                        </option>
+
+                                        <option value="confirmed"
+                                            {{ old('booking_status', $pujaBooking->booking_status) == 'confirmed' ? 'selected' : '' }}>
+                                            Confirmed
+                                        </option>
+
+                                        <option value="cancelled"
+                                            {{ old('booking_status', $pujaBooking->booking_status) == 'cancelled' ? 'selected' : '' }}>
+                                            Cancelled
+                                        </option>
+
+                                        <option value="completed"
+                                            {{ old('booking_status', $pujaBooking->booking_status) == 'completed' ? 'selected' : '' }}>
+                                            Completed
+                                        </option>
+
+                                    </select>
+
+                                    @error('booking_status')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="form-group col-md-4">
+                                    <label>Sankalp Status</label>
+
+                                    <select name="sankalp_status"
+                                            class="form-control @error('sankalp_status') is-invalid @enderror">
+
+                                        <option value="pending"
+                                            {{ old('sankalp_status', $pujaBooking->sankalp_status) == 'pending' ? 'selected' : '' }}>
+                                            Pending
+                                        </option>
+
+                                        <option value="completed"
+                                            {{ old('sankalp_status', $pujaBooking->sankalp_status) == 'completed' ? 'selected' : '' }}>
+                                            Completed
+                                        </option>
+
+                                    </select>
+
+                                    @error('sankalp_status')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="form-group col-md-4">
+                                    <label>Puja Status</label>
+
+                                    <select name="puja_status"
+                                            class="form-control @error('puja_status') is-invalid @enderror">
+
+                                        <option value="pending"
+                                            {{ old('puja_status', $pujaBooking->puja_status) == 'pending' ? 'selected' : '' }}>
+                                            Pending
+                                        </option>
+
+                                        <option value="scheduled"
+                                            {{ old('puja_status', $pujaBooking->puja_status) == 'scheduled' ? 'selected' : '' }}>
+                                            Scheduled
+                                        </option>
+
+                                        <option value="completed"
+                                            {{ old('puja_status', $pujaBooking->puja_status) == 'completed' ? 'selected' : '' }}>
+                                            Completed
+                                        </option>
+
+                                    </select>
+
+                                    @error('puja_status')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="form-group col-md-4">
+                                    <label>Video Status</label>
+
+                                    <select name="video_status"
+                                            class="form-control @error('video_status') is-invalid @enderror">
+
+                                        <option value="pending"
+                                            {{ old('video_status', $pujaBooking->video_status) == 'pending' ? 'selected' : '' }}>
+                                            Pending
+                                        </option>
+
+                                        <option value="available"
+                                            {{ old('video_status', $pujaBooking->video_status) == 'available' ? 'selected' : '' }}>
+                                            Available
+                                        </option>
+
+                                    </select>
+
+                                    @error('video_status')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="form-group col-md-4">
+                                    <label>Prasad Status</label>
+
+                                    <select name="prasad_status"
+                                            class="form-control @error('prasad_status') is-invalid @enderror">
+
+                                        <option value="pending"
+                                            {{ old('prasad_status', $pujaBooking->prasad_status) == 'pending' ? 'selected' : '' }}>
+                                            Pending
+                                        </option>
+
+                                        <option value="packed"
+                                            {{ old('prasad_status', $pujaBooking->prasad_status) == 'packed' ? 'selected' : '' }}>
+                                            Packed
+                                        </option>
+
+                                        <option value="shipped"
+                                            {{ old('prasad_status', $pujaBooking->prasad_status) == 'shipped' ? 'selected' : '' }}>
+                                            Shipped
+                                        </option>
+
+                                        <option value="delivered"
+                                            {{ old('prasad_status', $pujaBooking->prasad_status) == 'delivered' ? 'selected' : '' }}>
+                                            Delivered
+                                        </option>
+
+                                    </select>
+
+                                    @error('prasad_status')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="card-footer text-right">
+
+                            <a href="{{ route('puja-bookings.index') }}"
+                               class="btn btn-secondary mr-1">
+                                Cancel
+                            </a>
+
+                            <button type="reset"
+                                    class="btn btn-light mr-1">
+                                Reset
+                            </button>
+
+                            <button type="submit"
+                                    class="btn btn-primary">
+                                <i class="fas fa-save"></i>
+                                Update Booking
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
         </div>
     </div>
-</div>
+</section>
 
-<div class="row clearfix">
-    <div class="col-lg-12">
-        <div class="card">
-            <div class="header">
-                <h2><strong>Edit</strong> Booking</h2>
-            </div>
+<script>
+    document.getElementById('user_id').addEventListener('change', function () {
+        const selectedOption = this.options[this.selectedIndex];
 
-            <div class="body">
+        if (!this.value) {
+            document.getElementById('customer_name').value = '';
+            document.getElementById('customer_email').value = '';
+            document.getElementById('customer_mobile').value = '';
+            return;
+        }
 
-                @if ($errors->any())
-                    <div class="alert alert-danger">
-                        <ul class="mb-0">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
+        document.getElementById('customer_name').value = selectedOption.dataset.name || '';
+        document.getElementById('customer_email').value = selectedOption.dataset.email || '';
+        document.getElementById('customer_mobile').value = selectedOption.dataset.phone || '';
+    });
 
-                <form action="{{ route('puja-bookings.update', $pujaBooking->id) }}"
-                      method="POST">
+    document.getElementById('user_id').dispatchEvent(new Event('change'));
 
-                    @csrf
-                    @method('PUT')
+    document.getElementById('puja_package_id').addEventListener('change', function () {
+        const selectedOption = this.options[this.selectedIndex];
 
-                    <div class="row">
+        document.getElementById('package_name').value =
+            selectedOption.dataset.packageName || '';
+    });
 
-                        {{-- Booking Number --}}
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Booking Number</label>
-                                <input type="text"
-                                       class="form-control"
-                                       value="{{ $pujaBooking->booking_number }}"
-                                       readonly>
-                            </div>
-                        </div>
+    document.getElementById('puja_package_id').dispatchEvent(new Event('change'));
+</script>
 
-                        {{-- Customer --}}
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Customer</label>
-                                <select name="user_id" class="form-control">
-                                    <option value="">Select Customer</option>
-                                    @foreach($users as $user)
-                                        <option value="{{ $user->id }}"
-                                            {{ old('user_id', $pujaBooking->user_id) == $user->id ? 'selected' : '' }}>
-                                            {{ $user->name }} - {{ $user->email }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-
-                        {{-- Temple --}}
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Temple</label>
-                                <select name="temple_id" class="form-control">
-                                    <option value="">Select Temple</option>
-                                    @foreach($temples as $temple)
-                                        <option value="{{ $temple->id }}"
-                                            {{ old('temple_id', $pujaBooking->temple_id) == $temple->id ? 'selected' : '' }}>
-                                            {{ $temple->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-
-                        {{-- Deity --}}
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Deity</label>
-                                <select name="deity_id" class="form-control">
-                                    <option value="">Select Deity</option>
-                                    @foreach($deities as $deity)
-                                        <option value="{{ $deity->id }}"
-                                            {{ old('deity_id', $pujaBooking->deity_id) == $deity->id ? 'selected' : '' }}>
-                                            {{ $deity->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-
-                        {{-- Puja --}}
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Puja</label>
-                                <select name="puja_id" class="form-control">
-                                    <option value="">Select Puja</option>
-                                    @foreach($pujas as $puja)
-                                        <option value="{{ $puja->id }}"
-                                            {{ old('puja_id', $pujaBooking->puja_id) == $puja->id ? 'selected' : '' }}>
-                                            {{ $puja->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-
-                        {{-- Puja Package --}}
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Puja Package</label>
-                                <select name="puja_package_id" class="form-control">
-                                    <option value="">Select Package</option>
-                                    @foreach($pujaPackages as $package)
-                                        <option value="{{ $package->id }}"
-                                            {{ old('puja_package_id', $pujaBooking->puja_package_id) == $package->id ? 'selected' : '' }}>
-                                            {{ $package->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-
-                        {{-- Schedule --}}
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Puja Schedule</label>
-                                <select name="puja_schedule_id" class="form-control">
-                                    <option value="">Select Schedule</option>
-                                    @foreach($pujaSchedules as $schedule)
-                                        <option value="{{ $schedule->id }}"
-                                            {{ old('puja_schedule_id', $pujaBooking->puja_schedule_id) == $schedule->id ? 'selected' : '' }}>
-                                            {{ $schedule->puja_date }} |
-                                            {{ $schedule->start_time }} - {{ $schedule->end_time }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-
-                        {{-- Customer Name --}}
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Customer Name</label>
-                                <input type="text"
-                                       name="customer_name"
-                                       class="form-control"
-                                       value="{{ old('customer_name', $pujaBooking->customer_name) }}">
-                            </div>
-                        </div>
-
-                        {{-- Customer Email --}}
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Customer Email</label>
-                                <input type="email"
-                                       name="customer_email"
-                                       class="form-control"
-                                       value="{{ old('customer_email', $pujaBooking->customer_email) }}">
-                            </div>
-                        </div>
-
-                        {{-- Customer Mobile --}}
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Customer Mobile</label>
-                                <input type="text"
-                                       name="customer_mobile"
-                                       class="form-control"
-                                       value="{{ old('customer_mobile', $pujaBooking->customer_mobile) }}">
-                            </div>
-                        </div>
-
-                        {{-- Package Name Snapshot --}}
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Package Name</label>
-                                <input type="text"
-                                       name="package_name"
-                                       class="form-control"
-                                       value="{{ old('package_name', $pujaBooking->package_name) }}">
-                            </div>
-                        </div>
-
-                        {{-- Person Count --}}
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Person Count</label>
-                                <input type="number"
-                                       name="person_count"
-                                       class="form-control"
-                                       min="1"
-                                       value="{{ old('person_count', $pujaBooking->person_count) }}">
-                            </div>
-                        </div>
-
-                        {{-- Base Amount --}}
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Base Amount</label>
-                                <input type="number"
-                                       name="base_amount"
-                                       class="form-control"
-                                       step="0.01"
-                                       value="{{ old('base_amount', $pujaBooking->base_amount) }}">
-                            </div>
-                        </div>
-
-                        {{-- Discount --}}
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Discount Amount</label>
-                                <input type="number"
-                                       name="discount_amount"
-                                       class="form-control"
-                                       step="0.01"
-                                       value="{{ old('discount_amount', $pujaBooking->discount_amount) }}">
-                            </div>
-                        </div>
-
-                        {{-- Coupon Discount --}}
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Coupon Discount</label>
-                                <input type="number"
-                                       name="coupon_discount"
-                                       class="form-control"
-                                       step="0.01"
-                                       value="{{ old('coupon_discount', $pujaBooking->coupon_discount) }}">
-                            </div>
-                        </div>
-
-                        {{-- Addon Amount --}}
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Addon Amount</label>
-                                <input type="number"
-                                       name="addon_amount"
-                                       class="form-control"
-                                       step="0.01"
-                                       value="{{ old('addon_amount', $pujaBooking->addon_amount) }}">
-                            </div>
-                        </div>
-
-                        {{-- Shipping --}}
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Shipping Amount</label>
-                                <input type="number"
-                                       name="shipping_amount"
-                                       class="form-control"
-                                       step="0.01"
-                                       value="{{ old('shipping_amount', $pujaBooking->shipping_amount) }}">
-                            </div>
-                        </div>
-
-                        {{-- Tax --}}
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Tax Amount</label>
-                                <input type="number"
-                                       name="tax_amount"
-                                       class="form-control"
-                                       step="0.01"
-                                       value="{{ old('tax_amount', $pujaBooking->tax_amount) }}">
-                            </div>
-                        </div>
-
-                        {{-- Total --}}
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Total Amount</label>
-                                <input type="number"
-                                       name="total_amount"
-                                       class="form-control"
-                                       step="0.01"
-                                       value="{{ old('total_amount', $pujaBooking->total_amount) }}">
-                            </div>
-                        </div>
-
-                        {{-- Payment Status --}}
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Payment Status</label>
-                                <select name="payment_status" class="form-control">
-                                    @foreach([
-                                        'pending' => 'Pending',
-                                        'processing' => 'Processing',
-                                        'paid' => 'Paid',
-                                        'failed' => 'Failed',
-                                        'refunded' => 'Refunded',
-                                        'partially_refunded' => 'Partially Refunded'
-                                    ] as $key => $value)
-                                        <option value="{{ $key }}"
-                                            {{ old('payment_status', $pujaBooking->payment_status) == $key ? 'selected' : '' }}>
-                                            {{ $value }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-
-                        {{-- Payment Method --}}
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Payment Method</label>
-                                <select name="payment_method" class="form-control">
-                                    <option value="">Select Method</option>
-                                    <option value="razorpay" {{ old('payment_method', $pujaBooking->payment_method ?? '') == 'razorpay' ? 'selected' : '' }}>
-                                        Razorpay
-                                    </option>
-                                    <option value="cod" {{ old('payment_method', $pujaBooking->payment_method ?? '') == 'cod' ? 'selected' : '' }}>
-                                        Cash / COD
-                                    </option>
-                                    <option value="upi" {{ old('payment_method', $pujaBooking->payment_method ?? '') == 'upi' ? 'selected' : '' }}>
-                                        UPI
-                                    </option>
-                                </select>
-                            </div>
-                        </div>
-
-                        {{-- Booking Status --}}
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Booking Status</label>
-                                <select name="booking_status" class="form-control">
-                                    @foreach([
-                                        'pending' => 'Pending',
-                                        'confirmed' => 'Confirmed',
-                                        'pandit_assigned' => 'Pandit Assigned',
-                                        'sankalp_pending' => 'Sankalp Pending',
-                                        'sankalp_completed' => 'Sankalp Completed',
-                                        'puja_scheduled' => 'Puja Scheduled',
-                                        'puja_in_progress' => 'Puja In Progress',
-                                        'puja_completed' => 'Puja Completed',
-                                        'video_uploaded' => 'Video Uploaded',
-                                        'prasad_packed' => 'Prasad Packed',
-                                        'prasad_shipped' => 'Prasad Shipped',
-                                        'delivered' => 'Delivered',
-                                        'completed' => 'Completed',
-                                        'cancelled' => 'Cancelled'
-                                    ] as $key => $value)
-                                        <option value="{{ $key }}"
-                                            {{ old('booking_status', $pujaBooking->booking_status) == $key ? 'selected' : '' }}>
-                                            {{ $value }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-
-                        {{-- Sankalp Status --}}
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Sankalp Status</label>
-                                <select name="sankalp_status" class="form-control">
-                                    <option value="pending" {{ old('sankalp_status', $pujaBooking->sankalp_status) == 'pending' ? 'selected' : '' }}>Pending</option>
-                                    <option value="in_progress" {{ old('sankalp_status', $pujaBooking->sankalp_status) == 'in_progress' ? 'selected' : '' }}>In Progress</option>
-                                    <option value="completed" {{ old('sankalp_status', $pujaBooking->sankalp_status) == 'completed' ? 'selected' : '' }}>Completed</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        {{-- Puja Status --}}
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Puja Status</label>
-                                <select name="puja_status" class="form-control">
-                                    <option value="pending" {{ old('puja_status', $pujaBooking->puja_status) == 'pending' ? 'selected' : '' }}>Pending</option>
-                                    <option value="scheduled" {{ old('puja_status', $pujaBooking->puja_status) == 'scheduled' ? 'selected' : '' }}>Scheduled</option>
-                                    <option value="in_progress" {{ old('puja_status', $pujaBooking->puja_status) == 'in_progress' ? 'selected' : '' }}>In Progress</option>
-                                    <option value="completed" {{ old('puja_status', $pujaBooking->puja_status) == 'completed' ? 'selected' : '' }}>Completed</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        {{-- Video Status --}}
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Video Status</label>
-                                <select name="video_status" class="form-control">
-                                    <option value="pending" {{ old('video_status', $pujaBooking->video_status) == 'pending' ? 'selected' : '' }}>Pending</option>
-                                    <option value="uploaded" {{ old('video_status', $pujaBooking->video_status) == 'uploaded' ? 'selected' : '' }}>Uploaded</option>
-                                    <option value="shared" {{ old('video_status', $pujaBooking->video_status) == 'shared' ? 'selected' : '' }}>Shared</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        {{-- Prasad Status --}}
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Prasad Status</label>
-                                <select name="prasad_status" class="form-control">
-                                    <option value="pending" {{ old('prasad_status', $pujaBooking->prasad_status) == 'pending' ? 'selected' : '' }}>Pending</option>
-                                    <option value="packed" {{ old('prasad_status', $pujaBooking->prasad_status) == 'packed' ? 'selected' : '' }}>Packed</option>
-                                    <option value="shipped" {{ old('prasad_status', $pujaBooking->prasad_status) == 'shipped' ? 'selected' : '' }}>Shipped</option>
-                                    <option value="delivered" {{ old('prasad_status', $pujaBooking->prasad_status) == 'delivered' ? 'selected' : '' }}>Delivered</option>
-                                </select>
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <div class="form-group">
-                        <label>Special Instructions</label>
-                        <textarea name="special_instructions"
-                                  class="form-control"
-                                  rows="4">{{ old('special_instructions', $pujaBooking->special_instructions ?? '') }}</textarea>
-                    </div>
-
-                    <div class="mt-3">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="zmdi zmdi-check"></i> Update Booking
-                        </button>
-
-                        <a href="{{ route('puja-bookings.index') }}"
-                           class="btn btn-secondary">
-                            Cancel
-                        </a>
-                    </div>
-
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
 @endsection
 @else
     @php

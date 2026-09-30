@@ -169,13 +169,18 @@
 
                                 </div>
                                 <div class="form-group col-md-6">
+
+                                @if(!$isPandit)
+
                                     <label>
                                         Role <span class="text-danger">*</span>
                                     </label>
 
                                     <div class="input-group">
 
-                                        <select name="role_id" class="form-control">
+                                        <select name="role_id"
+                                                class="form-control @error('role_id') is-invalid @enderror">
+
                                             <option value="">Select Role</option>
 
                                             @foreach($roles as $role)
@@ -184,13 +189,17 @@
                                                     {{ $role->name }}
                                                 </option>
                                             @endforeach
+
                                         </select>
                                     </div>
 
                                     @error('role_id')
                                         <small class="text-danger">{{ $message }}</small>
                                     @enderror
-                                </div>
+
+                                @endif
+
+                            </div>
 
                                 <div class="form-group col-md-6">
 
