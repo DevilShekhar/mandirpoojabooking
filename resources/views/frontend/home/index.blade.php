@@ -54,7 +54,6 @@
                 </div>
             </div>
         </div>
-
         <div class="row">
             <div class="product-active owl-carousel">
                 @forelse($temples as $temple)
@@ -101,10 +100,220 @@
         </div>
     </div>
 </section>
-
-<!-- ================================
-     WHY BUY FROM US
-================================ -->
+<section class="special-puja-area pt-60 pb-60">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="special-puja-heading text-center mb-30">
+                    <h2>
+                        <span>Sri Mandir</span> Special Pujas
+                    </h2>
+                    <p>
+                        Begin 2026 with faith - get special pujas performed in your name
+                        at India's powerful temples to achieve peace and protection for your family.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="special-puja-slider owl-carousel">
+                    <div class="col-lg-4">
+                        <div class="special-puja-card">
+                            <div class="puja-image">
+                                <img  src="{{ asset('assets/frontend/assets/images/puja/puja-1.jpg') }}" alt="Shradh Ekadashi Gaya Tripindi Shradh">
+                            </div>
+                            <div class="puja-content">
+                                <div class="puja-category">
+                                    PIND DAAN AND TRIPINDI SHRADDH GAYA SPECIAL
+                                </div>
+                                <h3>
+                                    Shradh Ekadashi - Gaya Tripindi Shradh,
+                                    Pind Daan and Til Tarpanam
+                                </h3>
+                                <p class="puja-description">
+                                    For Peace of Departed Souls
+                                </p>
+                                <div class="puja-info">
+                                    <div>
+                                        <i class="fa fa-map-marker"></i>
+                                        <span>
+                                            Vishnu Pad Gaya Ji, Gaya Ji, Bihar
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <i class="fa fa-calendar"></i>
+                                        <span>
+                                            6 October, Tuesday, Ashwina Krishna Ekadashi
+                                        </span>
+                                    </div>
+                                </div>
+                                <a href="#" class="puja-btn">
+                                    PARTICIPATE
+                                    <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="special-puja-card">
+                            <div class="puja-image">
+                                <img  src="{{ asset('assets/frontend/assets/images/puja/puja-2.jpg') }}"   alt="Mahalaya Amavasya">
+                            </div>
+                            <div class="puja-content">
+                                <div class="puja-category">
+                                    LAST DAY OF PITRU PAKSHA SARVA PITRU SHANTI SPECIAL
+                                </div>
+                                <h3>
+                                    Mahalaya Amavasya: Gaya Ji Sarva Pitru
+                                    Shanti Puja and Pind Daan
+                                </h3>
+                                <p class="puja-description">
+                                    For ancestral peace and blessings across seven generations
+                                </p>
+                                <div class="puja-info">
+                                    <div>
+                                        <i class="fa fa-map-marker"></i>
+                                        <span>
+                                            Dharmaranya Vedi, Gaya Ji, Bihar
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <i class="fa fa-calendar"></i>
+                                        <span>
+                                            10 October, Saturday, Ashwin Krishna Amavasya
+                                        </span>
+                                    </div>
+                                </div>
+                                <a href="#" class="puja-btn">
+                                    PARTICIPATE
+                                    <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="special-puja-card">
+                            <div class="puja-image">
+                                <img  src="{{ asset('assets/frontend/assets/images/puja/puja-3.jpg') }}" alt="Kaal Bhairav Puja">
+                            </div>
+                            <div class="puja-content">
+                                <div class="puja-category">
+                                    KAALASHTAMI KAAL BHAIRAV KASHI SPECIAL
+                                </div>
+                                <h3>
+                                    Kaal Bhairav Kashi 1,00,000 Kaal Bhairav
+                                    Mool Mantra Jaap and Bagalamukhi Havan
+                                </h3>
+                                <p class="puja-description">
+                                    For protection from enemies, legal success and removal of all negativity
+                                </p>
+                                <div class="puja-info">
+                                    <div>
+                                        <i class="fa fa-map-marker"></i>
+                                        <span>
+                                            Kaal Bhairav Temple, Kashi
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <i class="fa fa-calendar"></i>
+                                        <span>
+                                            3 October, Saturday, Ashwina Krishna Ashtami
+                                        </span>
+                                    </div>
+                                </div>
+                                <a href="#" class="puja-btn">
+                                    PARTICIPATE
+                                    <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="special-puja-card">
+                            <div class="puja-image">
+                                <img src="{{ asset('assets/frontend/assets/images/puja/puja-4.jpg') }}" alt="Navratri Special Puja">
+                            </div>
+                            <div class="puja-content">
+                                <div class="puja-category">
+                                    NAVRATRI SPECIAL PUJA
+                                </div>
+                                <h3>
+                                    Maa Durga Navratri Special Puja and Havan
+                                </h3>
+                                <p class="puja-description">
+                                    For prosperity, happiness and divine protection for your family
+                                </p>
+                                <div class="puja-info">
+                                    <div>
+                                        <i class="fa fa-map-marker"></i>
+                                        <span>
+                                            Maa Durga Temple, Varanasi
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <i class="fa fa-calendar"></i>
+                                        <span>
+                                            15 October, Thursday, Navratri Special
+                                        </span>
+                                    </div>
+                                </div>
+                                <a href="#" class="puja-btn">
+                                    PARTICIPATE
+                                    <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="special-puja-card">
+                            <div class="puja-image">
+                                <img src="{{ asset('assets/frontend/assets/images/puja/puja-5.jpg') }}" alt="Maha Mrityunjaya Puja">
+                            </div>
+                            <div class="puja-content">
+                                <div class="puja-category">
+                                    MAHA MRITYUNJAYA SPECIAL PUJA
+                                </div>
+                                <h3>
+                                    Maha Mrityunjaya Jaap and Rudrabhishek Puja
+                                </h3>
+                                <p class="puja-description">
+                                    For health, peace, protection and removal of negative energies
+                                </p>
+                                <div class="puja-info">
+                                    <div>
+                                        <i class="fa fa-map-marker"></i>
+                                        <span>
+                                            Kashi Vishwanath Temple, Varanasi
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <i class="fa fa-calendar"></i>
+                                        <span>
+                                            20 October, Tuesday, Special Muhurat
+                                        </span>
+                                    </div>
+                                </div>
+                                <a href="#" class="puja-btn">
+                                    PARTICIPATE
+                                    <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 text-center mt-25">
+                <a href="#" class="view-all-pujas">
+                    View All Pujas
+                    <i class="fa fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
 <section class="why-buy-section">
     <div class="container">
         <div class="why-buy-heading text-center">
@@ -230,7 +439,6 @@
         </div>
     </div>
 </section>
-
 <section class="trusted-devotees-section">
     <div class="container">
         <div class="row align-items-center">
@@ -293,11 +501,88 @@
         </div>
     </div>
 </section>
-
-
-<!-- ================================
-     WHY CHOOSE US
-================================ -->
+<section class="special-puja-area pt-60 pb-60">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="special-puja-heading text-center mb-30">
+                    <h2>Sri Mandir in News</h2>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="special-puja-slider owl-carousel">
+                    <div class="col-lg-4">
+                        <div class="special-puja-card">
+                            <div class="puja-content text-center">
+                                <div class="puja-category">द्रिक पंचांग</div>
+                                <h3>अयोध्या का विग्रहण: श्री मंदिर एवं बालाजी धाम से जुड़ी विशेष खबर</h3>
+                                <p class="puja-description">श्री मंदिर से जुड़ी महत्वपूर्ण धार्मिक खबरें और विशेष समाचार पढ़ें।</p>
+                            </div>
+                            <div class="puja-image">
+                                <img src="{{ asset('assets/frontend/assets/images/news/news-1.jpg') }}" alt="Sri Mandir News">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="special-puja-card">
+                            <div class="puja-content text-center">
+                                <div class="puja-category">प्रभात खबर</div>
+                                <h3>पितृपक्ष में अनुष्ठान का बना बदलाव, श्री मंदिर ऐप से दुनिया भर के श्रद्धालु जुड़ रहे</h3>
+                                <p class="puja-description">देश और विदेश के भक्तों के लिए विशेष पूजा और धार्मिक अनुष्ठानों की जानकारी।</p>
+                            </div>
+                            <div class="puja-image">
+                                <img src="{{ asset('assets/frontend/assets/images/news/news-2.jpg') }}" alt="Sri Mandir News">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="special-puja-card">
+                            <div class="puja-content text-center">
+                                <div class="puja-category">नवभारत टाइम्स</div>
+                                <h3>उदय के अतिथि देवों भवः की सेवा और भक्ति लोकपयोगी भी मंदिर सेवा पर</h3>
+                                <p class="puja-description">भारत के प्रसिद्ध मंदिरों और धार्मिक आयोजनों से जुड़ी नवीनतम खबरें।</p>
+                            </div>
+                            <div class="puja-image">
+                                <img src="{{ asset('assets/frontend/assets/images/news/news-3.jpg') }}" alt="Sri Mandir News">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="special-puja-card">
+                            <div class="puja-content text-center">
+                                <div class="puja-category">आज तक</div>
+                                <h3>धार्मिक स्थलों और मंदिरों से जुड़ी महत्वपूर्ण खबरें और अपडेट</h3>
+                                <p class="puja-description">मंदिरों, पूजा और धार्मिक आयोजनों की नवीनतम जानकारी।</p>
+                            </div>
+                            <div class="puja-image">
+                                <img src="{{ asset('assets/frontend/assets/images/news/news-4.jpg') }}" alt="Sri Mandir News">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="special-puja-card">
+                            <div class="puja-content text-center">
+                                <div class="puja-category">दैनिक जागरण</div>
+                                <h3>भारत के प्रसिद्ध मंदिरों में विशेष पूजा और धार्मिक कार्यक्रमों की जानकारी</h3>
+                                <p class="puja-description">श्रद्धालुओं के लिए पूजा और धार्मिक कार्यक्रमों से जुड़ी विशेष जानकारी।</p>
+                            </div>
+                            <div class="puja-image">
+                                <img src="{{ asset('assets/frontend/assets/images/news/news-5.jpg') }}" alt="Sri Mandir News">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 text-center mt-25">
+                <a href="#" class="view-all-pujas">View All News <i class="fa fa-arrow-right"></i></a>
+            </div>
+        </div>
+    </div>
+</section>
 <section class="why-choose-section">
 
     <div class="container">
@@ -395,168 +680,90 @@
     </div>
 
 </section>
-
-
-<!-- ================================
-     COUNTERS
-================================ -->
 <div class="counterup-area">
-
     <div class="container-fluid p-0">
-
         <div class="row no-gutters">
-
-
             <div class="col-lg-3 col-md-6">
-
                 <div class="limupa-counter white-smoke-bg">
-
                     <div class="container">
-
                         <div class="counter-img">
-
                             <img src="{{ asset('assets/frontend/assets/images/about-us/icon/1.png') }}"
                                 alt="Happy Customers">
-
                         </div>
-
                         <div class="counter-info">
-
                             <div class="counter-number">
-
                                 <h3 class="counter">
                                     2169
                                 </h3>
-
                             </div>
-
                             <div class="counter-text">
-
                                 <span>
                                     HAPPY CUSTOMERS
                                 </span>
-
                             </div>
-
                         </div>
-
                     </div>
-
                 </div>
-
             </div>
-
-
             <div class="col-lg-3 col-md-6">
-
                 <div class="limupa-counter gray-bg">
-
                     <div class="counter-img">
-
                         <img src="{{ asset('assets/frontend/assets/images/about-us/icon/2.png') }}" alt="Awards">
-
                     </div>
-
                     <div class="counter-info">
-
                         <div class="counter-number">
-
                             <h3 class="counter">
                                 869
                             </h3>
-
                         </div>
-
                         <div class="counter-text">
-
                             <span>
                                 AWARDS WON
                             </span>
-
                         </div>
-
                     </div>
-
                 </div>
-
             </div>
-
-
             <div class="col-lg-3 col-md-6">
-
                 <div class="limupa-counter white-smoke-bg">
-
                     <div class="counter-img">
-
                         <img src="{{ asset('assets/frontend/assets/images/about-us/icon/3.png') }}" alt="Hours Worked">
-
                     </div>
-
                     <div class="counter-info">
-
                         <div class="counter-number">
-
                             <h3 class="counter">
-                                689
+                               689
                             </h3>
-
                         </div>
-
                         <div class="counter-text">
-
                             <span>
                                 HOURS WORKED
                             </span>
-
                         </div>
-
                     </div>
-
                 </div>
-
             </div>
-
-
             <div class="col-lg-3 col-md-6">
-
                 <div class="limupa-counter gray-bg">
-
                     <div class="counter-img">
-
                         <img src="{{ asset('assets/frontend/assets/images/about-us/icon/4.png') }}"
                             alt="Completed Projects">
-
                     </div>
-
                     <div class="counter-info">
-
                         <div class="counter-number">
-
                             <h3 class="counter">
-                                2169
+                               2169
                             </h3>
-
                         </div>
-
                         <div class="counter-text">
-
                             <span>
                                 COMPLETE PROJECTS
                             </span>
-
                         </div>
-
                     </div>
-
                 </div>
-
             </div>
-
-
         </div>
-
     </div>
-
 </div>
-
 @endsection

@@ -855,74 +855,66 @@
 
     <!-- Body Wrapper End Here -->
 
-    <!-- jQuery-V1.12.4 -->
     <script src="{{ asset('assets/frontend/assets/js/vendor/jquery-1.12.4.min.js') }}"></script>
-
-    <!-- Popper JS -->
     <script src="{{ asset('assets/frontend/assets/js/vendor/popper.min.js') }}"></script>
-
-    <!-- Bootstrap V4.1.3 Framework JS -->
     <script src="{{ asset('assets/frontend/assets/js/bootstrap.min.js') }}"></script>
-
-    <!-- Ajax Mail JS -->
     <script src="{{ asset('assets/frontend/assets/js/ajax-mail.js') }}"></script>
-
-    <!-- Meanmenu JS -->
     <script src="{{ asset('assets/frontend/assets/js/jquery.meanmenu.min.js') }}"></script>
-
-    <!-- Wow.min JS -->
     <script src="{{ asset('assets/frontend/assets/js/wow.min.js') }}"></script>
-
-    <!-- Slick Carousel JS -->
     <script src="{{ asset('assets/frontend/assets/js/slick.min.js') }}"></script>
-
-    <!-- Owl Carousel-2 JS -->
     <script src="{{ asset('assets/frontend/assets/js/owl.carousel.min.js') }}"></script>
-
-    <!-- Magnific Popup JS -->
     <script src="{{ asset('assets/frontend/assets/js/jquery.magnific-popup.min.js') }}"></script>
-
-    <!-- Isotope JS -->
     <script src="{{ asset('assets/frontend/assets/js/isotope.pkgd.min.js') }}"></script>
-
-    <!-- Imagesloaded JS -->
     <script src="{{ asset('assets/frontend/assets/js/imagesloaded.pkgd.min.js') }}"></script>
-
-    <!-- Mixitup JS -->
     <script src="{{ asset('assets/frontend/assets/js/jquery.mixitup.min.js') }}"></script>
-
-    <!-- Countdown JS -->
     <script src="{{ asset('assets/frontend/assets/js/jquery.countdown.min.js') }}"></script>
-
-    <!-- Counterup JS -->
     <script src="{{ asset('assets/frontend/assets/js/jquery.counterup.min.js') }}"></script>
-
-    <!-- Waypoints JS -->
     <script src="{{ asset('assets/frontend/assets/js/waypoints.min.js') }}"></script>
-
-    <!-- Barrating JS -->
     <script src="{{ asset('assets/frontend/assets/js/jquery.barrating.min.js') }}"></script>
-
-    <!-- jQuery UI JS -->
     <script src="{{ asset('assets/frontend/assets/js/jquery-ui.min.js') }}"></script>
-
-    <!-- Venobox JS -->
     <script src="{{ asset('assets/frontend/assets/js/venobox.min.js') }}"></script>
-
-    <!-- Nice Select JS -->
     <script src="{{ asset('assets/frontend/assets/js/jquery.nice-select.min.js') }}"></script>
-
-    <!-- ScrollUp JS -->
     <script src="{{ asset('assets/frontend/assets/js/scrollUp.min.js') }}"></script>
     <script src="{{ asset('assets/bundles/sweetalert/sweetalert-11.js') }}"></script>
-
-    <!-- Main/Activator JS -->
+    <!-- Main Theme JS -->
     <script src="{{ asset('assets/frontend/assets/js/main.js') }}"></script>
-    
-    
-   
-    
-  
+    <script>
+        $(document).ready(function () {
+            var $pujaSlider = $('.special-puja-slider');
+            if (!$pujaSlider.length) {
+                return;
+            }
+            if (typeof $.fn.owlCarousel === 'undefined') {
+                console.error('Owl Carousel is not loaded.');
+                return;
+            }
+            if ($pujaSlider.hasClass('owl-loaded')) {
+                $pujaSlider.trigger('destroy.owl.carousel');
+            }
+            $pujaSlider.owlCarousel({
+                loop: true,
+                margin: 0,
+                nav: true,
+                dots: false,
+                autoplay: true,
+                autoplayTimeout: 3000,
+                autoplayHoverPause: true,
+                smartSpeed: 700,
+                slideBy: 1,
+                responsive: {
+                    0: {
+                        items: 1
+                    },
+                    576: {
+                        items: 2
+                    },
+                    992: {
+                        items: 3
+                    }
+                }
+            });
+        });
+    </script>
     
     @if(session('error'))
     <script>
