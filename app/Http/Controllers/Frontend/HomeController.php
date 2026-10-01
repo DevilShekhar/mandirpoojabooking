@@ -3,15 +3,16 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Models\HomeBanner;
 
 class HomeController extends Controller
 {
-    /**
-     * Display the frontend home page.
-     */
     public function index()
     {
-        return view('frontend.home.index');
+        $homeBanners = HomeBanner::where('status', 1)
+            ->latest()
+            ->get();
+
+        return view('frontend.home.index', compact('homeBanners'));
     }
 }

@@ -11,10 +11,13 @@
                 <div class="card">
                     <div class="card-header">
                         <h4>Home Banner Management</h4>
+
                         <div class="card-header-action">
-                            <a href="{{ route('home-banners.create') }}" class="btn btn-primary">
-                                <i class="fas fa-plus"></i> Add Home Banner
-                            </a>
+                            @can('home-banners.create')
+                                <a href="{{ route('home-banners.create') }}" class="btn btn-primary">
+                                    <i class="fas fa-plus"></i> Add Home Banner
+                                </a>
+                            @endcan
                         </div>
                     </div>
 
@@ -40,6 +43,7 @@
                                         <th>Title</th>
                                         <th>Short Description</th>
                                         <th>Button</th>
+                                        <th>Status</th>
                                         <th>Created By</th>
                                         <th>Created At</th>
                                         <th class="text-center">Action</th>
@@ -96,6 +100,18 @@
                                             </td>
 
                                             <td>
+                                                @if($homeBanner->status == 1)
+                                                    <span class="badge badge-success">
+                                                        Active
+                                                    </span>
+                                                @else
+                                                    <span class="badge badge-danger">
+                                                        Inactive
+                                                    </span>
+                                                @endif
+                                            </td>
+
+                                            <td>
                                                 {{ $homeBanner->createdBy->name ?? '-' }}
                                             </td>
 
@@ -105,36 +121,44 @@
 
                                             <td>
                                                 <div class="d-flex align-items-center justify-content-center">
-                                                    <a href="{{ route('home-banners.show', $homeBanner->id) }}"
-                                                        class="btn btn-info btn-sm mr-1"
-                                                        title="View">
-                                                        <i class="fas fa-eye"></i>
-                                                    </a>
+                                                    @can('home-banners.view')
+                                                        <a href="{{ route('home-banners.show', $homeBanner->id) }}"
+                                                            class="btn btn-info btn-sm mr-1"
+                                                            title="View">
+                                                            <i class="fas fa-eye"></i>
+                                                        </a>
+                                                    @endcan
 
-                                                    <a href="{{ route('home-banners.edit', $homeBanner->id) }}"
-                                                        class="btn btn-primary btn-sm mr-1"
-                                                        title="Edit">
-                                                        <i class="fas fa-edit"></i>
-                                                    </a>
+                                                    @can('home-banners.edit')
+                                                        <a href="{{ route('home-banners.edit', $homeBanner->id) }}"
+                                                            class="btn btn-primary btn-sm mr-1"
+                                                            title="Edit">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                    @endcan
 
-                                                    <form action="{{ route('home-banners.destroy', $homeBanner->id) }}"
-                                                        method="POST"
-                                                        class="d-inline delete-home-banner-form">
-                                                        @csrf
-                                                        @method('DELETE')
+                                                    @if($homeBanner->status == 1)
+                                                        @can('home-banners.delete')
+                                                            <form action="{{ route('home-banners.destroy', $homeBanner->id) }}"
+                                                                method="POST"
+                                                                class="d-inline delete-home-banner-form">
+                                                                @csrf
+                                                                @method('DELETE')
 
-                                                        <button type="submit"
-                                                            class="btn btn-danger btn-sm"
-                                                            title="Delete">
-                                                            <i class="fas fa-trash"></i>
-                                                        </button>
-                                                    </form>
+                                                                <button type="submit"
+                                                                    class="btn btn-danger btn-sm"
+                                                                    title="Delete">
+                                                                    <i class="fas fa-trash"></i>
+                                                                </button>
+                                                            </form>
+                                                        @endcan
+                                                    @endif
                                                 </div>
                                             </td>
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="8" class="text-center">
+                                            <td colspan="9" class="text-center">
                                                 No home banners found.
                                             </td>
                                         </tr>
@@ -142,6 +166,12 @@
                                 </tbody>
                             </table>
                         </div>
+
+                        @if(method_exists($homeBanners, 'links'))
+                            <div class="mt-3">
+                                {{ $homeBanners->links() }}
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -166,7 +196,7 @@
             columnDefs: [
                 {
                     orderable: false,
-                    targets: [0, 1, 7]
+                    targets: [0, 1, 8]
                 }
             ]
         });
