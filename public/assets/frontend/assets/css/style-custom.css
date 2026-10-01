@@ -9045,3 +9045,146 @@ span.required {
     border: 0 !important;
     padding: 0 !important;
 }
+.trusted-devotees-section {
+    padding: 75px 0;
+    background: #14294a;
+}
+
+.trusted-devotees-content {
+    padding-right: 45px;
+}
+
+.trusted-devotees-label {
+    display: inline-block;
+    margin-bottom: 20px;
+    color: #70a0ff;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.trusted-devotees-content h2 {
+    margin: 0 0 25px;
+    color: #ffffff;
+    font-size: 48px;
+    line-height: 1.3;
+    font-weight: 700;
+}
+
+.trusted-devotees-content p {
+    margin: 0;
+    color: #ffffff;
+    font-size: 20px;
+    line-height: 1.6;
+}
+
+.trusted-devotees-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    column-gap: 55px;
+    row-gap: 55px;
+    padding-left: 20px;
+}
+
+.trusted-stat-item {
+    min-height: 195px;
+}
+
+.trusted-stat-icon {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #29456f;
+    border-radius: 14px;
+}
+
+.trusted-stat-icon i {
+    color: #ffb300;
+    font-size: 30px;
+}
+
+.trusted-stat-item h3 {
+    margin: 0 0 12px;
+    color: #ffffff;
+    font-size: 30px;
+    line-height: 1.3;
+    font-weight: 700;
+}
+
+.trusted-stat-item p {
+    margin: 0;
+    max-width: 310px;
+    color: #b8c4d7;
+    font-size: 18px;
+    line-height: 1.5;
+}
+
+@media (max-width: 1199px) {
+    .trusted-devotees-content h2 {
+        font-size: 42px;
+    }
+
+    .trusted-devotees-content p {
+        font-size: 18px;
+    }
+
+    .trusted-stat-item h3 {
+        font-size: 26px;
+    }
+
+    .trusted-stat-item p {
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 991px) {
+    .trusted-devotees-section {
+        padding: 60px 0;
+    }
+
+    .trusted-devotees-content {
+        padding-right: 0;
+        margin-bottom: 50px;
+    }
+
+    .trusted-devotees-content h2 {
+        font-size: 38px;
+    }
+
+    .trusted-devotees-stats {
+        padding-left: 0;
+    }
+}
+
+@media (max-width: 575px) {
+    .trusted-devotees-section {
+        padding: 50px 0;
+    }
+
+    .trusted-devotees-label {
+        font-size: 16px;
+    }
+
+    .trusted-devotees-content h2 {
+        font-size: 32px;
+    }
+
+    .trusted-devotees-content p {
+        font-size: 16px;
+    }
+
+    .trusted-devotees-stats {
+        grid-template-columns: 1fr;
+        row-gap: 35px;
+    }
+
+    .trusted-stat-item {
+        min-height: auto;
+    }
+
+    .trusted-stat-item h3 {
+        font-size: 24px;
+    }
+}

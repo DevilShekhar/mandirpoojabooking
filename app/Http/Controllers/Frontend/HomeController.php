@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\HomeBanner;
+use App\Models\Temple;
 
 class HomeController extends Controller
 {
@@ -13,6 +14,11 @@ class HomeController extends Controller
             ->latest()
             ->get();
 
-        return view('frontend.home.index', compact('homeBanners'));
+        $temples = Temple::with(['state', 'district', 'city'])
+            ->where('status', 1)
+            ->latest()
+            ->get();
+
+        return view('frontend.home.index', compact('homeBanners', 'temples'));
     }
 }
