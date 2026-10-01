@@ -26,6 +26,7 @@ use App\Http\Controllers\Admin\TempleController;
 use App\Http\Controllers\Admin\TempleDeityController;
 use App\Http\Controllers\Admin\PasswordController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\HomeBannerController;
 use App\Models\PujaAssignment;
 use App\Http\Controllers\Frontend\HomeController;
 
@@ -36,6 +37,8 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
+    // Home Banners
+    Route::resource('home-banners', HomeBannerController::class);
     Route::get('/profile', [ProfileController::class, 'index']) ->name('admin.profile.index');
     Route::get('/profile/edit', [ProfileController::class, 'edit']) ->name('admin.profile.edit'); 
     Route::put('/profile', [ProfileController::class, 'update']) ->name('admin.profile.update');
