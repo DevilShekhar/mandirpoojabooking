@@ -174,6 +174,14 @@ class PermissionSeeder extends Seeder
             'booking-sankalps.edit',
             'booking-sankalps.index',
             'booking-sankalps.delete',
+
+            // Home Banners
+            'home-banners.view',
+            'home-banners.create',
+            'home-banners.edit',
+            'home-banners.index',
+            'home-banners.delete',
+
         ];
         foreach ($permissions as $permission) {
             Permission::firstOrCreate([
