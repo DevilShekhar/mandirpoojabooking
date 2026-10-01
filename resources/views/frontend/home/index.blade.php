@@ -1,205 +1,101 @@
 @extends('frontend.layouts.app')
-
 @section('title', 'Home')
-
 @section('meta_keyword', 'Computer Hardware, Gaming PC, PC Components')
-
 @section('meta_description', 'Premium computer hardware and gaming PC products.')
-
 @section('content')
-
-<!-- ================================
-     HERO SECTION
-================================ -->
 <div class="slider-with-banner full-screen-slider">
-
     <div class="slider-area">
-
         <div class="slider-active owl-carousel">
-
-            <div class="single-slide align-center-left animation-style-01"
-                style="background-image: url('{{ asset('assets/frontend/assets/images/slider/1.jpg') }}');">
-
-                <div class="slider-progress"></div>
-
-                <div class="slider-content">
-
-                    <h5>Power Your Performance</h5>
-
-                    <h2>Build Your Dream PC</h2>
-
-                    <div class="default-btn slide-btn">
-                        <span class="links">Build Your PC</span>
+            @forelse($homeBanners as $homeBanner)
+                <div class="single-slide align-center-left animation-style-01"
+                    style="background-image: url('{{ asset('storage/' . $homeBanner->image) }}');">
+                    <div class="slider-progress"></div>
+                    <div class="slider-content">
+                        @if($homeBanner->title)
+                            <h2>{{ $homeBanner->title }}</h2>
+                        @endif
+                        @if($homeBanner->short_description)
+                            <h5>{{ $homeBanner->short_description }}</h5>
+                        @endif
+                        @if($homeBanner->btn_name)
+                            <div class="default-btn slide-btn">
+                                <a class="links" href="{{ $homeBanner->btn_url ?: '#' }}">
+                                    {{ $homeBanner->btn_name }}
+                                </a>
+                            </div>
+                        @endif
                     </div>
-
                 </div>
-
-            </div>
-
-
-            <div class="single-slide align-center-left animation-style-01"
-                style="background-image: url('{{ asset('assets/frontend/assets/images/slider/2.jpg') }}');">
-
-                <div class="slider-progress"></div>
-
-                <div class="slider-content">
-
-                    <h5>Premium Computer Components</h5>
-
-                    <h2>Upgrade Your Setup</h2>
-
-                    <div class="default-btn slide-btn">
-                        <span class="links">Shop Now</span>
+            @empty
+                <div class="single-slide align-center-left animation-style-01">
+                    <div class="slider-progress"></div>
+                    <div class="slider-content">
+                        <h5>Welcome to Puja Pandit</h5>
+                        <h2>Book Your Puja With Experienced Pandits</h2>
+                        <div class="default-btn slide-btn">
+                            <a class="links" href="#">
+                                Explore Puja
+                            </a>
+                        </div>
                     </div>
-
                 </div>
-
-            </div>
-
-
-            <div class="single-slide align-center-left animation-style-01"
-                style="background-image: url('{{ asset('assets/frontend/assets/images/slider/3.jpg') }}');">
-
-                <div class="slider-progress"></div>
-
-                <div class="slider-content">
-
-                    <h5>Genuine Products</h5>
-
-                    <h2>Performance. Reliability. Quality.</h2>
-
-                    <div class="default-btn slide-btn">
-                        <span class="links">Explore Products</span>
-                    </div>
-
-                </div>
-
-            </div>
-
+            @endforelse
         </div>
-
     </div>
-
 </div>
-
-
-<!-- ================================
-     STATIC BANNERS
-================================ -->
 <div class="li-static-banner li-static-banner-4 text-center pt-20">
-
     <div class="container">
-
         <div class="row">
-
             <div class="col-lg-6">
-
                 <div class="single-banner pb-sm-30 pb-xs-30">
-
                     <img src="{{ asset('assets/frontend/assets/images/banner/2_3.jpg') }}" alt="Computer Hardware">
-
                 </div>
-
             </div>
-
-
             <div class="col-lg-6">
-
                 <div class="single-banner">
-
                     <img src="{{ asset('assets/frontend/assets/images/banner/2_4.jpg') }}" alt="Gaming Products">
-
                 </div>
-
             </div>
-
         </div>
-
     </div>
-
 </div>
-
-
-<!-- ================================
-     OUR BRANDS
-================================ -->
 <section class="team-area pt-60 pt-sm-44">
-
     <div class="container">
-
         <div class="row">
-
             <div class="col-12">
-
                 <div class="li-section-title capitalize mb-25">
-
                     <h2>
                         <span>Our Brands</span>
                     </h2>
-
                 </div>
-
             </div>
-
         </div>
-
-
         <div class="row">
-
             <div class="product-active owl-carousel">
-
-
-                <!-- Intel -->
                 <div class="col-lg-12">
-
                     <div class="team-member mb-60">
-
                         <div class="team-thumb">
-
                             <img src="{{ asset('assets/frontend/assets/images/brand/intel.png') }}" alt="Intel"
                                 style="width:100%;height:220px;object-fit:contain;">
-
                         </div>
-
                         <div class="team-content text-center">
-
                             <h3>Intel</h3>
-
                             <p>Computer Processors</p>
-
                         </div>
-
                     </div>
-
                 </div>
-
-
-                <!-- AMD -->
                 <div class="col-lg-12">
-
                     <div class="team-member mb-60">
-
                         <div class="team-thumb">
-
                             <img src="{{ asset('assets/frontend/assets/images/brand/amd.png') }}" alt="AMD"
                                 style="width:100%;height:220px;object-fit:contain;">
-
                         </div>
-
                         <div class="team-content text-center">
-
                             <h3>AMD</h3>
-
                             <p>Processors & Graphics</p>
-
                         </div>
-
                     </div>
-
                 </div>
-
-
-                <!-- NVIDIA -->
                 <div class="col-lg-12">
 
                     <div class="team-member mb-60">

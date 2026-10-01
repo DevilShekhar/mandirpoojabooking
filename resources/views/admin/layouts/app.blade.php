@@ -264,6 +264,14 @@
                                 <span>Dashboard</span>
                             </a>
                         </li>
+                        @can('home-banners.view')
+                            <li class="{{ request()->routeIs('home-banners.*') ? 'active' : '' }}">
+                                <a href="{{ route('home-banners.index') }}" class="nav-link">
+                                    <i data-feather="image"></i>
+                                    <span>Home Banners</span>
+                                </a>
+                            </li>
+                        @endcan
 
                         {{-- Users --}}
                         @can('users.view')

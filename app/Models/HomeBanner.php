@@ -16,21 +16,16 @@ class HomeBanner extends Model
         'image',
         'btn_name',
         'btn_url',
+        'status',
         'created_by',
         'updated_by',
     ];
 
-    /**
-     * Created By User
-     */
     public function createdBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
     }
 
-    /**
-     * Updated By User
-     */
     public function updatedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'updated_by');
