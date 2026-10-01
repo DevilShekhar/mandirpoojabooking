@@ -27,10 +27,9 @@ use App\Http\Controllers\Admin\TempleDeityController;
 use App\Http\Controllers\Admin\PasswordController;
 use App\Http\Controllers\Admin\UserController;
 use App\Models\PujaAssignment;
+use App\Http\Controllers\Frontend\HomeController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
 
 Route::get('/dashboard', function () {
     return view('dashboard');

@@ -1,4 +1,4 @@
-@can('roles.permissions')
+@can('roles-assign-permission')
 @extends('admin.layouts.app')
 
 @section('title', 'Manage Permissions - ' . $role->name)
