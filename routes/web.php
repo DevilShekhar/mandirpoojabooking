@@ -29,9 +29,12 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\HomeBannerController;
 use App\Models\PujaAssignment;
 use App\Http\Controllers\Frontend\HomeController;
+use App\Http\Controllers\Frontend\OurTemplesContoller;
+
 
 Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
-
+Route::get('our-temples', [OurTemplesContoller::class, 'index'])->name('frontend.our-temples');
+Route::get('our-temples/{temple:slug}', [OurTemplesContoller::class, 'show'])->name('frontend.our-temple.show');
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
