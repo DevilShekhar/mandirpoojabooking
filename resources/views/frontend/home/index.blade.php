@@ -115,195 +115,80 @@
                 </div>
             </div>
         </div>
+
         <div class="row">
             <div class="col-12">
                 <div class="special-puja-slider owl-carousel">
-                    <div class="col-lg-4">
-                        <div class="special-puja-card">
-                            <div class="puja-image">
-                                <img  src="{{ asset('assets/frontend/assets/images/puja/puja-1.jpg') }}" alt="Shradh Ekadashi Gaya Tripindi Shradh">
-                            </div>
-                            <div class="puja-content">
-                                <div class="puja-category">
-                                    PIND DAAN AND TRIPINDI SHRADDH GAYA SPECIAL
+                    @forelse($pujas as $puja)
+                        <div class="col-lg-4">
+                            <div class="special-puja-card">
+                                <div class="puja-image">
+                                    @if($puja->image)
+                                        <img src="{{ asset('storage/' . $puja->image) }}" alt="{{ $puja->name }}">
+                                    @else
+                                        <img src="{{ asset('assets/frontend/assets/images/puja/puja-1.jpg') }}" alt="{{ $puja->name }}">
+                                    @endif
                                 </div>
-                                <h3>
-                                    Shradh Ekadashi - Gaya Tripindi Shradh,
-                                    Pind Daan and Til Tarpanam
-                                </h3>
-                                <p class="puja-description">
-                                    For Peace of Departed Souls
-                                </p>
-                                <div class="puja-info">
-                                    <div>
-                                        <i class="fa fa-map-marker"></i>
-                                        <span>
-                                            Vishnu Pad Gaya Ji, Gaya Ji, Bihar
-                                        </span>
+
+                                <div class="puja-content">
+                                    <div class="puja-category">
+                                        {{ $puja->pujaCategory->name ?? 'SPECIAL PUJA' }}
                                     </div>
-                                    <div>
-                                        <i class="fa fa-calendar"></i>
-                                        <span>
-                                            6 October, Tuesday, Ashwina Krishna Ekadashi
-                                        </span>
+
+                                    <h3>
+                                        {{ $puja->name }}
+                                    </h3>
+
+                                    @if($puja->description)
+                                        <p class="puja-description">
+                                            {{ \Illuminate\Support\Str::limit(strip_tags($puja->description), 120) }}
+                                        </p>
+                                    @endif
+
+                                    <div class="puja-info">
+                                        @if($puja->temple)
+                                            <div>
+                                                <i class="fa fa-map-marker"></i>
+                                                <span>
+                                                    {{ $puja->temple->address ?? $puja->temple->name }}
+
+                                                    @if($puja->temple->city)
+                                                        , {{ $puja->temple->city->name }}
+                                                    @endif
+
+                                                    @if($puja->temple->state)
+                                                        , {{ $puja->temple->state->name }}
+                                                    @endif
+                                                </span>
+                                            </div>
+                                        @endif
+
+                                        @if($puja->duration)
+                                            <div>
+                                                <i class="fa fa-clock-o"></i>
+                                                <span>
+                                                    {{ $puja->duration }}
+                                                </span>
+                                            </div>
+                                        @endif
                                     </div>
+
+                                    <a href="#" class="puja-btn">
+                                        PARTICIPATE
+                                        <i class="fa fa-arrow-right"></i>
+                                    </a>
                                 </div>
-                                <a href="#" class="puja-btn">
-                                    PARTICIPATE
-                                    <i class="fa fa-arrow-right"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="special-puja-card">
-                            <div class="puja-image">
-                                <img  src="{{ asset('assets/frontend/assets/images/puja/puja-2.jpg') }}"   alt="Mahalaya Amavasya">
-                            </div>
-                            <div class="puja-content">
-                                <div class="puja-category">
-                                    LAST DAY OF PITRU PAKSHA SARVA PITRU SHANTI SPECIAL
-                                </div>
-                                <h3>
-                                    Mahalaya Amavasya: Gaya Ji Sarva Pitru
-                                    Shanti Puja and Pind Daan
-                                </h3>
-                                <p class="puja-description">
-                                    For ancestral peace and blessings across seven generations
-                                </p>
-                                <div class="puja-info">
-                                    <div>
-                                        <i class="fa fa-map-marker"></i>
-                                        <span>
-                                            Dharmaranya Vedi, Gaya Ji, Bihar
-                                        </span>
-                                    </div>
-                                    <div>
-                                        <i class="fa fa-calendar"></i>
-                                        <span>
-                                            10 October, Saturday, Ashwin Krishna Amavasya
-                                        </span>
-                                    </div>
-                                </div>
-                                <a href="#" class="puja-btn">
-                                    PARTICIPATE
-                                    <i class="fa fa-arrow-right"></i>
-                                </a>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="special-puja-card">
-                            <div class="puja-image">
-                                <img  src="{{ asset('assets/frontend/assets/images/puja/puja-3.jpg') }}" alt="Kaal Bhairav Puja">
-                            </div>
-                            <div class="puja-content">
-                                <div class="puja-category">
-                                    KAALASHTAMI KAAL BHAIRAV KASHI SPECIAL
-                                </div>
-                                <h3>
-                                    Kaal Bhairav Kashi 1,00,000 Kaal Bhairav
-                                    Mool Mantra Jaap and Bagalamukhi Havan
-                                </h3>
-                                <p class="puja-description">
-                                    For protection from enemies, legal success and removal of all negativity
-                                </p>
-                                <div class="puja-info">
-                                    <div>
-                                        <i class="fa fa-map-marker"></i>
-                                        <span>
-                                            Kaal Bhairav Temple, Kashi
-                                        </span>
-                                    </div>
-                                    <div>
-                                        <i class="fa fa-calendar"></i>
-                                        <span>
-                                            3 October, Saturday, Ashwina Krishna Ashtami
-                                        </span>
-                                    </div>
-                                </div>
-                                <a href="#" class="puja-btn">
-                                    PARTICIPATE
-                                    <i class="fa fa-arrow-right"></i>
-                                </a>
-                            </div>
+                    @empty
+                        <div class="col-12 text-center">
+                            <p>No pujas available.</p>
                         </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="special-puja-card">
-                            <div class="puja-image">
-                                <img src="{{ asset('assets/frontend/assets/images/puja/puja-4.jpg') }}" alt="Navratri Special Puja">
-                            </div>
-                            <div class="puja-content">
-                                <div class="puja-category">
-                                    NAVRATRI SPECIAL PUJA
-                                </div>
-                                <h3>
-                                    Maa Durga Navratri Special Puja and Havan
-                                </h3>
-                                <p class="puja-description">
-                                    For prosperity, happiness and divine protection for your family
-                                </p>
-                                <div class="puja-info">
-                                    <div>
-                                        <i class="fa fa-map-marker"></i>
-                                        <span>
-                                            Maa Durga Temple, Varanasi
-                                        </span>
-                                    </div>
-                                    <div>
-                                        <i class="fa fa-calendar"></i>
-                                        <span>
-                                            15 October, Thursday, Navratri Special
-                                        </span>
-                                    </div>
-                                </div>
-                                <a href="#" class="puja-btn">
-                                    PARTICIPATE
-                                    <i class="fa fa-arrow-right"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="special-puja-card">
-                            <div class="puja-image">
-                                <img src="{{ asset('assets/frontend/assets/images/puja/puja-5.jpg') }}" alt="Maha Mrityunjaya Puja">
-                            </div>
-                            <div class="puja-content">
-                                <div class="puja-category">
-                                    MAHA MRITYUNJAYA SPECIAL PUJA
-                                </div>
-                                <h3>
-                                    Maha Mrityunjaya Jaap and Rudrabhishek Puja
-                                </h3>
-                                <p class="puja-description">
-                                    For health, peace, protection and removal of negative energies
-                                </p>
-                                <div class="puja-info">
-                                    <div>
-                                        <i class="fa fa-map-marker"></i>
-                                        <span>
-                                            Kashi Vishwanath Temple, Varanasi
-                                        </span>
-                                    </div>
-                                    <div>
-                                        <i class="fa fa-calendar"></i>
-                                        <span>
-                                            20 October, Tuesday, Special Muhurat
-                                        </span>
-                                    </div>
-                                </div>
-                                <a href="#" class="puja-btn">
-                                    PARTICIPATE
-                                    <i class="fa fa-arrow-right"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
+                    @endforelse
                 </div>
             </div>
         </div>
+
         <div class="row">
             <div class="col-12 text-center mt-25">
                 <a href="#" class="view-all-pujas">
