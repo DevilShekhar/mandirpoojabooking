@@ -43,4 +43,9 @@ class Puja extends Model
     {
         return $this->hasMany(FestivalPuja::class);
     }
+     public function faqs()
+    {
+        return $this->hasMany(PujaFaq::class, 'puja_id')
+            ->orderBy('sort_order');
+    }
 }
