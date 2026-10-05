@@ -378,7 +378,7 @@
                                                 <a href="">Contact</a>
                                             </li>
                                             <li>
-                                                <a href="">Puja</a>
+                                                <a href="{{ route('frontend.puja') }}">Puja</a>
                                             </li>
                                             <li>
                                                 <a href="">My Bookings</a>
