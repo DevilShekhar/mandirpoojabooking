@@ -385,80 +385,52 @@
             </div>
 
             <div class="tab-pane fade" id="faqs" role="tabpanel" aria-labelledby="faqs-tab">
-                <div class="detail-tab-card">
-                    <div class="detail-tab-heading">
-                        <div class="detail-tab-icon">
-                            <i class="fa fa-question-circle-o"></i>
-                        </div>
-                        <div>
-                            <h3>Frequently Asked Questions</h3>
-                            <p>Common questions about this puja</p>
-                        </div>
-                    </div>
-
-                    <div class="puja-faq">
-                        <div class="faq-item">
-                            <button type="button" class="faq-question" data-toggle="collapse" data-target="#faqOne" aria-expanded="true" aria-controls="faqOne">
-                                <span>Who can participate in this puja?</span>
-                                <i class="fa fa-angle-down"></i>
-                            </button>
-                            <div id="faqOne" class="collapse show">
-                                <div class="faq-answer">
-                                    Devotees can participate according to the puja guidelines and available package options.
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="faq-item">
-                            <button type="button" class="faq-question collapsed" data-toggle="collapse" data-target="#faqTwo" aria-expanded="false" aria-controls="faqTwo">
-                                <span>Can I participate in the puja online?</span>
-                                <i class="fa fa-angle-down"></i>
-                            </button>
-                            <div id="faqTwo" class="collapse">
-                                <div class="faq-answer">
-                                    @if($puja->is_online)
-                                        Yes, this puja supports online participation.
-                                    @else
-                                        Online participation is not currently available for this puja.
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="faq-item">
-                            <button type="button" class="faq-question collapsed" data-toggle="collapse" data-target="#faqThree" aria-expanded="false" aria-controls="faqThree">
-                                <span>How long does the puja take?</span>
-                                <i class="fa fa-angle-down"></i>
-                            </button>
-                            <div id="faqThree" class="collapse">
-                                <div class="faq-answer">
-                                    @if($puja->duration)
-                                        The approximate duration of this puja is {{ $puja->duration }}.
-                                    @else
-                                        The puja duration will be shared during booking.
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="faq-item">
-                            <button type="button" class="faq-question collapsed" data-toggle="collapse" data-target="#faqFour" aria-expanded="false" aria-controls="faqFour">
-                                <span>What samagri is required for the puja?</span>
-                                <i class="fa fa-angle-down"></i>
-                            </button>
-                            <div id="faqFour" class="collapse">
-                                <div class="faq-answer">
-                                    @if($puja->samagri_details)
-                                        {!! nl2br(e($puja->samagri_details)) !!}
-                                    @else
-                                        Samagri details will be shared by the temple or pandit.
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    <div class="detail-tab-card">
+        <div class="detail-tab-heading">
+            <div class="detail-tab-icon">
+                <i class="fa fa-question-circle-o"></i>
             </div>
+            <div>
+                <h3>Frequently Asked Questions</h3>
+                <p>Common questions about this puja</p>
+            </div>
+        </div>
+
+        @if($puja->faqs && $puja->faqs->count())
+            <div class="puja-faq">
+                @foreach($puja->faqs as $index => $faq)
+                    <div class="faq-item">
+                        <button
+                            type="button"
+                            class="faq-question {{ $index === 0 ? '' : 'collapsed' }}"
+                            data-toggle="collapse"
+                            data-target="#faq{{ $faq->id }}"
+                            aria-expanded="{{ $index === 0 ? 'true' : 'false' }}"
+                            aria-controls="faq{{ $faq->id }}"
+                        >
+                            <span>{{ $faq->question }}</span>
+                            <i class="fa fa-angle-down"></i>
+                        </button>
+
+                        <div
+                            id="faq{{ $faq->id }}"
+                            class="collapse {{ $index === 0 ? 'show' : '' }}"
+                        >
+                            <div class="faq-answer">
+                                {!! nl2br(e($faq->answer)) !!}
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        @else
+            <div class="empty-tab-content">
+                <i class="fa fa-question-circle-o"></i>
+                <p>Frequently asked questions will be available soon.</p>
+            </div>
+        @endif
+    </div>
+</div>
         </div>
     </div>
 </section>

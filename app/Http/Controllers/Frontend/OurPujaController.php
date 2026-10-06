@@ -7,9 +7,6 @@ use App\Models\Puja;
 
 class OurPujaController extends Controller
 {
-    /**
-     * Display all active pujas.
-     */
     public function index()
     {
         $pujas = Puja::with([
@@ -18,6 +15,7 @@ class OurPujaController extends Controller
             'temple.city',
             'deity',
             'pujaCategory',
+            'faqs',
         ])
             ->where('status', 1)
             ->whereNotNull('slug')
@@ -27,9 +25,6 @@ class OurPujaController extends Controller
         return view('frontend.pujas.index', compact('pujas'));
     }
 
-    /**
-     * Display a single puja using its slug.
-     */
     public function show(string $slug)
     {
         $puja = Puja::with([
@@ -38,6 +33,7 @@ class OurPujaController extends Controller
             'temple.city',
             'deity',
             'pujaCategory',
+            'faqs',
         ])
             ->where('status', 1)
             ->where('slug', $slug)
