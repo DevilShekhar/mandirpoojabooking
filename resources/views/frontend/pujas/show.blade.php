@@ -369,76 +369,259 @@
                             <i class="fa fa-star-o"></i>
                         </div>
                         <div>
-                            <h3>Devotee Reviews</h3>
-                            <p>Experiences shared by devotees</p>
+                            <h3>Puja Reviews & Ratings</h3>
+                            <p>See what devotees say about this puja</p>
                         </div>
+                    </div>
+                    <div class="text-right mb-4">
+                        @auth
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addReviewModal">
+                                <i class="fa fa-star"></i> Add Review
+                            </button>
+                        @else
+                            <a href="{{ route('login') }}" class="btn btn-primary">
+                                <i class="fa fa-sign-in"></i> Login to Add Review
+                            </a>
+                        @endauth
                     </div>
 
-                    <div class="review-empty">
-                        <div class="review-empty-icon">
-                            <i class="fa fa-comments-o"></i>
+                    @if(session('success'))
+                        <div class="alert alert-success">
+                            {{ session('success') }}
                         </div>
-                        <h4>No Reviews Yet</h4>
-                        <p>Be the first devotee to share your experience after participating in this puja.</p>
-                    </div>
+                    @endif
+
+                    @if($errors->any())
+                        <div class="alert alert-danger">
+                            <ul class="mb-0">
+                                @foreach($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    @if($reviews->count() > 0)
+                        <div class="review-list">
+                            @foreach($reviews as $review)
+                                <div class="review-item mb-4">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h5 class="mb-1">
+                                                {{ $review->user->name ?? 'Devotee' }}                           
+                                            </h5>
+                                            <div class="review-stars">
+                                                @for($i = 1; $i <= 5; $i++)
+                                                    @if($i <= $review->rating)
+                                                        <i class="fa fa-star"></i>
+                                                    @else
+                                                        <i class="fa fa-star-o"></i>
+                                                    @endif
+                                                @endfor
+                                            </div>
+                                        </div>
+                                        <small class="text-muted">
+                                            {{ $review->created_at->format('d M Y') }}
+                                        </small>
+                                    </div>
+                                    <p class="mt-2 mb-0">
+                                        {{ $review->review }}
+                                    </p>              
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="review-empty">
+                            <div class="review-empty-icon">
+                                <i class="fa fa-comments-o"></i>
+                            </div>
+                            <h4>No Reviews Yet</h4>
+                            <p>
+                                Be the first devotee to share your experience
+                                after participating in this puja.
+                            </p>
+                        </div>
+                    @endif
                 </div>
             </div>
-
             <div class="tab-pane fade" id="faqs" role="tabpanel" aria-labelledby="faqs-tab">
-    <div class="detail-tab-card">
-        <div class="detail-tab-heading">
-            <div class="detail-tab-icon">
-                <i class="fa fa-question-circle-o"></i>
-            </div>
-            <div>
-                <h3>Frequently Asked Questions</h3>
-                <p>Common questions about this puja</p>
-            </div>
-        </div>
-
-        @if($puja->faqs && $puja->faqs->count())
-            <div class="puja-faq">
-                @foreach($puja->faqs as $index => $faq)
-                    <div class="faq-item">
-                        <button
-                            type="button"
-                            class="faq-question {{ $index === 0 ? '' : 'collapsed' }}"
-                            data-toggle="collapse"
-                            data-target="#faq{{ $faq->id }}"
-                            aria-expanded="{{ $index === 0 ? 'true' : 'false' }}"
-                            aria-controls="faq{{ $faq->id }}"
-                        >
-                            <span>{{ $faq->question }}</span>
-                            <i class="fa fa-angle-down"></i>
-                        </button>
-
-                        <div
-                            id="faq{{ $faq->id }}"
-                            class="collapse {{ $index === 0 ? 'show' : '' }}"
-                        >
-                            <div class="faq-answer">
-                                {!! nl2br(e($faq->answer)) !!}
-                            </div>
+                <div class="detail-tab-card">
+                    <div class="detail-tab-heading">
+                        <div class="detail-tab-icon">
+                            <i class="fa fa-question-circle-o"></i>
+                        </div>
+                        <div>
+                            <h3>Frequently Asked Questions</h3>
+                            <p>Common questions about this puja</p>
                         </div>
                     </div>
-                @endforeach
+
+                    @if($puja->faqs && $puja->faqs->count())
+                        <div class="puja-faq">
+                            @foreach($puja->faqs as $index => $faq)
+                                <div class="faq-item">
+                                    <button
+                                        type="button"
+                                        class="faq-question {{ $index === 0 ? '' : 'collapsed' }}"
+                                        data-toggle="collapse"
+                                        data-target="#faq{{ $faq->id }}"
+                                        aria-expanded="{{ $index === 0 ? 'true' : 'false' }}"
+                                        aria-controls="faq{{ $faq->id }}"
+                                    >
+                                        <span>{{ $faq->question }}</span>
+                                        <i class="fa fa-angle-down"></i>
+                                    </button>
+
+                                    <div
+                                        id="faq{{ $faq->id }}"
+                                        class="collapse {{ $index === 0 ? 'show' : '' }}"
+                                    >
+                                        <div class="faq-answer">
+                                            {!! nl2br(e($faq->answer)) !!}
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="empty-tab-content">
+                            <i class="fa fa-question-circle-o"></i>
+                            <p>Frequently asked questions will be available soon.</p>
+                        </div>
+                    @endif
+                </div>
             </div>
-        @else
-            <div class="empty-tab-content">
-                <i class="fa fa-question-circle-o"></i>
-                <p>Frequently asked questions will be available soon.</p>
-            </div>
-        @endif
-    </div>
-</div>
         </div>
     </div>
 </section>
+{{-- Add Review Modal --}}
+@auth
+<div class="modal fade" id="addReviewModal" tabindex="-1" role="dialog"
+     aria-labelledby="addReviewModalLabel" aria-hidden="true">
 
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="addReviewModalLabel">
+                    <i class="fa fa-star"></i>
+                    Add Your Review
+                </h5>
+
+                <button type="button"
+                        class="close"
+                        data-dismiss="modal"
+                        aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <form action="{{ route('our-puja.review.store', $puja->id) }}"
+                  method="POST">
+
+                @csrf
+
+                <div class="modal-body">
+
+                    {{-- Rating --}}
+                    <div class="form-group">
+                        <label>
+                            Rating <span class="text-danger">*</span>
+                        </label>
+
+                        <div class="review-rating-input">
+
+                            @for($i = 5; $i >= 1; $i--)
+                                <input type="radio"
+                                       id="rating{{ $i }}"
+                                       name="rating"
+                                       value="{{ $i }}"
+                                       {{ old('rating') == $i ? 'checked' : '' }}>
+
+                                <label for="rating{{ $i }}">
+                                    <i class="fa fa-star"></i>
+                                </label>
+                            @endfor
+
+                        </div>
+                    </div>
+
+                    {{-- Review --}}
+                    <div class="form-group">
+                        <label for="review">
+                            Your Review <span class="text-danger">*</span>
+                        </label>
+
+                        <textarea
+                            name="review"
+                            id="review"
+                            class="form-control"
+                            rows="5"
+                            maxlength="2000"
+                            placeholder="Share your experience about this puja..."
+                            required>{{ old('review') }}</textarea>
+
+                        <small class="text-muted">
+                            Maximum 2000 characters.
+                        </small>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-dismiss="modal">
+                        Cancel
+                    </button>
+
+                    <button type="submit"
+                            class="btn btn-primary">
+                        <i class="fa fa-paper-plane"></i>
+                        Submit Review
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+@endauth
 @endsection
 
 @push('styles')
 <style>
+    .review-rating-input {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    gap: 4px;
+}
+
+.review-rating-input input {
+    display: none;
+}
+
+.review-rating-input label {
+    cursor: pointer;
+    font-size: 28px;
+    color: #ccc;
+    margin: 0;
+    transition: color .2s ease;
+}
+
+.review-rating-input label:hover,
+.review-rating-input label:hover ~ label,
+.review-rating-input input:checked ~ label {
+    color: #ffc107;
+}
+
+.review-rating-input label i {
+    cursor: pointer;
+}
 .puja-detail-section {
     background: #fffaf5;
     color: #29211c;
