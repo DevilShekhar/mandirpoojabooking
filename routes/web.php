@@ -27,6 +27,7 @@ use App\Http\Controllers\Admin\TempleDeityController;
 use App\Http\Controllers\Admin\PasswordController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\HomeBannerController;
+use App\Http\Controllers\Admin\PujaReviewController;
 use App\Models\PujaAssignment;
 use App\Http\Controllers\Frontend\HomeController;
 use App\Http\Controllers\Frontend\OurTemplesContoller;
@@ -39,6 +40,7 @@ Route::get('our-temples', [OurTemplesContoller::class, 'index'])->name('frontend
 Route::get('our-temples/{temple:slug}', [OurTemplesContoller::class, 'show'])->name('frontend.our-temple.show');
 Route::get('/puja', [OurPujaController::class, 'index'])->name('frontend.puja');
 Route::get('/puja/{slug}', [OurPujaController::class, 'show'])->name('frontend.puja.show');
+Route::post('/our-puja/{pujaId}/review', [OurPujaController::class, 'storeReview'])->name('our-puja.review.store');
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
@@ -97,6 +99,9 @@ Route::middleware('auth')->group(function () {
     Route::resource('puja-bookings', PujaBookingController::class);
     Route::resource('booking-devotees', BookingDevoteeController::class);
     Route::resource('booking-sankalps', BookingSankalpController::class);
+    Route::get('/puja-reviews',[PujaReviewController::class, 'index'])->name('admin.puja-reviews.index');
+    Route::post('/puja-reviews/{id}/approve',[PujaReviewController::class, 'approve'])->name('admin.puja-reviews.approve');
+    Route::post('/puja-reviews/{id}/reject',[PujaReviewController::class, 'reject'])->name('admin.puja-reviews.reject');
 });
 
 require __DIR__.'/auth.php';

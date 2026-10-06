@@ -272,6 +272,12 @@
                                 </a>
                             </li>
                         @endcan
+                        <li class="{{ request()->routeIs('admin.puja-reviews.*') ? 'active' : '' }}">
+                            <a href="{{ route('admin.puja-reviews.index') }}" class="nav-link">
+                                <i data-feather="star"></i>
+                                <span>Reviews & Ratings</span>
+                            </a>
+                        </li>
 
                         {{-- Users --}}
                         @can('users.view')
