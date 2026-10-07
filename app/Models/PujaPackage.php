@@ -28,20 +28,29 @@ class PujaPackage extends Model
     protected $casts = [
         'price' => 'decimal:2',
         'discount_price' => 'decimal:2',
+
         'includes_sankalp' => 'boolean',
         'includes_prasad' => 'boolean',
         'includes_video' => 'boolean',
         'includes_certificate' => 'boolean',
+
         'is_featured' => 'boolean',
         'status' => 'boolean',
     ];
 
+    /**
+     * Puja
+     */
     public function puja()
     {
-        return $this->belongsTo(Puja::class);
+        return $this->belongsTo(Puja::class, 'puja_id');
     }
+
+    /**
+     * Package Features
+     */
     public function features()
     {
-        return $this->hasMany(PackageFeature::class);
+        return $this->hasMany(PackageFeature::class, 'puja_package_id');
     }
 }
