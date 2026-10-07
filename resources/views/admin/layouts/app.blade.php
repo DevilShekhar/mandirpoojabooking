@@ -466,7 +466,7 @@
                         @endcanany
 
                         {{-- Puja --}}
-                        @canany(['puja-categories.view','pujas.view','puja-packages.view','package-features.view','package-addons.view','puja-schedules.view','puja-bookings.view'])
+                        @canany(['puja-categories.view','pujas.view','puja-packages.view','puja-bookings.view'])
                             <li class="dropdown {{ request()->routeIs('puja-categories.*', 'pujas.*', 'puja-packages.*', 'package-features.*', 'package-addons.*', 'puja-schedules.*', 'puja-bookings.*') ? 'active' : '' }}">
 
                                 <a href="#" class="menu-toggle nav-link has-dropdown">
@@ -492,37 +492,7 @@
                                         </li>
                                     @endcan
 
-                                    @can('puja-packages.view')
-                                        <li class="{{ request()->routeIs('puja-packages.*') ? 'active' : '' }}">
-                                            <a class="nav-link" href="{{ route('puja-packages.index') }}">
-                                                Puja Packages
-                                            </a>
-                                        </li>
-                                    @endcan
-
-                                    @can('package-features.view')
-                                        <li class="{{ request()->routeIs('package-features.*') ? 'active' : '' }}">
-                                            <a class="nav-link" href="{{ route('package-features.index') }}">
-                                                Package Features
-                                            </a>
-                                        </li>
-                                    @endcan
-
-                                    @can('package-addons.view')
-                                        <li class="{{ request()->routeIs('package-addons.*') ? 'active' : '' }}">
-                                            <a class="nav-link" href="{{ route('package-addons.index') }}">
-                                                Package Addons
-                                            </a>
-                                        </li>
-                                    @endcan
-
-                                    @can('puja-schedules.view')
-                                        <li class="{{ request()->routeIs('puja-schedules.*') ? 'active' : '' }}">
-                                            <a class="nav-link" href="{{ route('puja-schedules.index') }}">
-                                                Puja Schedules
-                                            </a>
-                                        </li>
-                                    @endcan
+                                    
 
                                     @can('puja-bookings.view')
                                         <li class="{{ request()->routeIs('puja-bookings.*') ? 'active' : '' }}">

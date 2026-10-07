@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Http\Controllers\Admin;
-
 use App\Http\Controllers\Controller;
 use App\Models\Puja;
 use App\Models\PujaFaq;
@@ -10,14 +8,11 @@ use App\Models\Temple;
 use App\Models\Deity;
 use App\Models\PujaCategory;
 use Illuminate\Http\Request;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-
 class PujaController extends Controller
 {
-   
     public function index()
     {
         $pujas = Puja::with(['temple','deity','pujaCategory','faqs', 'packages',])->latest()->get();
@@ -126,11 +121,9 @@ class PujaController extends Controller
             ]);
             foreach ($validated['packages'] ?? [] as $index => $package) {
                 $packageImage = null;
-                if (
-                    isset($package['package_image']) &&
-                    $package['package_image'] instanceof UploadedFile
-                ) {
-                    $packageImage = $package['package_image']
+                if ($request->hasFile("packages.$index.package_image")) {
+                    $packageImage = $request
+                        ->file("packages.$index.package_image")
                         ->store('puja_packages', 'public');
                     $uploadedPackageImages[] = $packageImage;
                 }
@@ -205,7 +198,6 @@ class PujaController extends Controller
         $pujaCategories = PujaCategory::where('status', 1)->orderBy('sort_order')->get();
         return view('admin.pujas.edit', compact('puja','temples','deities','pujaCategories'));
     }
-
     public function update(Request $request, Puja $puja)
     {
         $validated = $request->validate([
@@ -240,6 +232,7 @@ class PujaController extends Controller
             'packages.*.includes_certificate' => 'nullable|boolean',
             'packages.*.is_featured' => 'nullable|boolean',
             'packages.*.package_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'packages.*.existing_package_image' => 'nullable|string|max:500',
         ]);
         $description = $request->input('description');
         $benefits = $request->input('benefits');
@@ -296,9 +289,11 @@ class PujaController extends Controller
             }
             PujaPackage::where('puja_id', $puja->id)->delete();
             foreach ($validated['packages'] ?? [] as $index => $package) {
-                $packageImage = null;
-                if (isset($package['package_image']) && $package['package_image'] instanceof UploadedFile) {
-                    $packageImage = $package['package_image']->store('puja_packages', 'public');
+                $packageImage = $package['existing_package_image'] ?? null;
+                if ($request->hasFile("packages.$index.package_image")) {
+                    $packageImage = $request
+                        ->file("packages.$index.package_image")
+                        ->store('puja_packages', 'public');
                     $newPackageImages[] = $packageImage;
                 }
                 PujaPackage::create([
@@ -401,17 +396,14 @@ class PujaController extends Controller
         }
         return $slug;
     }
-
     private function generatePackageSlug(
         string $name,
         int $pujaId
     ): string {
         $slug = Str::slug($name);
-
         if ($slug === '') {
             $slug = 'package';
         }
-
         $originalSlug = $slug;
         $counter = 1;
         while (
