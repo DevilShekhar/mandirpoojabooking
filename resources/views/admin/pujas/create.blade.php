@@ -736,11 +736,7 @@
     @push('scripts')
         <script>
             $(document).ready(function() {
-                let faqIndex = {
-                    {
-                        old('faq') ? count(old('faq')) : 0
-                    }
-                };
+                let faqIndex = @json(old('faq') ? count(old('faq')) : 0);
                 $('#addFaq').on('click', function() {
                     let faqHtml = `
                             <div class="faq-item border rounded p-3 mb-3">
@@ -786,7 +782,8 @@
                 });
             });
             $(document).ready(function() {
-                let packageIndex = 0;
+                let packageIndex = @json(count(old('packages', [])));
+
                 $(document).on(
                     'click',
                     '#addPackageBtn, #addFirstPackageBtn',
@@ -819,6 +816,7 @@
                     $('#package_is_featured').prop('checked', false);
                     $('#package_image').val('');
                 }
+
                 $('#savePackageBtn').on('click', function() {
                     let name = $.trim($('#package_name').val());
                     let personCount = $('#package_person_count').val();
@@ -831,17 +829,26 @@
                     let prasad = $('#package_prasad').is(':checked') ? 1 : 0;
                     let video = $('#package_video').is(':checked') ? 1 : 0;
                     let certificate = $('#package_certificate').is(':checked') ? 1 : 0;
-                    let featured = $('#package_is_featured').val();
+                    let featured = $('#package_is_featured').is(':checked') ? 1 : 0;
+                    let imageInput = document.getElementById('package_image');
+                    let packageFile = imageInput && imageInput.files.length
+                        ? imageInput.files[0]
+                        : null;
+
                     let errors = [];
+
                     if (!name) {
                         errors.push('Package name is required.');
                     }
-                    if (!personCount || personCount < 1) {
+
+                    if (!personCount || parseInt(personCount) < 1) {
                         errors.push('Person count must be at least 1.');
                     }
-                    if (price === '' || price < 0) {
+
+                    if (price === '' || parseFloat(price) < 0) {
                         errors.push('Package price is required.');
                     }
+
                     if (
                         discountPrice !== '' &&
                         parseFloat(discountPrice) > parseFloat(price)
@@ -850,16 +857,21 @@
                             'Discount price cannot be greater than package price.'
                         );
                     }
+
                     if (errors.length > 0) {
                         $('#packageModalError')
                             .html(errors.join('<br>'))
                             .removeClass('d-none');
                         return;
                     }
+
                     $('#noPackageMessage').remove();
+
+                    let currentIndex = packageIndex;
+
                     let packageHtml = `
                         <div class="package-card border rounded p-3 mb-3"
-                            data-index="${packageIndex}">
+                            data-index="${currentIndex}">
                             <div class="d-flex justify-content-between align-items-start">
                                 <div>
                                     <h6 class="mb-1">
@@ -925,58 +937,96 @@
                                     : ''
                                 }
                                 ${
-                                    featured == 1
+                                    featured
                                     ? '<span class="badge badge-dark mr-1">Featured</span>'
                                     : ''
                                 }
                             </div>
+                            ${
+                                packageFile
+                                ? `
+                                    <div class="mt-2">
+                                        <span class="badge badge-secondary">
+                                            ${packageFile.name}
+                                        </span>
+                                    </div>
+                                `
+                                : ''
+                            }
                             <input type="hidden"
-                                name="packages[${packageIndex}][name]"
+                                name="packages[${currentIndex}][name]"
                                 value="${name}">
                             <input type="hidden"
-                                name="packages[${packageIndex}][person_count]"
+                                name="packages[${currentIndex}][person_count]"
                                 value="${personCount}">
                             <input type="hidden"
-                                name="packages[${packageIndex}][price]"
+                                name="packages[${currentIndex}][price]"
                                 value="${price}">
                             <input type="hidden"
-                                name="packages[${packageIndex}][discount_price]"
+                                name="packages[${currentIndex}][discount_price]"
                                 value="${discountPrice}">
                             <input type="hidden"
-                                name="packages[${packageIndex}][sort_order]"
+                                name="packages[${currentIndex}][sort_order]"
                                 value="${sortOrder}">
                             <input type="hidden"
-                                name="packages[${packageIndex}][short_description]"
+                                name="packages[${currentIndex}][short_description]"
                                 value="${shortDescription}">
                             <input type="hidden"
-                                name="packages[${packageIndex}][description]"
+                                name="packages[${currentIndex}][description]"
                                 value="${description}">
                             <input type="hidden"
-                                name="packages[${packageIndex}][includes_sankalp]"
+                                name="packages[${currentIndex}][includes_sankalp]"
                                 value="${sankalp}">
                             <input type="hidden"
-                                name="packages[${packageIndex}][includes_prasad]"
+                                name="packages[${currentIndex}][includes_prasad]"
                                 value="${prasad}">
                             <input type="hidden"
-                                name="packages[${packageIndex}][includes_video]"
+                                name="packages[${currentIndex}][includes_video]"
                                 value="${video}">
                             <input type="hidden"
-                                name="packages[${packageIndex}][includes_certificate]"
+                                name="packages[${currentIndex}][includes_certificate]"
                                 value="${certificate}">
                             <input type="hidden"
-                                name="packages[${packageIndex}][is_featured]"
+                                name="packages[${currentIndex}][is_featured]"
                                 value="${featured}">
                         </div>
                     `;
+
                     $('#packageContainer').append(packageHtml);
+
+                    if (packageFile) {
+                        let packageCard = $(
+                            `.package-card[data-index="${currentIndex}"]`
+                        )[0];
+
+                        let fileInput = document.createElement('input');
+
+                        fileInput.type = 'file';
+                        fileInput.name =
+                            `packages[${currentIndex}][package_image]`;
+                        fileInput.className = 'package-image-file d-none';
+
+                        let dataTransfer = new DataTransfer();
+
+                        dataTransfer.items.add(packageFile);
+
+                        fileInput.files = dataTransfer.files;
+
+                        packageCard.appendChild(fileInput);
+                    }
+
                     packageIndex++;
+
                     $('#packageModal').modal('hide');
+
                     resetPackageForm();
                 });
+
                 $(document).on('click', '.removePackage', function() {
                     $(this)
                         .closest('.package-card')
                         .remove();
+
                     if ($('#packageContainer .package-card').length === 0) {
                         $('#packageContainer').html(`
                             <div id="noPackageMessage"
@@ -997,6 +1047,7 @@
                 });
 
             });
+
             $(document).ready(function() {
                 var $description = $('#puja_description');
                 if ($description.length && typeof $.fn.summernote === 'function') {

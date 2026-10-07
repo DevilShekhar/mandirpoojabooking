@@ -372,7 +372,7 @@
                                                                 value="{{ $package['is_featured'] ?? 0 }}">
                                                             @if(!empty($package['package_image']))
                                                             <input type="hidden" class="existing-package-image"
-                                                                value="{{ $package['package_image'] }}">
+                                                                name="packages[{{ $index }}][existing_package_image]" value="{{ $package['package_image'] }}">
                                                             @endif
                                                             <input type="file" name="packages[{{ $index }}][package_image]"
                                                                 class="package-image-input d-none" accept="image/*">
@@ -739,7 +739,7 @@
                                     </label>
                                     <textarea class="form-control" id="package_short_description" rows="3"
                                         placeholder="Enter short description"></textarea>
-        1                        </div>
+                                </div>
                             </div>
                             <div class="col-md-12">
                                 <div class="form-group">
@@ -832,11 +832,11 @@
                             height: 200,
                             callbacks: {
                                 onInit: function() {
-                                    // Make sure the original textarea has the initial HTML.
+
                                     $description.val($(this).summernote('code'));
                                 },
                                 onChange: function(contents) {
-                                    // Summernote keeps the real form field synchronized.
+
                                     $description.val(contents);
                                 }
                             }
@@ -864,11 +864,7 @@
                 });
                 let packageIndex = $('#packageContainer .package-card').length;
                 let editingPackageIndex = null;
-                let faqIndex = {
-                    {
-                        old('faq') ? count(old('faq')) : ($puja - > faqs - > count())
-                    }
-                };
+                let faqIndex = @json(count($editFaqs));
                 $('#addFaq').on('click', function() {
                     let faqHtml = `
                         <div class="faq-item border rounded p-3 mb-3">
@@ -1008,8 +1004,7 @@
                         if (selectedFile) {
                             let input = card.find('.package-image-input')[0];
                             if (!input) {
-                                input = $('<input type="file" class="package-image-input d-none" accept="image/*">')
-                                    .appendTo(card)[0];
+                                input = $('<input type="file" class="package-image-input d-none" accept="image/*">').appendTo(card)[0];
                             }
                             let dt = new DataTransfer();
                             dt.items.add(selectedFile);
