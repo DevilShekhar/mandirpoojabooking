@@ -39,6 +39,7 @@ Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
 Route::get('our-temples', [OurTemplesContoller::class, 'index'])->name('frontend.our-temples');
 Route::get('our-temples/{temple:slug}', [OurTemplesContoller::class, 'show'])->name('frontend.our-temple.show');
 Route::get('/puja', [OurPujaController::class, 'index'])->name('frontend.puja');
+Route::post('/puja/filter', [OurPujaController::class, 'filter'])->name('frontend.puja.filter');
 Route::get('/puja/{slug}', [OurPujaController::class, 'show'])->name('frontend.puja.show');
 Route::post('/our-puja/{pujaId}/review', [OurPujaController::class, 'storeReview'])->name('our-puja.review.store');
 Route::get('/dashboard', function () {
