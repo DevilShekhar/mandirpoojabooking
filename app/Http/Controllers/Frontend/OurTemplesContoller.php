@@ -19,9 +19,18 @@ class OurTemplesContoller extends Controller
 
     public function show(Temple $temple)
     {
-        $temple->load(['state', 'district', 'city']);
-
         abort_if($temple->status != 1, 404);
+
+        $temple->load([
+            'state',
+            'district',
+            'city',
+            'pujas' => function ($query) {
+                $query->where('status', 1)
+                    ->with('creator:id,name')
+                    ->latest();
+            },
+        ]);
 
         return view('frontend.our-temples.show', compact('temple'));
     }

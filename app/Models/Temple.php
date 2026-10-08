@@ -45,4 +45,8 @@ class Temple extends Model
     {
         return $this->belongsToMany(Deity::class,'temple_deities');
     }
+    public function pujas()
+{
+    return $this->hasMany(Puja::class, 'temple_id');
+}
 }
