@@ -109,17 +109,6 @@ $imageUrl = $image
                         </span>
                         @endif
                     </div>
-
-                    @if($puja->description)
-                    <p class="detail-description">
-                        {{ $puja->description }}
-                    </p>
-                    @endif
-
-                    <a href="{{ route('frontend.puja') }}" class="back-to-pujas-btn">
-                        <i class="fa fa-arrow-left"></i>
-                        Back to All Pujas
-                    </a>
                 </div>
             </div>
         </div>
@@ -186,7 +175,7 @@ $imageUrl = $image
 
                     @if($puja->description)
                     <div class="detail-tab-content">
-                        {!! nl2br(e($puja->description)) !!}
+                        {!! $puja->description !!}
                     </div>
                     @else
                     <div class="empty-tab-content">
@@ -318,169 +307,166 @@ $imageUrl = $image
                     @endif
                 </div>
             </div>
-            <div class="tab-pane fade"
-     id="packages"
-     role="tabpanel"
-     aria-labelledby="packages-tab">
+            <div class="tab-pane fade" id="packages" role="tabpanel" aria-labelledby="packages-tab">
 
-    @php
-        /*
-        |--------------------------------------------------------------------------
-        | Packages
-        |--------------------------------------------------------------------------
-        */
-        $packages = $puja->packages;
+                @php
+                /*
+                |--------------------------------------------------------------------------
+                | Packages
+                |--------------------------------------------------------------------------
+                */
+                $packages = $puja->packages;
 
-        /*
-        |--------------------------------------------------------------------------
-        | Default Package
-        |--------------------------------------------------------------------------
-        | Featured package first.
-        | If no featured package exists, first package will be selected.
-        */
-        $defaultPackage = $packages->firstWhere('is_featured', 1);
+                /*
+                |--------------------------------------------------------------------------
+                | Default Package
+                |--------------------------------------------------------------------------
+                | Featured package first.
+                | If no featured package exists, first package will be selected.
+                */
+                $defaultPackage = $packages->firstWhere('is_featured', 1);
 
-        if (!$defaultPackage) {
-            $defaultPackage = $packages->first();
-        }
+                if (!$defaultPackage) {
+                $defaultPackage = $packages->first();
+                }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Default Price
-        |--------------------------------------------------------------------------
-        */
-        $defaultPrice = null;
+                /*
+                |--------------------------------------------------------------------------
+                | Default Price
+                |--------------------------------------------------------------------------
+                */
+                $defaultPrice = null;
 
-        if ($defaultPackage) {
+                if ($defaultPackage) {
 
-            $hasDefaultDiscount =
+                $hasDefaultDiscount =
                 $defaultPackage->discount_price !== null &&
                 $defaultPackage->discount_price !== '' &&
                 $defaultPackage->discount_price < $defaultPackage->price;
 
-            $defaultPrice = $hasDefaultDiscount
-                ? $defaultPackage->discount_price
-                : $defaultPackage->price;
-        }
-    @endphp
+                    $defaultPrice = $hasDefaultDiscount
+                    ? $defaultPackage->discount_price
+                    : $defaultPackage->price;
+                    }
+                    @endphp
 
 
-    <div class="detail-tab-card puja-package-section">
+                    <div class="detail-tab-card puja-package-section">
 
-        {{-- ==========================================================
+                        {{-- ==========================================================
              HEADER
         =========================================================== --}}
-        <div class="detail-tab-heading">
+                        <div class="detail-tab-heading">
 
-            <div class="detail-tab-icon">
-                <i class="fa fa-users"></i>
-            </div>
+                            <div class="detail-tab-icon">
+                                <i class="fa fa-users"></i>
+                            </div>
 
-            <div>
-                <h3>Select your puja package</h3>
+                            <div>
+                                <h3>Select your puja package</h3>
 
-                <p>
-                    Select a package according to the number of devotees
-                </p>
-            </div>
+                                <p>
+                                    Select a package according to the number of devotees
+                                </p>
+                            </div>
 
-        </div>
+                        </div>
 
 
-        {{-- ==========================================================
+                        {{-- ==========================================================
              PACKAGES AVAILABLE
         =========================================================== --}}
-        @if($packages->count())
+                        @if($packages->count())
 
-            <div class="puja-package-grid">
+                        <div class="puja-package-grid">
 
-                @foreach($packages as $package)
+                            @foreach($packages as $package)
 
-                    @php
+                            @php
 
-                        /*
-                        |--------------------------------------------------------------------------
-                        | Person Count
-                        |--------------------------------------------------------------------------
-                        */
-                        $personCount = (int) ($package->person_count ?? 1);
+                            /*
+                            |--------------------------------------------------------------------------
+                            | Person Count
+                            |--------------------------------------------------------------------------
+                            */
+                            $personCount = (int) ($package->person_count ?? 1);
 
-                        $personText = $personCount === 1
+                            $personText = $personCount === 1
                             ? 'Person'
                             : 'Persons';
 
 
-                        /*
-                        |--------------------------------------------------------------------------
-                        | Featured
-                        |--------------------------------------------------------------------------
-                        */
-                        $isFeatured = (int) $package->is_featured === 1;
+                            /*
+                            |--------------------------------------------------------------------------
+                            | Featured
+                            |--------------------------------------------------------------------------
+                            */
+                            $isFeatured = (int) $package->is_featured === 1;
 
 
-                        /*
-                        |--------------------------------------------------------------------------
-                        | Discount
-                        |--------------------------------------------------------------------------
-                        */
-                        $hasDiscount =
+                            /*
+                            |--------------------------------------------------------------------------
+                            | Discount
+                            |--------------------------------------------------------------------------
+                            */
+                            $hasDiscount =
                             $package->discount_price !== null &&
                             $package->discount_price !== '' &&
                             $package->discount_price < $package->price;
 
 
-                        /*
-                        |--------------------------------------------------------------------------
-                        | Final Price
-                        |--------------------------------------------------------------------------
-                        */
-                        $finalPrice = $hasDiscount
-                            ? $package->discount_price
-                            : $package->price;
+                                /*
+                                |--------------------------------------------------------------------------
+                                | Final Price
+                                |--------------------------------------------------------------------------
+                                */
+                                $finalPrice = $hasDiscount
+                                ? $package->discount_price
+                                : $package->price;
 
 
-                        /*
-                        |--------------------------------------------------------------------------
-                        | Selected Package
-                        |--------------------------------------------------------------------------
-                        */
-                        $isSelected =
-                            $defaultPackage &&
-                            $defaultPackage->id == $package->id;
+                                /*
+                                |--------------------------------------------------------------------------
+                                | Selected Package
+                                |--------------------------------------------------------------------------
+                                */
+                                $isSelected =
+                                $defaultPackage &&
+                                $defaultPackage->id == $package->id;
 
 
-                        /*
-                        |--------------------------------------------------------------------------
-                        | Package Image
-                        |--------------------------------------------------------------------------
-                        |
-                        | Controller stores:
-                        |
-                        | puja_packages/filename.jpg
-                        |
-                        | Therefore frontend URL:
-                        |
-                        | /storage/puja_packages/filename.jpg
-                        |
-                        |--------------------------------------------------------------------------
-                        */
-                        $packageImageUrl = null;
+                                /*
+                                |--------------------------------------------------------------------------
+                                | Package Image
+                                |--------------------------------------------------------------------------
+                                |
+                                | Controller stores:
+                                |
+                                | puja_packages/filename.jpg
+                                |
+                                | Therefore frontend URL:
+                                |
+                                | /storage/puja_packages/filename.jpg
+                                |
+                                |--------------------------------------------------------------------------
+                                */
+                                $packageImageUrl = null;
 
-                        if (!empty($package->package_image)) {
+                                if (!empty($package->package_image)) {
 
-                            $packageImage = trim($package->package_image);
+                                $packageImage = trim($package->package_image);
 
-                            /*
-                            | If DB already contains complete URL
-                            */
-                            if (
+                                /*
+                                | If DB already contains complete URL
+                                */
+                                if (
                                 str_starts_with($packageImage, 'http://') ||
                                 str_starts_with($packageImage, 'https://')
-                            ) {
+                                ) {
 
                                 $packageImageUrl = $packageImage;
 
-                            } else {
+                                } else {
 
                                 /*
                                 | Remove starting slash
@@ -494,303 +480,289 @@ $imageUrl = $image
                                 |
                                 */
                                 $packageImage = preg_replace(
-                                    '#^(storage/|public/)#',
-                                    '',
-                                    $packageImage
+                                '#^(storage/|public/)#',
+                                '',
+                                $packageImage
                                 );
 
                                 /*
                                 | Generate storage URL
                                 */
                                 $packageImageUrl = asset(
-                                    'storage/' . $packageImage
+                                'storage/' . $packageImage
                                 );
-                            }
-                        }
+                                }
+                                }
 
-                    @endphp
+                                @endphp
 
 
-                    {{-- ==================================================
+                                {{-- ==================================================
                          PACKAGE CARD
                     =================================================== --}}
-                    <div class="puja-package-card
+                                <div class="puja-package-card
                         {{ $isSelected ? 'is-selected' : '' }}
-                        {{ $isFeatured ? 'is-featured' : '' }}"
-
-                        data-package-id="{{ $package->id }}"
-                        data-package-name="{{ e($package->name) }}"
-                        data-package-price="{{ $finalPrice }}">
+                        {{ $isFeatured ? 'is-featured' : '' }}" data-package-id="{{ $package->id }}"
+                                    data-package-name="{{ e($package->name) }}" data-package-price="{{ $finalPrice }}">
 
 
-                        {{-- Featured Badge --}}
-                        @if($isFeatured)
+                                    {{-- Featured Badge --}}
+                                    @if($isFeatured)
 
-                            <div class="package-featured-badge">
+                                    <div class="package-featured-badge">
 
-                                <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
 
-                                Popular
+                                        Popular
 
-                            </div>
+                                    </div>
 
-                        @endif
-
-
-                        {{-- Person Badge --}}
-                        <div class="package-person-badge">
-
-                            <i class="fa fa-user"></i>
-
-                            <span>
-                                {{ $personCount }}
-                                {{ $personText }}
-                            </span>
-
-                        </div>
+                                    @endif
 
 
-                        {{-- Selected Check --}}
-                        <div class="package-check-icon">
+                                    {{-- Person Badge --}}
+                                    <div class="package-person-badge">
 
-                            @if($isSelected)
+                                        <i class="fa fa-user"></i>
 
-                                <i class="fa fa-check"></i>
+                                        <span>
+                                            {{ $personCount }}
+                                            {{ $personText }}
+                                        </span>
 
-                            @endif
-
-                        </div>
-
-
-                        {{-- Package Information --}}
-                        <div class="package-card-content">
+                                    </div>
 
 
-                            {{-- Package Name --}}
-                            <h4 class="package-title">
+                                    {{-- Selected Check --}}
+                                    <div class="package-check-icon">
 
-                                {{ $package->name }}
+                                        @if($isSelected)
 
-                            </h4>
+                                        <i class="fa fa-check"></i>
 
+                                        @endif
 
-                            {{-- Short Description --}}
-                            @if($package->short_description)
-
-                                <p class="package-short-description">
-
-                                    {{ $package->short_description }}
-
-                                </p>
-
-                            @endif
+                                    </div>
 
 
-                            {{-- ==================================================
+                                    {{-- Package Information --}}
+                                    <div class="package-card-content">
+
+
+                                        {{-- Package Name --}}
+                                        <h4 class="package-title">
+
+                                            {{ $package->name }}
+
+                                        </h4>
+
+
+                                        {{-- Short Description --}}
+                                        @if($package->short_description)
+
+                                        <p class="package-short-description">
+
+                                            {{ $package->short_description }}
+
+                                        </p>
+
+                                        @endif
+
+
+                                        {{-- ==================================================
                                  PACKAGE IMAGE
                             =================================================== --}}
-                            @if($packageImageUrl)
+                                        @if($packageImageUrl)
 
-                                <div class="package-image">
+                                        <div class="package-image">
 
-                                    <img
-                                        src="{{ $packageImageUrl }}"
-                                        alt="{{ $package->name }}"
-                                        class="package-image-img"
-                                        loading="lazy"
-                                    >
+                                            <img src="{{ $packageImageUrl }}" alt="{{ $package->name }}"
+                                                class="package-image-img" loading="lazy">
+
+                                        </div>
+
+                                        @endif
+
+
+                                        {{-- ==================================================
+                                 PRICE
+                            =================================================== --}}
+                                        <div class="package-price-box">
+
+                                            @if($hasDiscount)
+
+                                            <span class="package-old-price">
+
+                                                ₹{{ number_format($package->price, 0) }}
+
+                                            </span>
+
+                                            @endif
+
+
+                                            <span class="package-final-price">
+
+                                                ₹{{ number_format($finalPrice, 0) }}
+
+                                            </span>
+
+                                        </div>
+
+
+                                        {{-- Discount --}}
+                                        @if($hasDiscount)
+
+                                        @php
+                                        $discountPercent = $package->price > 0
+                                        ? round(
+                                        (($package->price - $package->discount_price)
+                                        / $package->price) * 100
+                                        )
+                                        : 0;
+                                        @endphp
+
+                                        <span class="package-discount">
+
+                                            {{ $discountPercent }}% OFF
+
+                                        </span>
+
+                                        @endif
+
+
+                                    </div>
 
                                 </div>
 
-                            @endif
+                                @endforeach
+
+                        </div>
 
 
-                            {{-- ==================================================
-                                 PRICE
-                            =================================================== --}}
-                            <div class="package-price-box">
+                        {{-- ==========================================================
+                 BOTTOM SECTION
+            =========================================================== --}}
+                        <div class="package-bottom-wrapper">
 
-                                @if($hasDiscount)
 
-                                    <span class="package-old-price">
+                            {{-- ======================================================
+                     TRUST BOX
+                ======================================================= --}}
+                            <div class="package-trust-box">
 
-                                        ₹{{ number_format($package->price, 0) }}
+                                <div class="package-trust-item">
 
+                                    <i class="fa fa-certificate"></i>
+
+                                    <span>
+                                        ISO 27001 Certified Company
                                     </span>
 
-                                @endif
+                                </div>
 
 
-                                <span class="package-final-price">
+                                <div class="package-trust-item">
 
-                                    ₹{{ number_format($finalPrice, 0) }}
+                                    <i class="fa fa-check-circle"></i>
 
-                                </span>
+                                    <span>
+                                        Official Temple Partner
+                                    </span>
+
+                                </div>
+
+
+                                <div class="package-trust-item">
+
+                                    <i class="fa fa-headphones"></i>
+
+                                    <span>
+                                        Customer Support
+                                    </span>
+
+                                </div>
 
                             </div>
 
 
-                            {{-- Discount --}}
-                            @if($hasDiscount)
+                            {{-- ======================================================
+                     SELECTED PACKAGE
+                ======================================================= --}}
+                            <div class="package-selected-box">
 
-                                @php
-                                    $discountPercent = $package->price > 0
-                                        ? round(
-                                            (($package->price - $package->discount_price)
-                                            / $package->price) * 100
-                                        )
-                                        : 0;
-                                @endphp
 
-                                <span class="package-discount">
+                                <div class="selected-package-details">
 
-                                    {{ $discountPercent }}% OFF
+                                    <strong id="selectedPackagePrice">
 
-                                </span>
+                                        @if($defaultPrice !== null)
 
-                            @endif
+                                        ₹{{ number_format($defaultPrice, 0) }}
 
+                                        @else
+
+                                        ₹0
+
+                                        @endif
+
+                                    </strong>
+
+
+                                    <span id="selectedPackageName">
+
+                                        {{ $defaultPackage->name ?? 'Select Package' }}
+
+                                    </span>
+
+                                </div>
+
+
+                                <button type="button" id="proceedPackageBtn" class="package-proceed-button">
+
+                                    <span>
+                                        Proceed
+                                    </span>
+
+                                    <i class="fa fa-arrow-right"></i>
+
+                                </button>
+
+                            </div>
 
                         </div>
 
-                    </div>
 
-                @endforeach
-
-            </div>
-
-
-            {{-- ==========================================================
-                 BOTTOM SECTION
-            =========================================================== --}}
-            <div class="package-bottom-wrapper">
-
-
-                {{-- ======================================================
-                     TRUST BOX
-                ======================================================= --}}
-                <div class="package-trust-box">
-
-                    <div class="package-trust-item">
-
-                        <i class="fa fa-certificate"></i>
-
-                        <span>
-                            ISO 27001 Certified Company
-                        </span>
-
-                    </div>
-
-
-                    <div class="package-trust-item">
-
-                        <i class="fa fa-check-circle"></i>
-
-                        <span>
-                            Official Temple Partner
-                        </span>
-
-                    </div>
-
-
-                    <div class="package-trust-item">
-
-                        <i class="fa fa-headphones"></i>
-
-                        <span>
-                            Customer Support
-                        </span>
-
-                    </div>
-
-                </div>
-
-
-                {{-- ======================================================
-                     SELECTED PACKAGE
-                ======================================================= --}}
-                <div class="package-selected-box">
-
-
-                    <div class="selected-package-details">
-
-                        <strong id="selectedPackagePrice">
-
-                            @if($defaultPrice !== null)
-
-                                ₹{{ number_format($defaultPrice, 0) }}
-
-                            @else
-
-                                ₹0
-
-                            @endif
-
-                        </strong>
-
-
-                        <span id="selectedPackageName">
-
-                            {{ $defaultPackage->name ?? 'Select Package' }}
-
-                        </span>
-
-                    </div>
-
-
-                    <button
-                        type="button"
-                        id="proceedPackageBtn"
-                        class="package-proceed-button">
-
-                        <span>
-                            Proceed
-                        </span>
-
-                        <i class="fa fa-arrow-right"></i>
-
-                    </button>
-
-                </div>
-
-            </div>
-
-
-            {{-- ==========================================================
+                        {{-- ==========================================================
                  SELECTED PACKAGE ID
             =========================================================== --}}
-            <input
-                type="hidden"
-                id="selected_package_id"
-                name="package_id"
-                value="{{ $defaultPackage->id ?? '' }}"
-            >
+                        <input type="hidden" id="selected_package_id" name="package_id"
+                            value="{{ $defaultPackage->id ?? '' }}">
 
 
-        @else
+                        @else
 
-            {{-- ==========================================================
+                        {{-- ==========================================================
                  NO PACKAGES
             =========================================================== --}}
-            <div class="package-empty">
+                        <div class="package-empty">
 
-                <i class="fa fa-inbox"></i>
+                            <i class="fa fa-inbox"></i>
 
-                <h4>
-                    No Packages Available
-                </h4>
+                            <h4>
+                                No Packages Available
+                            </h4>
 
-                <p>
-                    Packages are currently not available for this puja.
-                </p>
+                            <p>
+                                Packages are currently not available for this puja.
+                            </p>
+
+                        </div>
+
+                        @endif
+
+                    </div>
 
             </div>
-
-        @endif
-
-    </div>
-
-</div>
             <div class="tab-pane fade" id="reviews" role="tabpanel" aria-labelledby="reviews-tab">
                 <div class="detail-tab-card">
                     <div class="detail-tab-heading">
@@ -997,14 +969,14 @@ $imageUrl = $image
 @push('scripts')
 
 <script>
-$(document).ready(function () {
+$(document).ready(function() {
 
     /*
     |--------------------------------------------------------------------------
     | Select Package
     |--------------------------------------------------------------------------
     */
-    $(document).on('click', '.puja-package-card', function () {
+    $(document).on('click', '.puja-package-card', function() {
 
         const $card = $(this);
 
@@ -1074,7 +1046,7 @@ $(document).ready(function () {
     | Proceed Button
     |--------------------------------------------------------------------------
     */
-    $(document).on('click', '#proceedPackageBtn', function () {
+    $(document).on('click', '#proceedPackageBtn', function() {
 
         const packageId =
             $('#selected_package_id').val();
