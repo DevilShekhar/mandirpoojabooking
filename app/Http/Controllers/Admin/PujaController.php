@@ -118,6 +118,7 @@ class PujaController extends Controller
                 'status' => array_key_exists('status', $validated)
                     ? $validated['status']
                     : 1,
+                'created_by' => auth()->id(),
             ]);
             foreach ($validated['packages'] ?? [] as $index => $package) {
                 $packageImage = null;
@@ -280,6 +281,8 @@ class PujaController extends Controller
                 'is_online' => $validated['is_online'],
                 'is_offline' => $validated['is_offline'],
                 'status' => $validated['status'],
+                'updated_by' => auth()->id(),
+
             ]);
             $oldPackages = PujaPackage::where('puja_id', $puja->id)->get();
             foreach ($oldPackages as $oldPackage) {

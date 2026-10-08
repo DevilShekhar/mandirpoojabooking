@@ -23,6 +23,8 @@ class Puja extends Model
         'is_online',
         'is_offline',
         'status',
+        'created_by',
+        'updated_by',
     ];
 
     protected $casts = [
@@ -31,53 +33,45 @@ class Puja extends Model
         'status' => 'boolean',
     ];
 
-    /**
-     * Temple
-     */
     public function temple()
     {
         return $this->belongsTo(Temple::class);
     }
 
-    /**
-     * Deity
-     */
     public function deity()
     {
         return $this->belongsTo(Deity::class);
     }
 
-    /**
-     * Puja Category
-     */
     public function pujaCategory()
     {
         return $this->belongsTo(PujaCategory::class);
     }
 
-    /**
-     * Festival Pujas
-     */
     public function festivalPujas()
     {
         return $this->hasMany(FestivalPuja::class);
     }
 
-    /**
-     * FAQs
-     */
     public function faqs()
     {
         return $this->hasMany(PujaFaq::class, 'puja_id')
             ->orderBy('sort_order');
     }
 
-    /**
-     * Packages
-     */
     public function packages()
     {
         return $this->hasMany(PujaPackage::class, 'puja_id')
             ->orderBy('sort_order');
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function updater()
+    {
+        return $this->belongsTo(User::class, 'updated_by');
     }
 }

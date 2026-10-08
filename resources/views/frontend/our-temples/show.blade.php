@@ -701,6 +701,417 @@
         font-size: 25px;
     }
 }
+.temple-puja-section {
+    padding: 65px 0 70px;
+    background: #fbf8f2;
+    overflow: hidden;
+}
+
+.temple-puja-top {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 25px;
+    margin-bottom: 30px;
+}
+
+.temple-puja-heading {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.temple-puja-heading-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 12px;
+    background: #fff6e6;
+    color: var(--temple-gold);
+    font-size: 22px;
+    box-shadow: 0 8px 20px rgba(196, 124, 32, .08);
+}
+
+.temple-puja-eyebrow {
+    display: block;
+    color: var(--temple-gold);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+}
+
+.temple-puja-heading h2 {
+    color: #28211c;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 31px;
+    line-height: 1.1;
+    margin: 0;
+    font-weight: 700;
+}
+
+.temple-puja-heading p {
+    color: #91877f;
+    font-size: 12px;
+    margin: 6px 0 0;
+}
+
+.temple-puja-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.temple-puja-controls button {
+    width: 43px;
+    height: 43px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #e2d5c6;
+    border-radius: 50%;
+    background: #fff;
+    color: #6f6258;
+    font-size: 17px;
+    cursor: pointer;
+    transition: all .3s ease;
+}
+
+.temple-puja-controls button:hover {
+    color: #fff;
+    background: var(--temple-red);
+    border-color: var(--temple-red);
+    transform: translateY(-2px);
+}
+
+.temple-puja-slider {
+    width: 100%;
+    overflow: hidden;
+}
+
+.temple-puja-track {
+    display: flex;
+    gap: 22px;
+    transition: transform .65s cubic-bezier(.4, 0, .2, 1);
+    will-change: transform;
+}
+
+.temple-puja-slide {
+    flex: 0 0 calc((100% - 44px) / 3);
+    min-width: 0;
+}
+
+.temple-puja-card {
+    height: 100%;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid #eee2d2;
+    border-radius: 17px;
+    box-shadow: 0 15px 45px rgba(50, 29, 16, .08);
+    transition: all .35s ease;
+}
+
+.temple-puja-card:hover {
+    border-color: #dfc59e;
+    box-shadow: 0 22px 55px rgba(50, 29, 16, .14);
+    transform: translateY(-6px);
+}
+
+.temple-puja-image {
+    position: relative;
+    width: 100%;
+    height: 235px;
+    overflow: hidden;
+    background: #fff6e6;
+}
+
+.temple-puja-image img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    transition: transform .6s ease;
+}
+
+.temple-puja-card:hover .temple-puja-image img {
+    transform: scale(1.07);
+}
+
+.temple-puja-image-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--temple-gold);
+    font-size: 52px;
+}
+
+.temple-puja-image-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        180deg,
+        rgba(20, 9, 5, .05) 35%,
+        rgba(20, 9, 5, .55) 100%
+    );
+    pointer-events: none;
+}
+
+.temple-puja-badge {
+    position: absolute;
+    left: 15px;
+    bottom: 15px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 11px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, .94);
+    color: var(--temple-red);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: .4px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .12);
+}
+
+.temple-puja-badge i {
+    color: var(--temple-gold);
+    font-size: 10px;
+}
+
+.temple-puja-card-content {
+    padding: 22px;
+}
+
+.temple-puja-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 9px;
+}
+
+.temple-puja-title {
+    color: #2e2722;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 21px;
+    line-height: 1.3;
+    font-weight: 700;
+    margin: 0;
+}
+
+.temple-puja-code {
+    flex-shrink: 0;
+    padding: 5px 7px;
+    border-radius: 5px;
+    background: #faf6ed;
+    color: #9a8978;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: .5px;
+}
+
+.temple-puja-description {
+    min-height: 40px;
+    color: #8c8177;
+    font-size: 12px;
+    line-height: 1.7;
+    margin: 0 0 18px;
+}
+
+.temple-puja-info {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 9px;
+    padding: 14px 0;
+    margin-bottom: 17px;
+    border-top: 1px solid #eee7de;
+    border-bottom: 1px solid #eee7de;
+}
+
+.temple-puja-info-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.temple-puja-info-icon {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 8px;
+    background: #fff7e9;
+    color: var(--temple-gold);
+    font-size: 13px;
+}
+
+.temple-puja-info-item div:last-child {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.temple-puja-info-item span {
+    color: #999089;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.temple-puja-info-item strong {
+    color: #332923;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.temple-puja-button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
+    padding: 13px 16px;
+    background: var(--temple-red);
+    border-radius: 8px;
+    color: #fff;
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: 700;
+    transition: all .3s ease;
+}
+
+.temple-puja-button:hover {
+    color: #fff;
+    background: var(--temple-dark-red);
+    transform: translateY(-2px);
+}
+
+.temple-puja-button i {
+    font-size: 14px;
+    transition: transform .3s ease;
+}
+
+.temple-puja-button:hover i {
+    transform: translateX(4px);
+}
+
+.temple-puja-slider-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+.temple-puja-dots {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.temple-puja-dot {
+    width: 7px;
+    height: 7px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: #d8cabb;
+    cursor: pointer;
+    transition: all .3s ease;
+}
+
+.temple-puja-dot.active {
+    width: 22px;
+    border-radius: 10px;
+    background: var(--temple-red);
+}
+
+.temple-puja-slide-text {
+    color: #9b9086;
+    font-size: 9px;
+    letter-spacing: .3px;
+}
+
+.temple-no-puja {
+    padding: 55px 20px;
+    background: #fff;
+    border: 1px solid #eee2d2;
+    border-radius: 17px;
+    text-align: center;
+}
+
+.temple-no-puja-icon {
+    color: var(--temple-gold);
+    font-size: 40px;
+    margin-bottom: 12px;
+}
+
+.temple-no-puja h4 {
+    color: #332923;
+    font-family: Georgia, "Times New Roman", serif;
+    margin-bottom: 6px;
+}
+
+.temple-no-puja p {
+    color: #91877f;
+    font-size: 13px;
+    margin: 0;
+}
+
+@media (max-width: 991px) {
+    .temple-puja-slide {
+        flex: 0 0 calc((100% - 22px) / 2);
+    }
+
+    .temple-puja-image {
+        height: 220px;
+    }
+}
+
+@media (max-width: 767px) {
+    .temple-puja-section {
+        padding: 50px 0 55px;
+    }
+
+    .temple-puja-top {
+        align-items: flex-start;
+    }
+
+    .temple-puja-heading h2 {
+        font-size: 27px;
+    }
+
+    .temple-puja-controls {
+        display: none;
+    }
+
+    .temple-puja-slide {
+        flex: 0 0 100%;
+    }
+
+    .temple-puja-image {
+        height: 230px;
+    }
+
+    .temple-puja-card-content {
+        padding: 20px;
+    }
+
+    .temple-puja-slider-bottom {
+        margin-top: 20px;
+    }
+
+    .temple-puja-slide-text {
+        display: none;
+    }
+}
 </style>
 
 <div class="temple-detail-page">
@@ -906,6 +1317,145 @@
             @endif
         </div>
     </section>
+    <section class="temple-puja-section">
+    <div class="container">
+        <div class="temple-puja-top">
+            <div class="temple-puja-heading">
+                <div class="temple-puja-heading-icon">
+                    <i class="fa fa-om"></i>
+                </div>
+
+                <div>
+                    <span class="temple-puja-eyebrow">Divine Services</span>
+                    <h2>Temple Pujas</h2>
+                    <p>
+                        Discover sacred pujas available at {{ $temple->name }}.
+                    </p>
+                </div>
+            </div>
+
+            @if($temple->pujas->count() > 3)
+                <div class="temple-puja-controls">
+                    <button type="button" class="temple-puja-prev">
+                        <i class="fa fa-angle-left"></i>
+                    </button>
+
+                    <button type="button" class="temple-puja-next">
+                        <i class="fa fa-angle-right"></i>
+                    </button>
+                </div>
+            @endif
+        </div>
+
+        @if($temple->pujas->count())
+            <div class="temple-puja-slider">
+                <div class="temple-puja-track">
+                    @foreach($temple->pujas as $puja)
+                        <div class="temple-puja-slide">
+                            <div class="temple-puja-card">
+                                <div class="temple-puja-image">
+                                    @if($puja->image)
+                                        <img src="{{ asset('storage/' . $puja->image) }}"
+                                             alt="{{ $puja->name }}">
+                                    @else
+                                        <div class="temple-puja-image-placeholder">
+                                            <i class="fa fa-om"></i>
+                                        </div>
+                                    @endif
+
+                                    <div class="temple-puja-image-overlay"></div>
+
+                                    <div class="temple-puja-badge">
+                                        <i class="fa fa-star"></i>
+                                        Sacred Puja
+                                    </div>
+                                </div>
+
+                                <div class="temple-puja-card-content">
+                                    <div class="temple-puja-card-header">
+                                        <h3 class="temple-puja-title">
+                                            {{ $puja->name }}
+                                        </h3>
+
+                                        @if($puja->puja_code)
+                                            <span class="temple-puja-code">
+                                                {{ $puja->puja_code }}
+                                            </span>
+                                        @endif
+                                    </div>
+
+                                    @if($puja->description)
+                                        <p class="temple-puja-description">
+                                            {{ \Illuminate\Support\Str::limit(strip_tags($puja->description), 105) }}
+                                        </p>
+                                    @endif
+
+                                    <div class="temple-puja-info">
+                                        <div class="temple-puja-info-item">
+                                            <div class="temple-puja-info-icon">
+                                                <i class="fa fa-user"></i>
+                                            </div>
+
+                                            <div>
+                                                <span>Pandit</span>
+                                                <strong>
+                                                    {{ $puja->creator->name ?? 'N/A' }}
+                                                </strong>
+                                            </div>
+                                        </div>
+
+                                        @if($puja->duration)
+                                            <div class="temple-puja-info-item">
+                                                <div class="temple-puja-info-icon">
+                                                    <i class="fa fa-clock-o"></i>
+                                                </div>
+
+                                                <div>
+                                                    <span>Duration</span>
+                                                    <strong>
+                                                        {{ $puja->duration }}
+                                                    </strong>
+                                                </div>
+                                            </div>
+                                        @endif
+                                    </div>
+
+                                    <a href="{{ route('frontend.puja.show', $puja->slug) }}"
+                                       class="temple-puja-button">
+                                        <span>View Puja Details</span>
+                                        <i class="fa fa-long-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
+            @if($temple->pujas->count() > 3)
+                <div class="temple-puja-slider-bottom">
+                    <div class="temple-puja-dots"></div>
+
+                    <span class="temple-puja-slide-text">
+                        Swipe to explore more sacred pujas
+                    </span>
+                </div>
+            @endif
+        @else
+            <div class="temple-no-puja">
+                <div class="temple-no-puja-icon">
+                    <i class="fa fa-om"></i>
+                </div>
+
+                <h4>No Pujas Available</h4>
+
+                <p>
+                    There are currently no pujas available for this temple.
+                </p>
+            </div>
+        @endif
+    </div>
+</section>
     <footer class="temple-footer">
         <div class="container">
             <div class="temple-footer-content">
@@ -930,4 +1480,162 @@
         </div>
     </footer>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const slider = document.querySelector('.temple-puja-slider');
+    const track = document.querySelector('.temple-puja-track');
+    const slides = document.querySelectorAll('.temple-puja-slide');
+    const prevButton = document.querySelector('.temple-puja-prev');
+    const nextButton = document.querySelector('.temple-puja-next');
+    const dotsContainer = document.querySelector('.temple-puja-dots');
+
+    if (!slider || !track || slides.length <= 1) {
+        return;
+    }
+
+    let currentIndex = 0;
+    let autoSlide;
+
+    function getSlidesPerView() {
+        if (window.innerWidth <= 767) {
+            return 1;
+        }
+
+        if (window.innerWidth <= 991) {
+            return 2;
+        }
+
+        return 3;
+    }
+
+    function getMaxIndex() {
+        return Math.max(0, slides.length - getSlidesPerView());
+    }
+
+    function updateSlider() {
+        const slideWidth = slides[0].getBoundingClientRect().width;
+        const gap = parseFloat(getComputedStyle(track).gap) || 0;
+
+        currentIndex = Math.min(currentIndex, getMaxIndex());
+
+        track.style.transform =
+            `translateX(-${currentIndex * (slideWidth + gap)}px)`;
+
+        updateDots();
+    }
+
+    function createDots() {
+        if (!dotsContainer || slides.length <= getSlidesPerView()) {
+            return;
+        }
+
+        dotsContainer.innerHTML = '';
+
+        const totalDots = getMaxIndex() + 1;
+
+        for (let i = 0; i < totalDots; i++) {
+            const dot = document.createElement('button');
+
+            dot.type = 'button';
+            dot.className = 'temple-puja-dot';
+            dot.setAttribute('aria-label', `Go to puja slide ${i + 1}`);
+
+            dot.addEventListener('click', function () {
+                currentIndex = i;
+                updateSlider();
+                restartAutoSlide();
+            });
+
+            dotsContainer.appendChild(dot);
+        }
+
+        updateDots();
+    }
+
+    function updateDots() {
+        if (!dotsContainer) {
+            return;
+        }
+
+        const dots = dotsContainer.querySelectorAll('.temple-puja-dot');
+
+        dots.forEach((dot, index) => {
+            dot.classList.toggle('active', index === currentIndex);
+        });
+    }
+
+    function nextSlide() {
+        const maxIndex = getMaxIndex();
+
+        if (currentIndex >= maxIndex) {
+            currentIndex = 0;
+        } else {
+            currentIndex++;
+        }
+
+        updateSlider();
+    }
+
+    function previousSlide() {
+        const maxIndex = getMaxIndex();
+
+        if (currentIndex <= 0) {
+            currentIndex = maxIndex;
+        } else {
+            currentIndex--;
+        }
+
+        updateSlider();
+    }
+
+    function startAutoSlide() {
+        if (getMaxIndex() <= 0) {
+            return;
+        }
+
+        autoSlide = setInterval(nextSlide, 4000);
+    }
+
+    function stopAutoSlide() {
+        clearInterval(autoSlide);
+    }
+
+    function restartAutoSlide() {
+        stopAutoSlide();
+        startAutoSlide();
+    }
+
+    if (prevButton) {
+        prevButton.addEventListener('click', function () {
+            previousSlide();
+            restartAutoSlide();
+        });
+    }
+
+    if (nextButton) {
+        nextButton.addEventListener('click', function () {
+            nextSlide();
+            restartAutoSlide();
+        });
+    }
+
+    slider.addEventListener('mouseenter', stopAutoSlide);
+    slider.addEventListener('mouseleave', startAutoSlide);
+
+    let resizeTimer;
+
+    window.addEventListener('resize', function () {
+        clearTimeout(resizeTimer);
+
+        resizeTimer = setTimeout(function () {
+            createDots();
+            updateSlider();
+        }, 150);
+    });
+
+    createDots();
+    updateSlider();
+    startAutoSlide();
+});
+</script>
 @endsection
