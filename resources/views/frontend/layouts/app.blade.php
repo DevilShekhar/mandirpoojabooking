@@ -264,11 +264,10 @@
                         <div class="col-lg-9 pl-0 ml-sm-15 ml-xs-15 p-4">
                             <form action="{{ route('frontend.puja') }}" method="GET" class="hm-searchbox"
                                 id="pujaSearchForm">
-                                <select name="temple_id" id="headerTempleSelect"
-                                    class="nice-select select-search-category">
+                               <select name="temple_id" id="headerTempleSelect" class="nice-select select-search-category">
                                     <option value="">All Temples</option>
                                     @foreach($headerTemples as $temple)
-                                    <option value="{{ $temple->id }}">{{ $temple->name }}</option>
+                                        <option value="{{ $temple->slug }}">{{ $temple->name }}</option>
                                     @endforeach
                                 </select>
                                 <div class="search-input-wrapper">
@@ -350,6 +349,22 @@
                                         </li>
                                         <li>
                                             <a href="{{ route('frontend.puja') }}">Puja</a>
+                                        </li>
+                                        <li class="dropdown-holder">
+                                            <a href="{{ route('frontend.sanatanevents') }}">Sanatan Events</a>
+                                            <ul class="hb-dropdown">
+                                                @forelse($headerSanatanEvents as $event)
+                                                    <li>
+                                                        <a href="{{ route('frontend.sanatanevents', ['program_type' => $event->program_type]) }}">
+                                                            {{ $event->program_type }}
+                                                        </a>
+                                                    </li>
+                                                @empty
+                                                    <li>
+                                                        <a href="{{ route('frontend.sanatanevents') }}">All Events</a>
+                                                    </li>
+                                                @endforelse
+                                            </ul>
                                         </li>
                                         <li>
                                             <a href="">My Bookings</a>
@@ -768,6 +783,19 @@
     <script src="{{ asset('assets/bundles/sweetalert/sweetalert-11.js') }}"></script>
     <!-- Main Theme JS -->
     <script src="{{ asset('assets/frontend/assets/js/main.js') }}"></script>
+    <script>
+        $(document).ready(function () {
+            $('#headerTempleSelect').on('change', function () {
+                const slug = $(this).val();
+
+                if (slug) {
+                    window.location.href = "{{ url('/our-temples') }}/" + encodeURIComponent(slug);
+                } else {
+                    window.location.href = "{{ route('frontend.our-temples') }}";
+                }
+            });
+        });
+    </script>
     <script>
     $(document).ready(function() {
         var $pujaSlider = $('.special-puja-slider');

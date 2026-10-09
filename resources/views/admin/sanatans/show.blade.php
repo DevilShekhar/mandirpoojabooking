@@ -10,11 +10,11 @@
             <p class="text-muted mb-0">View complete religious event information.</p>
         </div>
         <div class="d-flex gap-2">
-            <a href="{{ route('sanatan-events.index') }}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Back to List
+            <a href="{{ route('admin.sanatan-events.index') }}" class="btn btn-secondary">
+                <i class="fa fa-arrow-left"></i> Back to List
             </a>
-            <a href="{{ route('sanatan-events.edit', $sanatan) }}" class="btn btn-warning">
-                <i class="fas fa-edit"></i> Edit Event
+            <a href="{{ route('admin.sanatan-events.edit', $sanatan->id) }}" class="btn btn-warning">
+                <i class="fa fa-edit"></i> Edit Event
             </a>
         </div>
     </div>
@@ -200,14 +200,14 @@
 
             <div class="card mb-4">
                 <div class="card-body">
-                    <a href="{{ route('sanatan-events.edit', $sanatan) }}" class="btn btn-warning btn-block mb-2">
-                        <i class="fas fa-edit"></i> Edit Event
+                    <a href="{{ route('admin.sanatan-events.edit', $sanatan->id) }}" class="btn btn-warning btn-block mb-2">
+                        <i class="fa fa-edit"></i> Edit Event
                     </a>
-                    <form action="{{ route('sanatan-events.destroy', $sanatan) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this Sanatan event?');">
+                    <form action="{{ route('admin.sanatan-events.destroy', $sanatan->id) }}" method="POST" class="delete-form">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="btn btn-danger btn-block">
-                            <i class="fas fa-trash"></i> Delete Event
+                            <i class="fa fa-trash"></i> Delete Event
                         </button>
                     </form>
                 </div>
@@ -216,7 +216,31 @@
     </div>
 </div>
 @endsection
-
+@push('scripts')
+<script>
+$(document).ready(function () {
+    $('.delete-form').on('submit', function (e) {
+        e.preventDefault();
+        const form = this;
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'Do you want to delete this Sanatan event?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+    });
+});
+</script>
+@endpush
 @push('styles')
 <style>
 .description-content {

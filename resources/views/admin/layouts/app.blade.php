@@ -278,6 +278,12 @@
                                 <span>Reviews & Ratings</span>
                             </a>
                         </li>
+                        <li class="{{ request()->routeIs('admin.sanatan-events.*') ? 'active' : '' }}">
+    <a href="{{ route('admin.sanatan-events.index') }}" class="nav-link">
+        <i data-feather="calendar"></i>
+        <span>Sanatan Events</span>
+    </a>
+</li>
 
                         {{-- Users --}}
                         @can('users.view')
@@ -490,9 +496,7 @@
                                                 Pujas
                                             </a>
                                         </li>
-                                    @endcan
-
-                                    
+                                    @endcan                                   
 
                                     @can('puja-bookings.view')
                                         <li class="{{ request()->routeIs('puja-bookings.*') ? 'active' : '' }}">

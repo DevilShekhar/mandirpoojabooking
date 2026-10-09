@@ -11,8 +11,7 @@
                     <div class="card-header">
                         <h4>Add New Sanatan Event</h4>
                     </div>
-                    <form action="{{ route('sanatan-events.store') }}" method="POST" enctype="multipart/form-data">
-                        @csrf
+                    <form action="{{ route('admin.sanatan-events.store') }}" method="POST" enctype="multipart/form-data">                        @csrf
                         <div class="card-body">
                             @if($errors->any())
                                 <div class="alert alert-danger">
@@ -157,7 +156,7 @@
                             </div>
                         </div>
                         <div class="card-footer text-right">
-                            <a href="{{ route('sanatan-events.index') }}" class="btn btn-secondary">Cancel</a>
+                            <a href="{{ route('admin.sanatan-events.index') }}" class="btn btn-secondary">Cancel</a>                            
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-save"></i> Save Event
                             </button>

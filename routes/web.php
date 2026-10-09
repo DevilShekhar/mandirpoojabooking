@@ -33,6 +33,7 @@ use App\Http\Controllers\Frontend\HomeController;
 use App\Http\Controllers\Frontend\OurTemplesContoller;
 use App\Http\Controllers\Frontend\OurPujaController;
 use App\Http\Controllers\Admin\SanatanController;
+use App\Http\Controllers\Frontend\SanatanEventsController;
 
 Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
 Route::get('our-temples', [OurTemplesContoller::class, 'index'])->name('frontend.our-temples');
@@ -41,6 +42,8 @@ Route::get('/puja', [OurPujaController::class, 'index'])->name('frontend.puja');
 Route::post('/puja/filter', [OurPujaController::class, 'filter'])->name('frontend.puja.filter');
 Route::get('/puja/{slug}', [OurPujaController::class, 'show'])->name('frontend.puja.show');
 Route::post('/our-puja/{pujaId}/review', [OurPujaController::class, 'storeReview'])->name('our-puja.review.store');
+Route::get('/sanatanevents', [SanatanEventsController::class, 'index'])->name('frontend.sanatanevents');
+Route::get('/sanatanevents/{slug}', [SanatanEventsController::class, 'show'])->name('frontend.sanatanevents.show');
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
@@ -102,7 +105,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/puja-reviews',[PujaReviewController::class, 'index'])->name('admin.puja-reviews.index');
     Route::post('/puja-reviews/{id}/approve',[PujaReviewController::class, 'approve'])->name('admin.puja-reviews.approve');
     Route::post('/puja-reviews/{id}/reject',[PujaReviewController::class, 'reject'])->name('admin.puja-reviews.reject');
-    Route::resource('sanatan-events', SanatanController::class)->parameters(['sanatan-events' => 'sanatan']);
+Route::resource('sanatan-events', SanatanController::class)->names('admin.sanatan-events')->parameters(['sanatan-events' => 'sanatan']);
 });
 
 require __DIR__.'/auth.php';

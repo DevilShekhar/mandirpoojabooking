@@ -13,8 +13,7 @@ class SanatanController extends Controller
 {
     public function index()
     {
-        $sanatans = Sanatan::latest()->get();
-
+        $sanatans = Sanatan::latest()->paginate(10);
         return view('admin.sanatans.index', compact('sanatans'));
     }
 
@@ -57,10 +56,12 @@ class SanatanController extends Controller
             $validated['banner_image'] = $request->file('banner_image')->store('sanatans/banners', 'public');
         }
 
+        unset($validated['language']);
+        $validated['language'] = json_encode(array_values(array_unique($request->input('language', []))));
+
         Sanatan::create($validated);
 
-        return redirect()->route('sanatan-events.index')
-            ->with('success', 'Sanatan event created successfully.');
+        return redirect()->route('admin.sanatan-events.index')->with('success', 'Sanatan event created successfully.');
     }
 
     public function show(Sanatan $sanatan)
@@ -105,7 +106,6 @@ class SanatanController extends Controller
             if ($sanatan->image) {
                 Storage::disk('public')->delete($sanatan->image);
             }
-
             $validated['image'] = $request->file('image')->store('sanatans', 'public');
         }
 
@@ -113,14 +113,12 @@ class SanatanController extends Controller
             if ($sanatan->banner_image) {
                 Storage::disk('public')->delete($sanatan->banner_image);
             }
-
             $validated['banner_image'] = $request->file('banner_image')->store('sanatans/banners', 'public');
         }
 
         $sanatan->update($validated);
 
-        return redirect()->route('sanatan-events.index')
-            ->with('success', 'Sanatan event updated successfully.');
+        return redirect()->route('admin.sanatan-events.index')->with('success', 'Sanatan event updated successfully.');
     }
 
     public function destroy(Sanatan $sanatan)
@@ -130,8 +128,7 @@ class SanatanController extends Controller
             'updated_by' => Auth::id(),
         ]);
 
-        return redirect()->route('sanatan-events.index')
-            ->with('success', 'Sanatan event deactivated successfully.');
+        return redirect()->route('admin.sanatan-events.index')->with('success', 'Sanatan event deactivated successfully.');
     }
 
     private function generateSlug(string $name, ?int $ignoreId = null): string
@@ -140,11 +137,7 @@ class SanatanController extends Controller
         $slug = $originalSlug;
         $counter = 1;
 
-        while (
-            Sanatan::where('slug', $slug)
-                ->when($ignoreId, fn ($query) => $query->where('id', '!=', $ignoreId))
-                ->exists()
-        ) {
+        while (Sanatan::where('slug', $slug)->when($ignoreId, fn ($query) => $query->where('id', '!=', $ignoreId))->exists()) {
             $slug = $originalSlug . '-' . $counter;
             $counter++;
         }
