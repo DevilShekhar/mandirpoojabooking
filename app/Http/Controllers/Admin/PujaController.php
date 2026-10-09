@@ -15,7 +15,12 @@ class PujaController extends Controller
 {
     public function index()
     {
-        $pujas = Puja::with(['temple','deity','pujaCategory','faqs', 'packages',])->latest()->get();
+        $user = auth()->user();
+        $query = Puja::with(['temple','deity','pujaCategory','faqs','packages',]);
+        if (!$user->hasAnyRole(['Super Admin', 'Admin'])) {
+            $query->where('created_by', $user->id);
+        }
+        $pujas = $query->latest()->get();
         return view('admin.pujas.index', compact('pujas'));
     }
     public function create()
@@ -186,6 +191,10 @@ class PujaController extends Controller
     }
     public function edit(Puja $puja)
     {
+        $user = auth()->user();
+        if (!$user->hasAnyRole(['Super Admin', 'Admin']) && $puja->created_by != $user->id) {
+            abort(403);
+        }
         $puja->load([
             'faqs' => function ($query) {
                 $query->orderBy('sort_order');
@@ -197,7 +206,7 @@ class PujaController extends Controller
         $temples = Temple::where('status', 1)->latest()->get();
         $deities = Deity::where('status', 1)->latest()->get();
         $pujaCategories = PujaCategory::where('status', 1)->orderBy('sort_order')->get();
-        return view('admin.pujas.edit', compact('puja','temples','deities','pujaCategories'));
+        return view('admin.pujas.edit', compact('puja', 'temples', 'deities', 'pujaCategories'));
     }
     public function update(Request $request, Puja $puja)
     {
