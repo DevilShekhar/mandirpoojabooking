@@ -9,8 +9,8 @@
                     <div class="card-header">
                         <h4>Sanatan Events</h4>
                         <div class="card-header-action">
-                            <a href="{{ route('sanatan-events.create') }}" class="btn btn-primary">
-                                <i class="fas fa-plus"></i> Add Event
+                            <a href="{{ route('admin.sanatan-events.create') }}" class="btn btn-primary">
+                                <i class="fa fa-plus"></i> Add Sanatan Event
                             </a>
                         </div>
                     </div>
@@ -50,7 +50,7 @@
                                 <tbody>
                                     @forelse($sanatans as $sanatan)
                                         <tr>
-                                            <td>{{ $loop->iteration }}</td>
+                                            <td>{{ $sanatans->firstItem() + $loop->index }}</td>
                                             <td>
                                                 @if($sanatan->image)
                                                     <img src="{{ asset('storage/' . $sanatan->image) }}" alt="{{ $sanatan->name }}" width="60" height="60" style="object-fit:cover;border-radius:5px;">
@@ -88,19 +88,21 @@
                                                 @endif
                                             </td>
                                             <td>
-                                                <a href="{{ route('sanatan-events.show', $sanatan->id) }}" class="btn btn-sm btn-info" title="View">
-                                                    <i class="fas fa-eye"></i>
-                                                </a>
-                                                <a href="{{ route('sanatan-events.edit', $sanatan->id) }}" class="btn btn-sm btn-primary" title="Edit">
-                                                    <i class="fas fa-edit"></i>
-                                                </a>
-                                                <form action="{{ route('sanatan-events.destroy', $sanatan->id) }}" method="POST" class="d-inline delete-form">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-danger" title="Delete">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </form>
+                                                <div class="d-flex align-items-center">
+                                                    <a href="{{ route('admin.sanatan-events.show', $sanatan->id) }}" class="btn btn-sm btn-info mr-1" title="View">
+                                                        <i class="fa fa-eye"></i>
+                                                    </a>
+                                                    <a href="{{ route('admin.sanatan-events.edit', $sanatan->id) }}" class="btn btn-sm btn-primary mr-1" title="Edit">
+                                                        <i class="fa fa-edit"></i>
+                                                    </a>
+                                                    <form action="{{ route('admin.sanatan-events.destroy', $sanatan->id) }}" method="POST" class="d-inline delete-form">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-sm btn-danger" title="Delete">
+                                                            <i class="fa fa-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
                                             </td>
                                         </tr>
                                     @empty
@@ -111,6 +113,11 @@
                                 </tbody>
                             </table>
                         </div>
+                        @if($sanatans->hasPages())
+                            <div class="d-flex justify-content-end mt-3">
+                                {{ $sanatans->links() }}
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -121,7 +128,18 @@
 @push('scripts')
 <script>
 $(document).ready(function () {
-    $('#table-1').DataTable();
+    if ($.fn.DataTable.isDataTable('#table-1')) {
+        $('#table-1').DataTable().destroy();
+    }
+    $('#table-1').DataTable({
+        paging: false,
+        searching: false,
+        info: false,
+        ordering: true,
+        columnDefs: [
+            { orderable: false, targets: [1, 9] }
+        ]
+    });
     $('.delete-form').on('submit', function (e) {
         e.preventDefault();
         let form = this;
