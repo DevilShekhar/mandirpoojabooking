@@ -32,8 +32,7 @@ use App\Models\PujaAssignment;
 use App\Http\Controllers\Frontend\HomeController;
 use App\Http\Controllers\Frontend\OurTemplesContoller;
 use App\Http\Controllers\Frontend\OurPujaController;
-
-
+use App\Http\Controllers\Admin\SanatanController;
 
 Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
 Route::get('our-temples', [OurTemplesContoller::class, 'index'])->name('frontend.our-temples');
@@ -103,6 +102,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/puja-reviews',[PujaReviewController::class, 'index'])->name('admin.puja-reviews.index');
     Route::post('/puja-reviews/{id}/approve',[PujaReviewController::class, 'approve'])->name('admin.puja-reviews.approve');
     Route::post('/puja-reviews/{id}/reject',[PujaReviewController::class, 'reject'])->name('admin.puja-reviews.reject');
+    Route::resource('sanatan-events', SanatanController::class)->parameters(['sanatan-events' => 'sanatan']);
 });
 
 require __DIR__.'/auth.php';
