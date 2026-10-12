@@ -42,6 +42,7 @@ Route::get('/puja', [OurPujaController::class, 'index'])->name('frontend.puja');
 Route::post('/puja/filter', [OurPujaController::class, 'filter'])->name('frontend.puja.filter');
 Route::get('/puja/{slug}', [OurPujaController::class, 'show'])->name('frontend.puja.show');
 Route::post('/our-puja/{pujaId}/review', [OurPujaController::class, 'storeReview'])->name('our-puja.review.store');
+Route::get('/sanatanevents/type/{typeSlug}', [SanatanEventsController::class, 'type'])->name('frontend.sanatanevents.type');
 Route::get('/sanatanevents', [SanatanEventsController::class, 'index'])->name('frontend.sanatanevents');
 Route::get('/sanatanevents/{slug}', [SanatanEventsController::class, 'show'])->name('frontend.sanatanevents.show');
 Route::get('/dashboard', function () {

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Sanatan;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class SanatanEventsController extends Controller
 {
@@ -81,7 +82,57 @@ class SanatanEventsController extends Controller
 
         return view('frontend.sanatanevents.index', compact('sanatans', 'programTypes', 'creators'));
     }
+     public function type(Request $request, string $typeSlug)
+    {
+        $programTypes = Sanatan::where('status', 1)
+            ->whereNotNull('program_type')
+            ->where('program_type', '!=', '')
+            ->distinct()
+            ->pluck('program_type');
 
+        $programType = $programTypes->first(function ($type) use ($typeSlug) {
+            return Str::slug($type) === $typeSlug;
+        });
+
+        abort_if(!$programType, 404);
+
+        $query = Sanatan::where('status', 1)
+            ->where('program_type', $programType);
+
+        if ($request->filled('created_by')) {
+            $query->where('created_by', $request->created_by);
+        }
+
+        $sanatans = $query->latest()->paginate(12)->withQueryString();
+
+        $creatorIds = Sanatan::where('status', 1)
+            ->where('program_type', $programType)
+            ->whereNotNull('created_by')
+            ->distinct()
+            ->pluck('created_by');
+
+        $creators = User::whereIn('id', $creatorIds)
+            ->orderBy('name')
+            ->get(['id', 'name']);
+
+        $usersById = User::whereIn(
+            'id',
+            $sanatans->getCollection()->pluck('created_by')->filter()->unique()
+        )->get(['id', 'name'])->keyBy('id');
+
+        $sanatans->getCollection()->transform(function ($sanatan) use ($usersById) {
+            $sanatan->languages = $this->decodeLanguages($sanatan->language);
+            $sanatan->creator_name = $usersById->get($sanatan->created_by)?->name ?? 'N/A';
+
+            return $sanatan;
+        });
+
+        return view('frontend.sanatanevents.type', compact(
+            'sanatans',
+            'programType',
+            'creators'
+        ));
+    }
     public function show(string $slug)
     {
         $sanatan = Sanatan::where('slug', $slug)
