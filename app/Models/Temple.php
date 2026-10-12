@@ -3,10 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Temple extends Model
 {
     protected $fillable = [
+        'country_id',
         'state_id',
         'district_id',
         'city_id',
@@ -22,6 +24,11 @@ class Temple extends Model
         'status',
     ];
 
+    public function country()
+    {
+        return $this->belongsTo(Country::class);
+    }
+
     public function state()
     {
         return $this->belongsTo(State::class);
@@ -36,6 +43,7 @@ class Temple extends Model
     {
         return $this->belongsTo(City::class);
     }
+
     public function templeDeities()
     {
         return $this->hasMany(TempleDeity::class);
@@ -43,10 +51,24 @@ class Temple extends Model
 
     public function deities()
     {
-        return $this->belongsToMany(Deity::class,'temple_deities');
+        return $this->belongsToMany(
+            Deity::class,
+            'temple_deities'
+        );
     }
+
     public function pujas()
     {
         return $this->hasMany(Puja::class, 'temple_id');
+    }
+
+    /**
+     * Users associated with this temple.
+     */
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'temple_user')
+            ->withPivot('approval_status')
+            ->withTimestamps();
     }
 }

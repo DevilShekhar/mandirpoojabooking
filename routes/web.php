@@ -35,6 +35,8 @@ use App\Http\Controllers\Frontend\OurPujaController;
 use App\Http\Controllers\Admin\SanatanController;
 use App\Http\Controllers\Frontend\SanatanEventsController;
 use App\Http\Controllers\Auth\CustomerRegistrationController;
+use App\Http\Controllers\Frontend\TempleRegistrationController;
+use App\Http\Controllers\Admin\TempleRegistrationListController;
 
 Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
 Route::get('our-temples', [OurTemplesContoller::class, 'index'])->name('frontend.our-temples');
@@ -50,7 +52,11 @@ Route::get('/customer-registration', [CustomerRegistrationController::class, 'cr
 Route::post('/customer-registration', [CustomerRegistrationController::class, 'store'])->name('customer.register.store');
 Route::get('/auth/google/redirect', [ CustomerRegistrationController::class,'redirectToGoogle',])->name('auth.google.redirect');
 Route::get('/auth/google/callback', [CustomerRegistrationController::class,'handleGoogleCallback',])->name('auth.google.callback');
-
+Route::get('/temple-register', [TempleRegistrationController::class, 'create'])->name('temple.register');
+Route::post('/temple-register', [TempleRegistrationController::class, 'store'])->name('temple.register.store');
+Route::get('/temple-register/get-states/{country}', [TempleRegistrationController::class,'getStates',])->name('temple.register.states');
+Route::get('/temple-register/get-districts/{state}', [TempleRegistrationController::class,'getDistricts',])->name('temple.register.districts');
+Route::get('/temple-register/get-cities/{district}', [TempleRegistrationController::class,'getCities',])->name('temple.register.cities');
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
@@ -112,7 +118,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/puja-reviews',[PujaReviewController::class, 'index'])->name('admin.puja-reviews.index');
     Route::post('/puja-reviews/{id}/approve',[PujaReviewController::class, 'approve'])->name('admin.puja-reviews.approve');
     Route::post('/puja-reviews/{id}/reject',[PujaReviewController::class, 'reject'])->name('admin.puja-reviews.reject');
-Route::resource('sanatan-events', SanatanController::class)->names('admin.sanatan-events')->parameters(['sanatan-events' => 'sanatan']);
+    Route::resource('sanatan-events', SanatanController::class)->names('admin.sanatan-events')->parameters(['sanatan-events' => 'sanatan']);
+    Route::get('/all-templae-register', [TempleRegistrationListController::class,'index'])->name('all-templae-register');
+    Route::post('/all-templae-register/{registrationId}/approve',[TempleRegistrationListController::class, 'approve'])->name('all-templae-register.approve');
+    Route::post('/all-templae-register/{registrationId}/reject',[TempleRegistrationListController::class, 'reject'])->name('all-templae-register.reject');
 });
 
 require __DIR__.'/auth.php';
