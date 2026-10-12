@@ -279,11 +279,11 @@
                             </a>
                         </li>
                         <li class="{{ request()->routeIs('admin.sanatan-events.*') ? 'active' : '' }}">
-    <a href="{{ route('admin.sanatan-events.index') }}" class="nav-link">
-        <i data-feather="calendar"></i>
-        <span>Sanatan Events</span>
-    </a>
-</li>
+                            <a href="{{ route('admin.sanatan-events.index') }}" class="nav-link">
+                                <i data-feather="calendar"></i>
+                                <span>Sanatan Events</span>
+                            </a>
+                        </li>
 
                         {{-- Users --}}
                         @can('users.view')

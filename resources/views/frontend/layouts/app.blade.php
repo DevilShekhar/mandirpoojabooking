@@ -355,7 +355,7 @@
                                             <ul class="hb-dropdown">
                                                 @forelse($headerSanatanEvents as $event)
                                                     <li>
-                                                        <a href="{{ route('frontend.sanatanevents', ['program_type' => $event->program_type]) }}">
+                                                        <a href="{{ route('frontend.sanatanevents.type', ['typeSlug' => \Illuminate\Support\Str::slug($event->program_type)]) }}">
                                                             {{ $event->program_type }}
                                                         </a>
                                                     </li>
