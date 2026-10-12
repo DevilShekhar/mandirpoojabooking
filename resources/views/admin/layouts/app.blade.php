@@ -284,6 +284,12 @@
                                 <span>Sanatan Events</span>
                             </a>
                         </li>
+                        <li class="{{ request()->routeIs('all-templae-register*') ? 'active' : '' }}">
+                            <a href="{{ route('all-templae-register') }}" class="nav-link">
+                                <i data-feather="clipboard"></i>
+                                <span>Temple Registrations</span>
+                            </a>
+                        </li>
 
                         {{-- Users --}}
                         @can('users.view')
