@@ -1,18 +1,11 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Customer Registration | Puja Booking</title>
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-          rel="stylesheet">
-
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     <style>
         :root {
             --primary: #ea0505;
@@ -102,7 +95,7 @@
         .form-subheading {
             color: #777;
             font-size: 14px;
-            margin-bottom: 28px;
+            margin-bottom: 25px;
         }
 
         .form-label {
@@ -154,6 +147,50 @@
             color: #fff;
         }
 
+        .btn-google {
+            width: 100%;
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            border: 1px solid #dadce0;
+            border-radius: 8px;
+            background: #fff;
+            color: #3c4043;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: background .2s ease;
+        }
+
+        .btn-google:hover {
+            background: #f8f9fa;
+            color: #202124;
+        }
+
+        .btn-google img {
+            width: 20px;
+            height: 20px;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin: 22px 0;
+            color: #888;
+            font-size: 13px;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #e5e5e5;
+        }
+
         .login-link {
             color: var(--primary);
             text-decoration: none;
@@ -187,346 +224,187 @@
         }
     </style>
 </head>
-
 <body>
-
-<div class="registration-wrapper">
-    <div class="registration-card">
-
-        <div class="row g-0">
-
-            {{-- Left information panel --}}
-            <div class="col-lg-5">
-                <div class="registration-info">
-
-                    <div class="brand-icon">
-                        <i class="fa fa-om"></i>
+    <div class="registration-wrapper">
+        <div class="registration-card">
+            <div class="row g-0">
+                <div class="col-lg-5">
+                    <div class="registration-info">
+                        <div class="brand-icon">
+                            <i class="fa fa-om"></i>
+                        </div>
+                        <h2>Join Our Spiritual Community</h2>
+                        <p>Create your customer account to book pujas, explore temples, and manage your bookings online.</p>
+                        <ul class="benefit-list">
+                            <li><i class="fa fa-check-circle"></i><span>Book pujas online</span></li>
+                            <li><i class="fa fa-check-circle"></i><span>Manage your bookings</span></li>
+                            <li><i class="fa fa-check-circle"></i><span>Receive booking updates</span></li>
+                            <li><i class="fa fa-check-circle"></i><span>Stay connected with temples</span></li>
+                        </ul>
                     </div>
-
-                    <h2>Join Our Spiritual Community</h2>
-
-                    <p>
-                        Create your customer account to book pujas,
-                        explore temples, and manage your bookings online.
-                    </p>
-
-                    <ul class="benefit-list">
-                        <li>
-                            <i class="fa fa-check-circle"></i>
-                            <span>Book pujas online</span>
-                        </li>
-
-                        <li>
-                            <i class="fa fa-check-circle"></i>
-                            <span>Manage your bookings</span>
-                        </li>
-
-                        <li>
-                            <i class="fa fa-check-circle"></i>
-                            <span>Receive booking updates</span>
-                        </li>
-
-                        <li>
-                            <i class="fa fa-check-circle"></i>
-                            <span>Stay connected with temples</span>
-                        </li>
-                    </ul>
-
                 </div>
-            </div>
+                <div class="col-lg-7">
+                    <div class="registration-form">
+                        <h1 class="form-heading">Create Account</h1>
+                        <p class="form-subheading">Register using Google or enter your details below.</p>
 
-            {{-- Registration form --}}
-            <div class="col-lg-7">
-                <div class="registration-form">
+                        @if(session('success'))
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                {{ session('success') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        @endif
 
-                    <h1 class="form-heading">Create Account</h1>
+                        @if($errors->any())
+                            <div class="alert alert-danger" role="alert">
+                                <ul class="mb-0 ps-3">
+                                    @foreach($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
 
-                    <p class="form-subheading">
-                        Fill in your details to register as a customer.
-                    </p>
+                        <a href="{{ route('auth.google.redirect') }}" class="btn-google">
+                            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+                            Continue with Google
+                        </a>
 
-                    {{-- Success message --}}
-                    @if(session('success'))
-                        <div class="alert alert-success alert-dismissible fade show">
-                            {{ session('success') }}
+                        <div class="divider"><span>OR REGISTER WITH EMAIL</span></div>
 
-                            <button type="button"
-                                    class="btn-close"
-                                    data-bs-dismiss="alert"></button>
-                        </div>
-                    @endif
+                        <form action="{{ route('customer.register.store') }}" method="POST" id="customerRegistrationForm">
+                            @csrf
 
-                    {{-- Validation errors --}}
-                    @if($errors->any())
-                        <div class="alert alert-danger">
-                            <ul class="mb-0 ps-3">
-                                @foreach($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-
-                    <form action="{{ route('customer.register.store') }}"
-                          method="POST"
-                          id="customerRegistrationForm">
-
-                        @csrf
-
-                        {{-- Full name --}}
-                        <div class="mb-3">
-                            <label for="name" class="form-label">
-                                Full Name <span class="text-danger">*</span>
-                            </label>
-
-                            <input type="text"
-                                   id="name"
-                                   name="name"
-                                   class="form-control @error('name') is-invalid @enderror"
-                                   placeholder="Enter your full name"
-                                   value="{{ old('name') }}"
-                                   maxlength="255"
-                                   autocomplete="name"
-                                   required>
-
-                            @error('name')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        {{-- Email --}}
-                        <div class="mb-3">
-                            <label for="email" class="form-label">
-                                Email Address <span class="text-danger">*</span>
-                            </label>
-
-                            <input type="email"
-                                   id="email"
-                                   name="email"
-                                   class="form-control @error('email') is-invalid @enderror"
-                                   placeholder="Enter your email address"
-                                   value="{{ old('email') }}"
-                                   maxlength="255"
-                                   autocomplete="email"
-                                   required>
-
-                            @error('email')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        {{-- Phone --}}
-                        <div class="mb-3">
-                            <label for="phone" class="form-label">
-                                Phone Number <span class="text-danger">*</span>
-                            </label>
-
-                            <input type="tel"
-                                   id="phone"
-                                   name="phone"
-                                   class="form-control @error('phone') is-invalid @enderror"
-                                   placeholder="Enter your phone number"
-                                   value="{{ old('phone') }}"
-                                   maxlength="20"
-                                   autocomplete="tel"
-                                   required>
-
-                            @error('phone')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="row">
-
-                            {{-- Gender --}}
-                            <div class="col-md-6 mb-3">
-                                <label for="gender" class="form-label">
-                                    Gender
-                                </label>
-
-                                <select name="gender"
-                                        id="gender"
-                                        class="form-select @error('gender') is-invalid @enderror">
-
-                                    <option value="">Select Gender</option>
-
-                                    <option value="Male"
-                                        {{ old('gender') === 'Male' ? 'selected' : '' }}>
-                                        Male
-                                    </option>
-
-                                    <option value="Female"
-                                        {{ old('gender') === 'Female' ? 'selected' : '' }}>
-                                        Female
-                                    </option>
-
-                                    <option value="Other"
-                                        {{ old('gender') === 'Other' ? 'selected' : '' }}>
-                                        Other
-                                    </option>
-                                </select>
-
-                                @error('gender')
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Full Name <span class="text-danger">*</span></label>
+                                <input type="text" id="name" name="name" class="form-control @error('name') is-invalid @enderror" placeholder="Enter your full name" value="{{ old('name') }}" maxlength="255" autocomplete="name" required>
+                                @error('name')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
 
-                            {{-- Birth date --}}
-                            <div class="col-md-6 mb-3">
-                                <label for="birth_date" class="form-label">
-                                    Date of Birth
-                                </label>
-
-                                <input type="date"
-                                       name="birth_date"
-                                       id="birth_date"
-                                       class="form-control @error('birth_date') is-invalid @enderror"
-                                       value="{{ old('birth_date') }}"
-                                       max="{{ now()->subDay()->format('Y-m-d') }}">
-
-                                @error('birth_date')
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email Address <span class="text-danger">*</span></label>
+                                <input type="email" id="email" name="email" class="form-control @error('email') is-invalid @enderror" placeholder="Enter your email address" value="{{ old('email') }}" maxlength="255" autocomplete="email" required>
+                                @error('email')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
 
-                        </div>
-
-                        {{-- Password --}}
-                        <div class="mb-3">
-                            <label for="password" class="form-label">
-                                Password <span class="text-danger">*</span>
-                            </label>
-
-                            <div class="input-group">
-                                <input type="password"
-                                       name="password"
-                                       id="password"
-                                       class="form-control @error('password') is-invalid @enderror"
-                                       placeholder="Create a password"
-                                       autocomplete="new-password"
-                                       required>
-
-                                <button type="button"
-                                        class="password-toggle"
-                                        onclick="togglePassword('password', this)"
-                                        aria-label="Show password">
-                                    <i class="fa fa-eye"></i>
-                                </button>
+                            <div class="mb-3">
+                                <label for="phone" class="form-label">Phone Number <span class="text-danger">*</span></label>
+                                <input type="tel" id="phone" name="phone" class="form-control @error('phone') is-invalid @enderror" placeholder="Enter your phone number" value="{{ old('phone') }}" maxlength="20" autocomplete="tel" required>
+                                @error('phone')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
 
-                            @error('password')
-                                <div class="text-danger small mt-1">{{ $message }}</div>
-                            @enderror
-                        </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="gender" class="form-label">Gender</label>
+                                    <select name="gender" id="gender" class="form-select @error('gender') is-invalid @enderror">
+                                        <option value="">Select Gender</option>
+                                        <option value="Male" {{ old('gender') === 'Male' ? 'selected' : '' }}>Male</option>
+                                        <option value="Female" {{ old('gender') === 'Female' ? 'selected' : '' }}>Female</option>
+                                        <option value="Other" {{ old('gender') === 'Other' ? 'selected' : '' }}>Other</option>
+                                    </select>
+                                    @error('gender')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
 
-                        {{-- Confirm password --}}
-                        <div class="mb-4">
-                            <label for="password_confirmation" class="form-label">
-                                Confirm Password
-                                <span class="text-danger">*</span>
-                            </label>
-
-                            <div class="input-group">
-                                <input type="password"
-                                       name="password_confirmation"
-                                       id="password_confirmation"
-                                       class="form-control"
-                                       placeholder="Confirm your password"
-                                       autocomplete="new-password"
-                                       required>
-
-                                <button type="button"
-                                        class="password-toggle"
-                                        onclick="togglePassword('password_confirmation', this)"
-                                        aria-label="Show confirm password">
-                                    <i class="fa fa-eye"></i>
-                                </button>
+                                <div class="col-md-6 mb-3">
+                                    <label for="birth_date" class="form-label">Date of Birth</label>
+                                    <input type="date" name="birth_date" id="birth_date" class="form-control @error('birth_date') is-invalid @enderror" value="{{ old('birth_date') }}" max="{{ now()->subDay()->format('Y-m-d') }}">
+                                    @error('birth_date')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
                             </div>
 
-                            <div id="passwordMismatch"
-                                 class="text-danger small mt-1"
-                                 style="display:none;">
-                                Passwords do not match.
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Password <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="password" name="password" id="password" class="form-control @error('password') is-invalid @enderror" placeholder="Create a password" autocomplete="new-password" required>
+                                    <button type="button" class="password-toggle" onclick="togglePassword('password', this)" aria-label="Show password">
+                                        <i class="fa fa-eye"></i>
+                                    </button>
+                                </div>
+                                @error('password')
+                                    <div class="text-danger small mt-1">{{ $message }}</div>
+                                @enderror
                             </div>
+
+                            <div class="mb-4">
+                                <label for="password_confirmation" class="form-label">Confirm Password <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="password" name="password_confirmation" id="password_confirmation" class="form-control" placeholder="Confirm your password" autocomplete="new-password" required>
+                                    <button type="button" class="password-toggle" onclick="togglePassword('password_confirmation', this)" aria-label="Show confirm password">
+                                        <i class="fa fa-eye"></i>
+                                    </button>
+                                </div>
+                                <div id="passwordMismatch" class="text-danger small mt-1" style="display:none;">Passwords do not match.</div>
+                            </div>
+
+                            <button type="submit" class="btn btn-register">
+                                <i class="fa fa-user-plus me-2"></i>Create Customer Account
+                            </button>
+                        </form>
+
+                        <div class="form-footer">
+                            Already have an account?
+                            <a href="{{ route('login') }}" class="login-link">Login Here</a>
                         </div>
 
-                        {{-- Register --}}
-                        <button type="submit" class="btn btn-register">
-                            <i class="fa fa-user-plus me-2"></i>
-                            Create Customer Account
-                        </button>
-
-                    </form>
-
-                    <div class="form-footer">
-                        Already have an account?
-                        <a href="{{ route('login') }}" class="login-link">
-                            Login Here
-                        </a>
+                        <div class="text-center mt-4">
+                            <a href="{{ url('/') }}" class="text-muted text-decoration-none small">
+                                <i class="fa fa-arrow-left me-1"></i>Back to Home
+                            </a>
+                        </div>
                     </div>
-
-                    <div class="text-center mt-4">
-                        <a href="{{ url('/') }}"
-                           class="text-muted text-decoration-none small">
-                            <i class="fa fa-arrow-left me-1"></i>
-                            Back to Home
-                        </a>
-                    </div>
-
                 </div>
             </div>
-
         </div>
     </div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function togglePassword(inputId, button) {
+            const input = document.getElementById(inputId);
+            const icon = button.querySelector('i');
 
-<script>
-    function togglePassword(inputId, button) {
-        const input = document.getElementById(inputId);
-        const icon = button.querySelector('i');
-
-        if (input.type === 'password') {
-            input.type = 'text';
-            icon.classList.replace('fa-eye', 'fa-eye-slash');
-            button.setAttribute('aria-label', 'Hide password');
-        } else {
-            input.type = 'password';
-            icon.classList.replace('fa-eye-slash', 'fa-eye');
-            button.setAttribute('aria-label', 'Show password');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+                button.setAttribute('aria-label', 'Hide password');
+            } else {
+                input.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+                button.setAttribute('aria-label', 'Show password');
+            }
         }
-    }
 
-    const form = document.getElementById('customerRegistrationForm');
-    const password = document.getElementById('password');
-    const confirmation = document.getElementById('password_confirmation');
-    const mismatch = document.getElementById('passwordMismatch');
+        const form = document.getElementById('customerRegistrationForm');
+        const password = document.getElementById('password');
+        const confirmation = document.getElementById('password_confirmation');
+        const mismatch = document.getElementById('passwordMismatch');
 
-    function checkPasswords() {
-        const different =
-            confirmation.value !== '' &&
-            password.value !== confirmation.value;
-
-        confirmation.setCustomValidity(
-            different ? 'Passwords do not match.' : ''
-        );
-
-        mismatch.style.display = different ? 'block' : 'none';
-
-        return !different;
-    }
-
-    password.addEventListener('input', checkPasswords);
-    confirmation.addEventListener('input', checkPasswords);
-
-    form.addEventListener('submit', function (event) {
-        if (!checkPasswords()) {
-            event.preventDefault();
-            confirmation.reportValidity();
+        function checkPasswords() {
+            const different = confirmation.value !== '' && password.value !== confirmation.value;
+            confirmation.setCustomValidity(different ? 'Passwords do not match.' : '');
+            mismatch.style.display = different ? 'block' : 'none';
+            return !different;
         }
-    });
-</script>
 
+        password.addEventListener('input', checkPasswords);
+        confirmation.addEventListener('input', checkPasswords);
+
+        form.addEventListener('submit', function (event) {
+            if (!checkPasswords()) {
+                event.preventDefault();
+                confirmation.reportValidity();
+            }
+        });
+    </script>
 </body>
 </html>

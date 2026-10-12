@@ -48,6 +48,9 @@ Route::get('/sanatanevents', [SanatanEventsController::class, 'index'])->name('f
 Route::get('/sanatanevents/{slug}', [SanatanEventsController::class, 'show'])->name('frontend.sanatanevents.show');
 Route::get('/customer-registration', [CustomerRegistrationController::class, 'create'])->name('customer.register');
 Route::post('/customer-registration', [CustomerRegistrationController::class, 'store'])->name('customer.register.store');
+Route::get('/auth/google/redirect', [ CustomerRegistrationController::class,'redirectToGoogle',])->name('auth.google.redirect');
+Route::get('/auth/google/callback', [CustomerRegistrationController::class,'handleGoogleCallback',])->name('auth.google.callback');
+
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
