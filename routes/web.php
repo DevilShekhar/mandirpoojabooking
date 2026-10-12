@@ -34,6 +34,7 @@ use App\Http\Controllers\Frontend\OurTemplesContoller;
 use App\Http\Controllers\Frontend\OurPujaController;
 use App\Http\Controllers\Admin\SanatanController;
 use App\Http\Controllers\Frontend\SanatanEventsController;
+use App\Http\Controllers\Auth\CustomerRegistrationController;
 
 Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
 Route::get('our-temples', [OurTemplesContoller::class, 'index'])->name('frontend.our-temples');
@@ -45,6 +46,8 @@ Route::post('/our-puja/{pujaId}/review', [OurPujaController::class, 'storeReview
 Route::get('/sanatanevents/type/{typeSlug}', [SanatanEventsController::class, 'type'])->name('frontend.sanatanevents.type');
 Route::get('/sanatanevents', [SanatanEventsController::class, 'index'])->name('frontend.sanatanevents');
 Route::get('/sanatanevents/{slug}', [SanatanEventsController::class, 'show'])->name('frontend.sanatanevents.show');
+Route::get('/customer-registration', [CustomerRegistrationController::class, 'create'])->name('customer.register');
+Route::post('/customer-registration', [CustomerRegistrationController::class, 'store'])->name('customer.register.store');
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
