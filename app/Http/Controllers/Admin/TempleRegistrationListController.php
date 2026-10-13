@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Throwable;
 
 class TempleRegistrationListController extends Controller
@@ -44,9 +47,9 @@ class TempleRegistrationListController extends Controller
                 'c.name as city_name'
             );
 
-        // Search registrations.
+        // Search by manager, contact details, temple or temple code.
         if ($request->filled('search')) {
-            $search = trim($request->search);
+            $search = trim($request->input('search'));
 
             $query->where(function ($q) use ($search) {
                 $q->where('u.name', 'like', "%{$search}%")
@@ -57,10 +60,19 @@ class TempleRegistrationListController extends Controller
             });
         }
 
-        // Filter by registration status.
-        if ($request->filled('status') &&
-            in_array($request->status, ['pending', 'approved', 'rejected'], true)) {
-            $query->where('tu.approval_status', $request->status);
+        // Filter by approval status.
+        if (
+            $request->filled('status') &&
+            in_array(
+                $request->input('status'),
+                ['pending', 'approved', 'rejected'],
+                true
+            )
+        ) {
+            $query->where(
+                'tu.approval_status',
+                $request->input('status')
+            );
         }
 
         $registrations = $query
@@ -68,7 +80,6 @@ class TempleRegistrationListController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        // Registration counts.
         $totalCount = DB::table('temple_user')->count();
 
         $pendingCount = DB::table('temple_user')
@@ -94,11 +105,19 @@ class TempleRegistrationListController extends Controller
 
     /**
      * Approve a temple registration.
+     *
+     * Approval will:
+     * 1. Mark the registration as approved.
+     * 2. Activate the manager account.
+     * 3. Set users.role_id to the Temple Manager role ID.
+     * 4. Synchronize the Spatie role in model_has_roles.
+     * 5. Activate and verify the temple.
      */
     public function approve($registrationId)
     {
         try {
             DB::transaction(function () use ($registrationId) {
+
                 $registration = DB::table('temple_user')
                     ->where('id', $registrationId)
                     ->lockForUpdate()
@@ -108,26 +127,55 @@ class TempleRegistrationListController extends Controller
                     abort(404, 'Temple registration not found.');
                 }
 
-                if ($registration->approval_status === 'approved') {
-                    return;
-                }
-
                 if ($registration->approval_status === 'rejected') {
-                    abort(422, 'A rejected registration cannot be approved directly.');
+                    abort(
+                        422,
+                        'A rejected registration cannot be approved directly.'
+                    );
                 }
 
+                // Find the role using its name and guard.
+                $role = Role::where('name', 'Temple Manager')
+                    ->where('guard_name', 'web')
+                    ->first();
+
+                if (!$role) {
+                    throw new \RuntimeException(
+                        'Temple Manager role was not found in the roles table.'
+                    );
+                }
+
+                // Lock and retrieve the registered manager.
+                $user = User::where('id', $registration->user_id)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (!$user) {
+                    abort(404, 'Temple Manager user account not found.');
+                }
+
+                // Update the manager account and custom role_id.
+                $user->role_id = $role->id;
+                $user->status = 1;
+                $user->save();
+
+                /*
+                 * Synchronize Spatie roles.
+                 *
+                 * This creates the model_has_roles record:
+                 * role_id   = Temple Manager role ID
+                 * model_type = App\Models\User
+                 * model_id   = registered user ID
+                 *
+                 * syncRoles makes Temple Manager the user's only Spatie role.
+                 */
+                $user->syncRoles([$role]);
+
+                // Approve the registration.
                 DB::table('temple_user')
                     ->where('id', $registrationId)
                     ->update([
                         'approval_status' => 'approved',
-                        'updated_at' => now(),
-                    ]);
-
-                // Activate the temple manager account.
-                DB::table('users')
-                    ->where('id', $registration->user_id)
-                    ->update([
-                        'status' => 1,
                         'updated_at' => now(),
                     ]);
 
@@ -141,12 +189,23 @@ class TempleRegistrationListController extends Controller
                     ]);
             });
 
+            // Refresh Spatie's cached permission data.
+            app(PermissionRegistrar::class)
+                ->forgetCachedPermissions();
+
+            Log::info('Temple registration approved', [
+                'registration_id' => $registrationId,
+            ]);
+
             return redirect()
                 ->route('all-templae-register')
-                ->with('success', 'Temple registration approved successfully.');
+                ->with(
+                    'success',
+                    'Temple registration approved and Temple Manager role assigned successfully.'
+                );
 
         } catch (Throwable $e) {
-            if ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpException) {
+            if ($e instanceof HttpExceptionInterface) {
                 throw $e;
             }
 
@@ -157,17 +216,24 @@ class TempleRegistrationListController extends Controller
 
             return redirect()
                 ->route('all-templae-register')
-                ->with('error', 'Unable to approve the registration. Please check the application logs.');
+                ->with(
+                    'error',
+                    'Unable to approve the registration. Please check the application logs.'
+                );
         }
     }
 
     /**
      * Reject a temple registration.
+     *
+     * Rejection does not assign the Temple Manager role
+     * or activate the user or temple.
      */
     public function reject($registrationId)
     {
         try {
             DB::transaction(function () use ($registrationId) {
+
                 $registration = DB::table('temple_user')
                     ->where('id', $registrationId)
                     ->lockForUpdate()
@@ -178,7 +244,10 @@ class TempleRegistrationListController extends Controller
                 }
 
                 if ($registration->approval_status === 'approved') {
-                    abort(422, 'An approved registration cannot be rejected directly.');
+                    abort(
+                        422,
+                        'An approved registration cannot be rejected directly.'
+                    );
                 }
 
                 if ($registration->approval_status === 'rejected') {
@@ -195,10 +264,13 @@ class TempleRegistrationListController extends Controller
 
             return redirect()
                 ->route('all-templae-register')
-                ->with('success', 'Temple registration rejected successfully.');
+                ->with(
+                    'success',
+                    'Temple registration rejected successfully.'
+                );
 
         } catch (Throwable $e) {
-            if ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpException) {
+            if ($e instanceof HttpExceptionInterface) {
                 throw $e;
             }
 
@@ -209,7 +281,10 @@ class TempleRegistrationListController extends Controller
 
             return redirect()
                 ->route('all-templae-register')
-                ->with('error', 'Unable to reject the registration. Please check the application logs.');
+                ->with(
+                    'error',
+                    'Unable to reject the registration. Please check the application logs.'
+                );
         }
     }
 }
