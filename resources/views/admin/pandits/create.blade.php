@@ -31,10 +31,10 @@
 
                         <div class="card-body">
 
-                            @if($errors->any())
+                            @if ($errors->any())
                                 <div class="alert alert-danger">
                                     <ul class="mb-0">
-                                        @foreach($errors->all() as $error)
+                                        @foreach ($errors->all() as $error)
                                             <li>{{ $error }}</li>
                                         @endforeach
                                     </ul>
@@ -42,21 +42,24 @@
                             @endif
 
                             <div class="section-title mt-0">
-                                Pandit Information
+                                Personal Information
                             </div>
 
                             <div class="form-row">
 
                                 <div class="form-group col-md-6">
-                                    <label>
-                                        Name <span class="text-danger">*</span>
+                                    <label for="name">
+                                        Full Name <span class="text-danger">*</span>
                                     </label>
 
                                     <input type="text"
+                                           id="name"
                                            name="name"
                                            class="form-control @error('name') is-invalid @enderror"
                                            value="{{ old('name') }}"
-                                           placeholder="Enter Pandit Name"
+                                           placeholder="Enter full name"
+                                           maxlength="255"
+                                           autocomplete="name"
                                            required>
 
                                     @error('name')
@@ -65,30 +68,19 @@
                                 </div>
 
                                 <div class="form-group col-md-6">
-                                    <label>
-                                        Mobile <span class="text-danger">*</span>
+                                    <label for="email">
+                                        Email Address <span class="text-danger">*</span>
                                     </label>
 
-                                    <input type="text"
-                                           name="mobile"
-                                           class="form-control @error('mobile') is-invalid @enderror"
-                                           value="{{ old('mobile') }}"
-                                           placeholder="Enter Mobile Number"
-                                           required>
-
-                                    @error('mobile')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-
-                                <div class="form-group col-md-6">
-                                    <label>Email</label>
-
                                     <input type="email"
+                                           id="email"
                                            name="email"
                                            class="form-control @error('email') is-invalid @enderror"
                                            value="{{ old('email') }}"
-                                           placeholder="Enter Email">
+                                           placeholder="Enter email address"
+                                           maxlength="255"
+                                           autocomplete="email"
+                                           required>
 
                                     @error('email')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -96,107 +88,187 @@
                                 </div>
 
                                 <div class="form-group col-md-6">
-                                    <label>Temple</label>
+                                    <label for="phone">
+                                        Phone Number <span class="text-danger">*</span>
+                                    </label>
 
-                                    <select name="temple_id"
-                                            class="form-control @error('temple_id') is-invalid @enderror">
-
-                                        <option value="">Select Temple</option>
-
-                                        @foreach($temples as $temple)
-                                            <option value="{{ $temple->id }}"
-                                                {{ old('temple_id') == $temple->id ? 'selected' : '' }}>
-                                                {{ $temple->name }}
-                                            </option>
-                                        @endforeach
-
-                                    </select>
-
-                                    @error('temple_id')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-
-                                <div class="form-group col-md-6">
-                                    <label>Experience (Years) <span class="text-danger">*</span></label>
-
-                                    <input type="number"
-                                           name="experience"
-                                           min="0"
-                                           class="form-control @error('experience') is-invalid @enderror"
-                                           value="{{ old('experience', 0) }}"
+                                    <input type="tel"
+                                           id="phone"
+                                           name="phone"
+                                           class="form-control @error('phone') is-invalid @enderror"
+                                           value="{{ old('phone') }}"
+                                           placeholder="Enter phone number"
+                                           maxlength="20"
+                                           autocomplete="tel"
                                            required>
 
-                                    @error('experience')
+                                    @error('phone')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
 
                                 <div class="form-group col-md-6">
-                                    <label>Profile Image</label>
+                                    <label for="gender">Gender</label>
 
-                                    <input type="file"
-                                           name="profile_image"
-                                           class="form-control @error('profile_image') is-invalid @enderror"
-                                           accept="image/*">
+                                    <select id="gender"
+                                            name="gender"
+                                            class="form-control @error('gender') is-invalid @enderror">
 
-                                    @error('profile_image')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
+                                        <option value="">Select Gender</option>
 
-                                <div class="form-group col-md-6">
-                                    <label>Languages</label>
-
-                                    <textarea name="languages"
-                                              class="form-control"
-                                              rows="3"
-                                              placeholder="e.g. Marathi, Hindi, Sanskrit">{{ old('languages') }}</textarea>
-                                </div>
-
-                                <div class="form-group col-md-6">
-                                    <label>Specialization</label>
-
-                                    <textarea name="specialization"
-                                              class="form-control"
-                                              rows="3"
-                                              placeholder="e.g. Ganesh Puja, Rudrabhishek, Havan">{{ old('specialization') }}</textarea>
-                                </div>
-
-                                <div class="form-group col-md-6">
-                                    <label>Verification Status <span class="text-danger">*</span></label>
-
-                                    <select name="verification_status"
-                                            class="form-control"
-                                            required>
-
-                                        <option value="pending"
-                                            {{ old('verification_status', 'pending') == 'pending' ? 'selected' : '' }}>
-                                            Pending
+                                        <option value="male"
+                                            {{ old('gender') === 'male' ? 'selected' : '' }}>
+                                            Male
                                         </option>
 
-                                        <option value="verified"
-                                            {{ old('verification_status') == 'verified' ? 'selected' : '' }}>
-                                            Verified
+                                        <option value="female"
+                                            {{ old('gender') === 'female' ? 'selected' : '' }}>
+                                            Female
                                         </option>
 
-                                        <option value="rejected"
-                                            {{ old('verification_status') == 'rejected' ? 'selected' : '' }}>
-                                            Rejected
+                                        <option value="other"
+                                            {{ old('gender') === 'other' ? 'selected' : '' }}>
+                                            Other
                                         </option>
 
                                     </select>
+
+                                    @error('gender')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
 
                                 <div class="form-group col-md-6">
-                                    <label>Status <span class="text-danger">*</span></label>
+                                    <label for="birth_date">Date of Birth</label>
 
-                                    <select name="status"
-                                            class="form-control"
+                                    <input type="date"
+                                           id="birth_date"
+                                           name="birth_date"
+                                           class="form-control @error('birth_date') is-invalid @enderror"
+                                           value="{{ old('birth_date') }}"
+                                           max="{{ date('Y-m-d') }}">
+
+                                    @error('birth_date')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="form-group col-md-6">
+                                    <label for="profile">Profile Image</label>
+
+                                    <input type="file"
+                                           id="profile"
+                                           name="profile"
+                                           class="form-control @error('profile') is-invalid @enderror"
+                                           accept=".jpg,.jpeg,.png,.webp"
+                                           aria-describedby="profile-help">
+
+                                    <small id="profile-help" class="form-text text-muted">
+                                        JPG, JPEG, PNG or WEBP. Maximum size: 2 MB.
+                                    </small>
+
+                                    @error('profile')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+
+                                    <div id="profile-preview-container" class="mt-3" style="display: none;">
+                                        <img id="profile-preview"
+                                             src=""
+                                             alt="Profile preview"
+                                             width="100"
+                                             height="100"
+                                             style="object-fit: cover; border-radius: 8px;">
+
+                                        <div class="mt-2">
+                                            <button type="button"
+                                                    id="remove-profile"
+                                                    class="btn btn-danger btn-sm">
+                                                <i class="fas fa-times"></i> Remove Image
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="section-title">
+                                Account Information
+                            </div>
+
+                            <div class="form-row">
+
+                                <div class="form-group col-md-6">
+                                    <label for="password">
+                                        Password <span class="text-danger">*</span>
+                                    </label>
+
+                                    <div class="input-group">
+                                        <input type="password"
+                                               id="password"
+                                               name="password"
+                                               class="form-control @error('password') is-invalid @enderror"
+                                               placeholder="Enter password"
+                                               minlength="8"
+                                               autocomplete="new-password"
+                                               required>
+
+                                        <div class="input-group-append">
+                                            <button type="button"
+                                                    class="btn btn-outline-secondary toggle-password"
+                                                    data-target="password"
+                                                    aria-label="Show password">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    @error('password')
+                                        <div class="text-danger small mt-1">{{ $message }}</div>
+                                    @enderror
+
+                                    <small class="form-text text-muted">
+                                        Minimum 8 characters.
+                                    </small>
+                                </div>
+
+                                <div class="form-group col-md-6">
+                                    <label for="password_confirmation">
+                                        Confirm Password <span class="text-danger">*</span>
+                                    </label>
+
+                                    <div class="input-group">
+                                        <input type="password"
+                                               id="password_confirmation"
+                                               name="password_confirmation"
+                                               class="form-control"
+                                               placeholder="Confirm password"
+                                               minlength="8"
+                                               autocomplete="new-password"
+                                               required>
+
+                                        <div class="input-group-append">
+                                            <button type="button"
+                                                    class="btn btn-outline-secondary toggle-password"
+                                                    data-target="password_confirmation"
+                                                    aria-label="Show confirm password">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group col-md-6">
+                                    <label for="status">
+                                        Account Status <span class="text-danger">*</span>
+                                    </label>
+
+                                    <select id="status"
+                                            name="status"
+                                            class="form-control @error('status') is-invalid @enderror"
                                             required>
 
                                         <option value="1"
-                                            {{ old('status', 1) == 1 ? 'selected' : '' }}>
+                                            {{ old('status', '1') == '1' ? 'selected' : '' }}>
                                             Active
                                         </option>
 
@@ -206,6 +278,24 @@
                                         </option>
 
                                     </select>
+
+                                    @error('status')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="form-group col-md-6">
+                                    <label for="role">Assigned Role</label>
+
+                                    <input type="text"
+                                           id="role"
+                                           class="form-control"
+                                           value="Pandit"
+                                           readonly>
+
+                                    <small class="form-text text-muted">
+                                        The Pandit role is assigned automatically when the account is created.
+                                    </small>
                                 </div>
 
                             </div>
@@ -215,19 +305,19 @@
                         <div class="card-footer text-right">
 
                             <a href="{{ route('pandits.index') }}"
-                               class="btn btn-secondary mr-1">
-                                Cancel
+                               class="btn btn-secondary mr-2">
+                                <i class="fas fa-times"></i> Cancel
                             </a>
 
                             <button type="reset"
-                                    class="btn btn-light mr-1">
-                                Reset
+                                    id="reset-form"
+                                    class="btn btn-light mr-2">
+                                <i class="fas fa-undo"></i> Reset
                             </button>
 
                             <button type="submit"
                                     class="btn btn-primary">
-                                <i class="fas fa-save"></i>
-                                Create Pandit
+                                <i class="fas fa-save"></i> Create Pandit
                             </button>
 
                         </div>
@@ -243,9 +333,113 @@
 </section>
 
 @endsection
+
+@push('scripts')
+<script>
+    $(document).ready(function () {
+
+        $('.toggle-password').on('click', function () {
+            const target = $('#' + $(this).data('target'));
+            const icon = $(this).find('i');
+
+            if (target.attr('type') === 'password') {
+                target.attr('type', 'text');
+                icon.removeClass('fa-eye').addClass('fa-eye-slash');
+            } else {
+                target.attr('type', 'password');
+                icon.removeClass('fa-eye-slash').addClass('fa-eye');
+            }
+        });
+
+        $('#profile').on('change', function () {
+            const file = this.files[0];
+
+            if (!file) {
+                clearProfilePreview();
+                return;
+            }
+
+            const allowedTypes = [
+                'image/jpeg',
+                'image/png',
+                'image/webp'
+            ];
+
+            if (!allowedTypes.includes(file.type)) {
+                this.value = '';
+                clearProfilePreview();
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid Image',
+                    text: 'Please select a JPG, JPEG, PNG or WEBP image.'
+                });
+
+                return;
+            }
+
+            if (file.size > 2 * 1024 * 1024) {
+                this.value = '';
+                clearProfilePreview();
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'File Too Large',
+                    text: 'Profile image must not exceed 2 MB.'
+                });
+
+                return;
+            }
+
+            const reader = new FileReader();
+
+            reader.onload = function (event) {
+                $('#profile-preview').attr('src', event.target.result);
+                $('#profile-preview-container').show();
+            };
+
+            reader.readAsDataURL(file);
+        });
+
+        $('#remove-profile').on('click', function () {
+            $('#profile').val('');
+            clearProfilePreview();
+        });
+
+        $('#reset-form').on('click', function () {
+            setTimeout(function () {
+                clearProfilePreview();
+            }, 0);
+        });
+
+        $('form').on('submit', function (event) {
+            const password = $('#password').val();
+            const confirmation = $('#password_confirmation').val();
+
+            if (password !== confirmation) {
+                event.preventDefault();
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Password Mismatch',
+                    text: 'Password and confirm password must match.'
+                });
+
+                $('#password_confirmation').focus();
+            }
+        });
+
+        function clearProfilePreview() {
+            $('#profile-preview').attr('src', '');
+            $('#profile-preview-container').hide();
+        }
+
+    });
+</script>
+@endpush
+
 @else
     @php
         abort(403);
     @endphp
 @endcan
-

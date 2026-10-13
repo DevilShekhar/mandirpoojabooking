@@ -22,6 +22,8 @@ class User extends Authenticatable
         'password',
         'role_id',
         'google_id',
+        'created_by',
+        'updated_by',
     ];
 
     protected $hidden = [
@@ -42,6 +44,22 @@ class User extends Authenticatable
         return $this->belongsTo(
             \Spatie\Permission\Models\Role::class,
             'role_id'
+        );
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(
+            self::class,
+            'created_by'
+        );
+    }
+
+    public function updater()
+    {
+        return $this->belongsTo(
+            self::class,
+            'updated_by'
         );
     }
 }
