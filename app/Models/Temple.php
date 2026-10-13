@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Temple extends Model
@@ -22,26 +23,38 @@ class Temple extends Model
         'banner_image',
         'is_verified',
         'status',
+        'created_by',
+        'updated_by',
     ];
 
-    public function country()
+    public function country(): BelongsTo
     {
         return $this->belongsTo(Country::class);
     }
 
-    public function state()
+    public function state(): BelongsTo
     {
         return $this->belongsTo(State::class);
     }
 
-    public function district()
+    public function district(): BelongsTo
     {
         return $this->belongsTo(District::class);
     }
 
-    public function city()
+    public function city(): BelongsTo
     {
         return $this->belongsTo(City::class);
+    }
+
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function updater(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'updated_by');
     }
 
     public function templeDeities()
@@ -62,9 +75,6 @@ class Temple extends Model
         return $this->hasMany(Puja::class, 'temple_id');
     }
 
-    /**
-     * Users associated with this temple.
-     */
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'temple_user')

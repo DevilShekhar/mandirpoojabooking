@@ -1,4 +1,5 @@
 @can('pandits.index')
+
 @extends('admin.layouts.app')
 
 @section('title', 'Pandit Management')
@@ -17,17 +18,37 @@
                         <h4>Pandit Management</h4>
 
                         <div class="card-header-action">
-                            <a href="{{ route('pandits.create') }}" class="btn btn-primary">
-                                <i class="fas fa-plus"></i> Add Pandit
-                            </a>
+                            @can('pandits.create')
+                                <a href="{{ route('pandits.create') }}"
+                                   class="btn btn-primary">
+                                    <i class="fas fa-plus"></i>
+                                    Add Pandit
+                                </a>
+                            @endcan
                         </div>
                     </div>
 
                     <div class="card-body">
 
                         @if(session('success'))
-                            <div class="alert alert-success">
+                            <div class="alert alert-success alert-dismissible fade show">
                                 {{ session('success') }}
+
+                                <button type="button"
+                                        class="close"
+                                        data-dismiss="alert">
+                                    <span>&times;</span>
+                                </button>
+                            </div>
+                        @endif
+
+                        @if($errors->any())
+                            <div class="alert alert-danger">
+                                <ul class="mb-0">
+                                    @foreach($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
                             </div>
                         @endif
 
@@ -39,11 +60,11 @@
                                     <tr>
                                         <th class="text-center">#</th>
                                         <th>Pandit</th>
-                                        <th>Mobile</th>
-                                        <th>Temple</th>
-                                        <th>Experience</th>
-                                        <th>Verification</th>
+                                        <th>Phone</th>
+                                        <th>Email</th>
+                                        <th>Gender</th>
                                         <th>Status</th>
+                                        <th>Created</th>
                                         <th class="text-center">Action</th>
                                     </tr>
                                 </thead>
@@ -52,117 +73,122 @@
 
                                     @forelse($pandits as $pandit)
 
-                                    <tr>
+                                        <tr>
 
-                                        <td class="text-center">
-                                            {{ $pandits->firstItem() + $loop->index }}
-                                        </td>
+                                            <td class="text-center">
+                                                {{ $pandits->firstItem() + $loop->index }}
+                                            </td>
 
-                                        <td>
-                                            <div class="d-flex align-items-center">
+                                            <td>
+                                                <div class="d-flex align-items-center">
 
-                                                @if($pandit->profile_image)
-                                                    <img src="{{ asset('storage/' . $pandit->profile_image) }}"
-                                                        alt="{{ $pandit->name }}"
-                                                        width="45"
-                                                        height="45"
-                                                        style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
+                                                    @if($pandit->profile)
+                                                        <img src="{{ asset('storage/' . $pandit->profile) }}"
+                                                             alt="{{ $pandit->name }}"
+                                                             width="45"
+                                                             height="45"
+                                                             style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
+                                                    @else
+                                                        <img src="{{ asset('assets/admin/img/avatar/avatar-1.png') }}"
+                                                             alt="No Image"
+                                                             width="45"
+                                                             height="45"
+                                                             style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
+                                                    @endif
+
+                                                    <strong>
+                                                        {{ $pandit->name }}
+                                                    </strong>
+
+                                                </div>
+                                            </td>
+
+                                            <td>
+                                                {{ $pandit->phone ?? '-' }}
+                                            </td>
+
+                                            <td>
+                                                {{ $pandit->email ?? '-' }}
+                                            </td>
+
+                                            <td>
+                                                {{ $pandit->gender
+                                                    ? ucfirst($pandit->gender)
+                                                    : '-' }}
+                                            </td>
+
+                                            <td>
+
+                                                @if($pandit->status)
+                                                    <div class="badge badge-success badge-shadow">
+                                                        Active
+                                                    </div>
                                                 @else
-                                                    <img src="{{ asset('assets/admin/img/avatar/avatar-1.png') }}"
-                                                        alt="No Image"
-                                                        width="45"
-                                                        height="45"
-                                                        style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
+                                                    <div class="badge badge-danger badge-shadow">
+                                                        Inactive
+                                                    </div>
                                                 @endif
 
-                                                <strong>{{ $pandit->name }}</strong>
+                                            </td>
 
-                                            </div>
-                                        </td>
-                                        <td>
-                                            {{ $pandit->mobile }}
-                                        </td>
+                                            <td>
+                                                {{ optional($pandit->created_at)->format('d M Y') }}
+                                            </td>
 
-                                        <td>
-                                            {{ $pandit->temple->name ?? '-' }}
-                                        </td>
+                                            <td>
+                                                <div class="d-flex align-items-center justify-content-center">
 
-                                        <td>
-                                            {{ $pandit->experience }} Years
-                                        </td>
+                                                    @can('pandits.show')
+                                                        <a href="{{ route('pandits.show', $pandit->id) }}"
+                                                           class="btn btn-info btn-sm mr-1"
+                                                           title="View">
+                                                            <i class="fas fa-eye"></i>
+                                                        </a>
+                                                    @endcan
 
-                                        <td>
-                                            @if($pandit->verification_status === 'verified')
-                                                <div class="badge badge-success badge-shadow">
-                                                    Verified
+                                                    @can('pandits.edit')
+                                                        <a href="{{ route('pandits.edit', $pandit->id) }}"
+                                                           class="btn btn-primary btn-sm mr-1"
+                                                           title="Edit">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                    @endcan
+
+                                                    @if($pandit->status)
+
+                                                        @can('pandits.delete')
+
+                                                            <form action="{{ route('pandits.destroy', $pandit->id) }}"
+                                                                  method="POST"
+                                                                  class="d-inline delete-pandit-form">
+
+                                                                @csrf
+                                                                @method('DELETE')
+
+                                                                <button type="submit"
+                                                                        class="btn btn-danger btn-sm"
+                                                                        title="Deactivate">
+                                                                    <i class="fas fa-trash"></i>
+                                                                </button>
+
+                                                            </form>
+
+                                                        @endcan
+
+                                                    @endif
+
                                                 </div>
-                                            @elseif($pandit->verification_status === 'rejected')
-                                                <div class="badge badge-danger badge-shadow">
-                                                    Rejected
-                                                </div>
-                                            @else
-                                                <div class="badge badge-warning badge-shadow">
-                                                    Pending
-                                                </div>
-                                            @endif
-                                        </td>
+                                            </td>
 
-                                        <td>
-                                            @if($pandit->status == 1)
-                                                <div class="badge badge-success badge-shadow">
-                                                    Active
-                                                </div>
-                                            @else
-                                                <div class="badge badge-danger badge-shadow">
-                                                    Inactive
-                                                </div>
-                                            @endif
-                                        </td>
-
-                                        <td>
-                                            <div class="d-flex align-items-center justify-content-center">
-
-                                                <a href="{{ route('pandits.show', $pandit->id) }}"
-                                                   class="btn btn-info btn-sm mr-1"
-                                                   title="View">
-                                                    <i class="fas fa-eye"></i>
-                                                </a>
-
-                                                <a href="{{ route('pandits.edit', $pandit->id) }}"
-                                                   class="btn btn-primary btn-sm mr-1"
-                                                   title="Edit">
-                                                    <i class="fas fa-edit"></i>
-                                                </a>
-
-                                                @if($pandit->status == 1)
-
-                                                <form action="{{ route('pandits.destroy', $pandit->id) }}"
-                                                      method="POST"
-                                                      class="d-inline delete-pandit-form">
-                                                    @csrf
-                                                    @method('DELETE')
-
-                                                    <button type="submit"
-                                                            class="btn btn-danger btn-sm"
-                                                            title="Deactivate">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </form>
-
-                                                @endif
-
-                                            </div>
-                                        </td>
-
-                                    </tr>
+                                        </tr>
 
                                     @empty
 
-                                    <tr>
-                                        <td colspan="8" class="text-center">
-                                            No pandits found.
-                                        </td>
-                                    </tr>
+                                        <tr>
+                                            <td colspan="8" class="text-center">
+                                                No pandits found.
+                                            </td>
+                                        </tr>
 
                                     @endforelse
 
@@ -191,7 +217,8 @@
 @push('scripts')
 
 <script>
-    $('.delete-pandit-form').on('submit', function(e) {
+    $(document).on('submit', '.delete-pandit-form', function(e) {
+
         e.preventDefault();
 
         let form = this;
@@ -206,16 +233,21 @@
             confirmButtonText: 'Yes, deactivate',
             cancelButtonText: 'Cancel'
         }).then(function(result) {
+
             if (result.isConfirmed) {
                 form.submit();
             }
+
         });
     });
 </script>
 
 @endpush
+
 @else
+
     @php
         abort(403);
     @endphp
+
 @endcan
