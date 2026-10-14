@@ -38,6 +38,8 @@ use App\Http\Controllers\Auth\CustomerRegistrationController;
 use App\Http\Controllers\Frontend\TempleRegistrationController;
 use App\Http\Controllers\Admin\TempleRegistrationListController;
 use App\Http\Controllers\Frontend\CheckoutController;
+use App\Http\Controllers\Frontend\RazorpayPaymentController;
+
 
 Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
 Route::get('our-temples', [OurTemplesContoller::class, 'index'])->name('frontend.our-temples');
@@ -125,5 +127,14 @@ Route::middleware('auth')->group(function () {
     Route::post('/all-templae-register/{registrationId}/reject',[TempleRegistrationListController::class, 'reject'])->name('all-templae-register.reject');
     Route::get('/checkout', [CheckoutController::class, 'show'])->name('frontend.checkout');
 });
+Route::middleware('auth')->prefix('payment/razorpay')->name('razorpay.')->group(function () {
+    Route::post('/create-order', [RazorpayPaymentController::class, 'createOrder'])
+        ->name('create-order');
 
+    Route::post('/verify', [RazorpayPaymentController::class, 'verifyPayment'])
+        ->name('verify');
+
+    Route::get('/success/{payment}', [RazorpayPaymentController::class, 'success'])
+        ->name('success');
+});
 require __DIR__.'/auth.php';

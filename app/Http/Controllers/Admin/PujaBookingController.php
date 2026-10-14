@@ -17,7 +17,9 @@ class PujaBookingController extends Controller
 {
     public function index()
     {
-        $bookings = PujaBooking::with([
+        $user = auth()->user();
+
+        $query = PujaBooking::with([
             'user',
             'temple',
             'deity',
@@ -26,10 +28,16 @@ class PujaBookingController extends Controller
             'pujaSchedule',
             'createdBy',
             'updatedBy'
-        ])
-        ->where('created_by', auth()->id())
-        ->latest()
-        ->paginate(10);
+        ]);
+
+        if (!$user->hasAnyRole(['Admin', 'Super Admin'])) {
+            $query->where(function ($q) use ($user) {
+                $q->where('created_by', $user->id)
+                    ->orWhere('updated_by', $user->id);
+            });
+        }
+
+        $bookings = $query->latest()->paginate(10);
 
         return view('admin.puja-bookings.index', compact('bookings'));
     }
@@ -107,7 +115,7 @@ class PujaBookingController extends Controller
             'prasad_status' => 'required|in:pending,packed,shipped,delivered',
         ]);
 
-        $booking = PujaBooking::create([
+        PujaBooking::create([
             'booking_number' => 'PB-' . strtoupper(Str::random(10)),
 
             'user_id' => $request->user_id,
@@ -139,6 +147,7 @@ class PujaBookingController extends Controller
             'puja_status' => $request->puja_status,
             'video_status' => $request->video_status,
             'prasad_status' => $request->prasad_status,
+
             'created_by' => auth()->id(),
             'updated_by' => auth()->id(),
         ]);
@@ -150,6 +159,16 @@ class PujaBookingController extends Controller
 
     public function show(PujaBooking $pujaBooking)
     {
+        $user = auth()->user();
+
+        if (
+            !$user->hasAnyRole(['Admin', 'Super Admin']) &&
+            $pujaBooking->created_by != $user->id &&
+            $pujaBooking->updated_by != $user->id
+        ) {
+            abort(403, 'You are not authorized to view this booking.');
+        }
+
         $pujaBooking->load([
             'user',
             'temple',
@@ -168,6 +187,16 @@ class PujaBookingController extends Controller
 
     public function edit(PujaBooking $pujaBooking)
     {
+        $user = auth()->user();
+
+        if (
+            !$user->hasAnyRole(['Admin', 'Super Admin']) &&
+            $pujaBooking->created_by != $user->id &&
+            $pujaBooking->updated_by != $user->id
+        ) {
+            abort(403, 'You are not authorized to edit this booking.');
+        }
+
         $users = User::orderBy('name')->get();
 
         $temples = Temple::where('status', 1)
@@ -203,6 +232,16 @@ class PujaBookingController extends Controller
 
     public function update(Request $request, PujaBooking $pujaBooking)
     {
+        $user = auth()->user();
+
+        if (
+            !$user->hasAnyRole(['Admin', 'Super Admin']) &&
+            $pujaBooking->created_by != $user->id &&
+            $pujaBooking->updated_by != $user->id
+        ) {
+            abort(403, 'You are not authorized to update this booking.');
+        }
+
         $request->validate([
             'user_id' => 'nullable|exists:users,id',
             'temple_id' => 'required|exists:temples,id',
@@ -266,6 +305,7 @@ class PujaBookingController extends Controller
             'puja_status' => $request->puja_status,
             'video_status' => $request->video_status,
             'prasad_status' => $request->prasad_status,
+
             'updated_by' => auth()->id(),
         ]);
 
@@ -276,8 +316,19 @@ class PujaBookingController extends Controller
 
     public function destroy(PujaBooking $pujaBooking)
     {
+        $user = auth()->user();
+
+        if (
+            !$user->hasAnyRole(['Admin', 'Super Admin']) &&
+            $pujaBooking->created_by != $user->id &&
+            $pujaBooking->updated_by != $user->id
+        ) {
+            abort(403, 'You are not authorized to cancel this booking.');
+        }
+
         $pujaBooking->update([
-            'booking_status' => 'cancelled'
+            'booking_status' => 'cancelled',
+            'updated_by' => $user->id,
         ]);
 
         return redirect()
