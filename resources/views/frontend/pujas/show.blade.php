@@ -1047,28 +1047,12 @@ $(document).ready(function() {
     |--------------------------------------------------------------------------
     */
     $(document).on('click', '#proceedPackageBtn', function() {
-
-        const packageId =
-            $('#selected_package_id').val();
-
-
+        const packageId = $('#selected_package_id').val();
         if (!packageId) {
-
             alert('Please select a package.');
-
             return;
-
         }
-
-
-        /*
-        | Your booking URL
-        |
-        | Change this according to your booking route.
-        */
-        window.location.href =
-            '#booking?package_id=' + packageId;
-
+        window.location.href = "{{ route('frontend.checkout') }}" + "?package_id=" + encodeURIComponent(packageId);
     });
 
 });
