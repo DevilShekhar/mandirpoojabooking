@@ -37,6 +37,7 @@ use App\Http\Controllers\Frontend\SanatanEventsController;
 use App\Http\Controllers\Auth\CustomerRegistrationController;
 use App\Http\Controllers\Frontend\TempleRegistrationController;
 use App\Http\Controllers\Admin\TempleRegistrationListController;
+use App\Http\Controllers\Frontend\CheckoutController;
 
 Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
 Route::get('our-temples', [OurTemplesContoller::class, 'index'])->name('frontend.our-temples');
@@ -122,6 +123,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/all-templae-register', [TempleRegistrationListController::class,'index'])->name('all-templae-register');
     Route::post('/all-templae-register/{registrationId}/approve',[TempleRegistrationListController::class, 'approve'])->name('all-templae-register.approve');
     Route::post('/all-templae-register/{registrationId}/reject',[TempleRegistrationListController::class, 'reject'])->name('all-templae-register.reject');
+    Route::get('/checkout', [CheckoutController::class, 'show'])->name('frontend.checkout');
 });
 
 require __DIR__.'/auth.php';
