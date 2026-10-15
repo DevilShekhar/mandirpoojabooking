@@ -1,7 +1,7 @@
 @can('puja-bookings.index')
 @extends('admin.layouts.app')
 
-@section('title', 'Puja Bookings')
+@section('title', 'Booking Puja Order')
 
 @section('content')
 <section class="section">
@@ -10,9 +10,9 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4>Puja Bookings</h4>
+                        <h4>Booking Puja Order</h4>
                         <div class="card-header-action">
-                            <a href="{{ route('puja-bookings.create') }}" class="btn btn-primary">
+                            <a href="{{ route('booking-puja-order.create') }}" class="btn btn-primary">
                                 <i class="fas fa-plus"></i> Add Booking
                             </a>
                         </div>
@@ -114,38 +114,18 @@
                                         </td>
                                         <td>
                                             <div class="d-flex align-items-center justify-content-center">
-                                                <a href="{{ route('puja-bookings.show', $booking) }}"
+                                                <a href="{{ route('booking-puja-order.show', $booking) }}"
                                                    class="btn btn-info btn-sm mr-1"
                                                    title="View">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
-
-                                                <a href="{{ route('puja-bookings.edit', $booking) }}"
-                                                   class="btn btn-primary btn-sm mr-1"
-                                                   title="Edit">
-                                                    <i class="fas fa-edit"></i>
-                                                </a>
-
-                                                @if($booking->booking_status != 'cancelled')
-                                                    <form action="{{ route('puja-bookings.destroy', $booking) }}"
-                                                          method="POST"
-                                                          class="d-inline delete-booking-form">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit"
-                                                                class="btn btn-danger btn-sm"
-                                                                title="Cancel Booking">
-                                                            <i class="fas fa-times"></i>
-                                                        </button>
-                                                    </form>
-                                                @endif
                                             </div>
                                         </td>
                                     </tr>
                                     @empty
                                     <tr>
                                         <td colspan="11" class="text-center">
-                                            No bookings found.
+                                            No booking orders found.
                                         </td>
                                     </tr>
                                     @endforelse
@@ -184,46 +164,7 @@
                 }
             ]
         });
-
-        $('.delete-booking-form').on('submit', function(e) {
-            e.preventDefault();
-            let form = this;
-            Swal.fire({
-                title: 'Are you sure?',
-                text: 'This booking will be cancelled.',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#fc544b',
-                cancelButtonColor: '#6777ef',
-                confirmButtonText: 'Yes, cancel it',
-                cancelButtonText: 'Cancel'
-            }).then(function(result) {
-                if (result.isConfirmed) {
-                    form.submit();
-                }
-            });
-        });
     });
-
-    @if(session('success'))
-        Swal.fire({
-            title: 'Success!',
-            text: @json(session('success')),
-            icon: 'success',
-            confirmButtonColor: '#6777ef',
-            confirmButtonText: 'OK'
-        });
-    @endif
-
-    @if(session('error'))
-        Swal.fire({
-            title: 'Error!',
-            text: @json(session('error')),
-            icon: 'error',
-            confirmButtonColor: '#6777ef',
-            confirmButtonText: 'OK'
-        });
-    @endif
 </script>
 @endpush
 @else

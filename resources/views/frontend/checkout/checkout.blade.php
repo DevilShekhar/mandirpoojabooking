@@ -792,6 +792,7 @@
 @push('scripts')
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const paymentButton = document.getElementById('checkoutPaymentButton');
@@ -803,10 +804,17 @@
 
         const originalButtonHtml = paymentButton.innerHTML;
         const csrfToken = '{{ csrf_token() }}';
+
         const createOrderUrl = @json(route('razorpay.create-order'));
         const verifyPaymentUrl = @json(route('razorpay.verify'));
+        const failedUrl = @json(route('razorpay.failed'));
         const packageId = @json($package->id);
 
+        let paymentInProgress = false;
+
+        /**
+         * Update payment button and message.
+         */
         function setLoading(isLoading, message = '') {
             paymentButton.disabled = isLoading;
 
@@ -819,9 +827,13 @@
             }
         }
 
+        /**
+         * Send JSON request to Laravel.
+         */
         async function postJson(url, payload) {
             const response = await fetch(url, {
                 method: 'POST',
+                credentials: 'same-origin',
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
@@ -831,7 +843,13 @@
                 body: JSON.stringify(payload)
             });
 
-            const data = await response.json();
+            let data;
+
+            try {
+                data = await response.json();
+            } catch (e) {
+                throw new Error('Invalid server response. Please try again.');
+            }
 
             if (!response.ok) {
                 throw new Error(
@@ -842,14 +860,67 @@
             return data;
         }
 
-        paymentButton.addEventListener('click', async function () {
-            setLoading(true);
+        /**
+         * Handle failed payment.
+         */
+        async function handlePaymentFailure(response, order) {
+            const error = response.error || {};
+            const metadata = error.metadata || {};
+
+            const description = error.description ||
+                'Payment failed. Please try again.';
+
+            setLoading(true, 'Processing payment failure...');
 
             try {
+                const result = await postJson(failedUrl, {
+                    razorpay_order_id: metadata.order_id || order.order_id,
+                    error_code: error.code || null,
+                    error_description: description,
+                    error_source: error.source || null,
+                    error_step: error.step || null,
+                    error_reason: error.reason || null
+                });
+
+                if (result.redirect_url) {
+                    window.location.href = result.redirect_url;
+                    return;
+                }
+
+                setLoading(false, 'Payment failed. Please try again.');
+
+            } catch (error) {
+                console.error('Payment failure handling error:', error);
+
+                setLoading(
+                    false,
+                    'Payment failed, but we could not open the failure page. Please check your payment status.'
+                );
+            }
+        }
+
+        /**
+         * Start checkout.
+         */
+        paymentButton.addEventListener('click', async function () {
+            if (paymentInProgress) {
+                return;
+            }
+
+            paymentInProgress = true;
+            setLoading(true, 'Creating payment order...');
+
+            try {
+                // 1. Create Razorpay order on the Laravel backend.
                 const order = await postJson(createOrderUrl, {
                     package_id: packageId
                 });
 
+                if (!order.order_id || !order.key) {
+                    throw new Error('Unable to create payment order.');
+                }
+
+                // 2. Configure Razorpay checkout.
                 const options = {
                     key: order.key,
                     amount: order.amount,
@@ -858,9 +929,12 @@
                     description: order.description || 'Puja Booking Payment',
                     order_id: order.order_id,
                     prefill: order.prefill || {},
+
                     theme: {
                         color: '#d71968'
                     },
+
+                    // 3. Successful payment: verify on the backend.
                     handler: async function (response) {
                         setLoading(true, 'Verifying payment...');
 
@@ -877,34 +951,50 @@
                             }
 
                             throw new Error(
-                                result.message || 'Payment verification could not be completed.'
+                                result.message ||
+                                'Payment verification could not be completed.'
                             );
+
                         } catch (error) {
+                            console.error('Payment verification error:', error);
+
+                            paymentInProgress = false;
                             setLoading(false, error.message);
                         }
                     },
+
+                    // 4. Customer closes the Razorpay popup.
                     modal: {
                         ondismiss: function () {
-                            setLoading(false, 'Payment was cancelled. You can try again.');
+                            paymentInProgress = false;
+
+                            setLoading(
+                                false,
+                                'Payment was cancelled or the checkout was closed. You can try again.'
+                            );
                         }
                     }
                 };
 
+                // 5. Create Razorpay instance.
                 const razorpay = new Razorpay(options);
 
+                // 6. Register failure event BEFORE opening checkout.
                 razorpay.on('payment.failed', function (response) {
-                    const description = response.error && response.error.description
-                        ? response.error.description
-                        : 'Payment failed. Please try again.';
-
-                    setLoading(false, description);
+                    handlePaymentFailure(response, order);
                 });
 
+                // 7. Open Razorpay popup.
                 razorpay.open();
+
             } catch (error) {
+                console.error('Checkout error:', error);
+
+                paymentInProgress = false;
                 setLoading(false, error.message);
             }
         });
     });
 </script>
+
 @endpush
