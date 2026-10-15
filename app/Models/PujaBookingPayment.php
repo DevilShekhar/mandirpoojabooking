@@ -12,19 +12,38 @@ class PujaBookingPayment extends Model
 
     protected $table = 'puja_booking_payments';
 
+    /**
+     * Mass assignable attributes.
+     */
     protected $fillable = [
         'user_id',
         'puja_id',
         'puja_package_id',
         'puja_booking_id',
+
+        // Payment amount
         'amount_paise',
         'currency',
+
+        // Razorpay payment details
         'razorpay_order_id',
         'razorpay_payment_id',
         'razorpay_signature',
+
+        // Payment status: pending, paid, failed
         'status',
+
+        // Razorpay failure details
+        'error_code',
+        'error_description',
+        'error_source',
+        'error_step',
+        'error_reason',
     ];
 
+    /**
+     * Attribute casting.
+     */
     protected function casts(): array
     {
         return [
@@ -36,16 +55,25 @@ class PujaBookingPayment extends Model
         ];
     }
 
+    /**
+     * Payment belongs to a user.
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * Payment belongs to a puja.
+     */
     public function puja(): BelongsTo
     {
         return $this->belongsTo(Puja::class);
     }
 
+    /**
+     * Payment belongs to a puja package.
+     */
     public function package(): BelongsTo
     {
         return $this->belongsTo(
@@ -54,6 +82,9 @@ class PujaBookingPayment extends Model
         );
     }
 
+    /**
+     * Payment belongs to a puja booking.
+     */
     public function booking(): BelongsTo
     {
         return $this->belongsTo(

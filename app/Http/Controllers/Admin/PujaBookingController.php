@@ -12,13 +12,16 @@ use App\Models\PujaPackage;
 use App\Models\PujaSchedule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-
+use App\Models\PujaBookingPayment;
+use App\Models\BookingDevotee;
+use App\Models\BookingSankalp;
+use App\Models\PujaAssignment;
+use Illuminate\Support\Facades\Schema;
 class PujaBookingController extends Controller
 {
     public function index()
     {
         $user = auth()->user();
-
         $query = PujaBooking::with([
             'user',
             'temple',
@@ -29,295 +32,115 @@ class PujaBookingController extends Controller
             'createdBy',
             'updatedBy'
         ]);
-
         if (!$user->hasAnyRole(['Admin', 'Super Admin'])) {
             $query->where(function ($q) use ($user) {
                 $q->where('created_by', $user->id)
                     ->orWhere('updated_by', $user->id);
             });
         }
-
         $bookings = $query->latest()->paginate(10);
-
         return view('admin.puja-bookings.index', compact('bookings'));
     }
-
-    public function create()
-    {
-        $users = User::whereHas('role', function ($query) {
-            $query->where('name', 'Customer');
-        })
-            ->orderBy('name')
-            ->get();
-
-        $temples = Temple::where('status', 1)
-            ->orderBy('name')
-            ->get();
-
-        $deities = Deity::where('status', 1)
-            ->orderBy('name')
-            ->get();
-
-        $pujas = Puja::where('status', 1)
-            ->orderBy('name')
-            ->get();
-
-        $pujaPackages = PujaPackage::where('status', 1)
-            ->orderBy('name')
-            ->get();
-
-        $pujaSchedules = PujaSchedule::where('status', 1)
-            ->orderBy('puja_date')
-            ->get();
-
-        return view('admin.puja-bookings.create', compact(
-            'users',
-            'temples',
-            'deities',
-            'pujas',
-            'pujaPackages',
-            'pujaSchedules'
-        ));
-    }
-
-    public function store(Request $request)
-    {
-        $request->validate([
-            'user_id' => 'nullable|exists:users,id',
-            'temple_id' => 'required|exists:temples,id',
-            'deity_id' => 'required|exists:deities,id',
-            'puja_id' => 'required|exists:pujas,id',
-            'puja_package_id' => 'required|exists:puja_packages,id',
-            'puja_schedule_id' => 'required|exists:puja_schedules,id',
-
-            'customer_name' => 'required|string|max:255',
-            'customer_email' => 'nullable|email|max:255',
-            'customer_mobile' => 'required|string|max:20',
-
-            'address_id' => 'nullable|integer',
-
-            'package_name' => 'required|string|max:255',
-            'person_count' => 'required|integer|min:1',
-
-            'base_amount' => 'required|numeric|min:0',
-            'discount_amount' => 'nullable|numeric|min:0',
-            'coupon_discount' => 'nullable|numeric|min:0',
-            'addon_amount' => 'nullable|numeric|min:0',
-            'shipping_amount' => 'nullable|numeric|min:0',
-            'tax_amount' => 'nullable|numeric|min:0',
-            'total_amount' => 'required|numeric|min:0',
-
-            'payment_status' => 'required|in:pending,paid,failed,refunded',
-            'booking_status' => 'required|in:new,payment_verified,confirmed,cancelled,completed',
-            'sankalp_status' => 'required|in:pending,completed',
-            'puja_status' => 'required|in:pending,scheduled,completed',
-            'video_status' => 'required|in:pending,available',
-            'prasad_status' => 'required|in:pending,packed,shipped,delivered',
-        ]);
-
-        PujaBooking::create([
-            'booking_number' => 'PB-' . strtoupper(Str::random(10)),
-
-            'user_id' => $request->user_id,
-            'temple_id' => $request->temple_id,
-            'deity_id' => $request->deity_id,
-            'puja_id' => $request->puja_id,
-            'puja_package_id' => $request->puja_package_id,
-            'puja_schedule_id' => $request->puja_schedule_id,
-
-            'customer_name' => $request->customer_name,
-            'customer_email' => $request->customer_email,
-            'customer_mobile' => $request->customer_mobile,
-            'address_id' => $request->address_id,
-
-            'package_name' => $request->package_name,
-            'person_count' => $request->person_count,
-
-            'base_amount' => $request->base_amount,
-            'discount_amount' => $request->discount_amount ?? 0,
-            'coupon_discount' => $request->coupon_discount ?? 0,
-            'addon_amount' => $request->addon_amount ?? 0,
-            'shipping_amount' => $request->shipping_amount ?? 0,
-            'tax_amount' => $request->tax_amount ?? 0,
-            'total_amount' => $request->total_amount,
-
-            'payment_status' => $request->payment_status,
-            'booking_status' => $request->booking_status,
-            'sankalp_status' => $request->sankalp_status,
-            'puja_status' => $request->puja_status,
-            'video_status' => $request->video_status,
-            'prasad_status' => $request->prasad_status,
-
-            'created_by' => auth()->id(),
-            'updated_by' => auth()->id(),
-        ]);
-
-        return redirect()
-            ->route('puja-bookings.index')
-            ->with('success', 'Puja booking created successfully.');
-    }
-
-    public function show(PujaBooking $pujaBooking)
+    public function show($id)
     {
         $user = auth()->user();
-
+        $pujaBooking = PujaBooking::query()->where('id', $id)->orWhere('booking_number', $id)->firstOrFail();
         if (
             !$user->hasAnyRole(['Admin', 'Super Admin']) &&
-            $pujaBooking->created_by != $user->id &&
-            $pujaBooking->updated_by != $user->id
+            (int) $pujaBooking->created_by !== (int) $user->id &&
+            (int) $pujaBooking->updated_by !== (int) $user->id
         ) {
             abort(403, 'You are not authorized to view this booking.');
         }
-
-        $pujaBooking->load([
+        $pujaBooking->load(['user', 'temple', 'deity', 'puja', 'pujaPackage', 'pujaSchedule']);
+        $bookingPayments = collect();
+        $paymentModel = new PujaBookingPayment();
+        $paymentTable = $paymentModel->getTable();
+        if (Schema::hasTable($paymentTable)) {
+            $paymentForeignKey = Schema::hasColumn($paymentTable, 'puja_booking_id') ? 'puja_booking_id' : (Schema::hasColumn($paymentTable, 'booking_id') ? 'booking_id' : null);
+            if ($paymentForeignKey) {
+                $bookingPayments = PujaBookingPayment::where($paymentForeignKey, $pujaBooking->id)->latest()->get();
+            }
+        }
+        $assignments = collect();
+        $assignmentModel = new PujaAssignment();
+        $assignmentTable = $assignmentModel->getTable();
+        if (Schema::hasTable($assignmentTable)) {
+            $assignmentForeignKey = Schema::hasColumn($assignmentTable, 'puja_booking_id') ? 'puja_booking_id' : (Schema::hasColumn($assignmentTable, 'booking_id') ? 'booking_id' : null);
+            if ($assignmentForeignKey) {
+                $assignmentQuery = PujaAssignment::query();
+                $assignmentRelations = [];
+                if (method_exists($assignmentModel, 'pandit')) {
+                    $assignmentRelations[] = 'pandit';
+                }
+                if (method_exists($assignmentModel, 'user')) {
+                    $assignmentRelations[] = 'user';
+                }
+                if (!empty($assignmentRelations)) {
+                    $assignmentQuery->with($assignmentRelations);
+                }
+                $assignments = $assignmentQuery->where($assignmentForeignKey, $pujaBooking->id)->latest()->get();
+            }
+        }
+        return view('admin.booking-puja-order.show', compact('pujaBooking', 'bookingPayments', 'assignments'));
+    }
+    /**
+     * Show bookings with successful payments.
+     */
+    public function successful()
+    {
+        $user = auth()->user();
+        $query = PujaBooking::with([
+            'user', 'temple', 'deity', 'puja', 'pujaPackage',
+            'pujaSchedule', 'createdBy', 'updatedBy'
+        ])->where('payment_status', 'paid');
+        if (!$user->hasAnyRole(['Admin', 'Super Admin'])) {
+            $query->where(function ($q) use ($user) {
+                $q->where('created_by', $user->id)
+                    ->orWhere('updated_by', $user->id);
+            });
+        }
+        $bookings = $query->latest()->paginate(10);
+        return view('admin.booking-puja-order.successful', compact('bookings'));
+    }
+    public function failed()
+    {
+        $user = auth()->user();
+        $query = PujaBookingPayment::with([
             'user',
-            'temple',
-            'deity',
             'puja',
-            'pujaPackage',
-            'pujaSchedule',
-            'devotees',
-            'sankalp',
-            'payments',
-            'assignments'
-        ]);
-
-        return view('admin.puja-bookings.show', compact('pujaBooking'));
+            'package',
+            'booking',
+        ])->where('status', 'failed');
+        if (!$user->hasAnyRole(['Admin', 'Super Admin'])) {
+            $query->where('user_id', $user->id);
+        }
+        $payments = $query->latest()->paginate(10);
+        return view('admin.booking-puja-order.failed', compact('payments')
+        );
     }
-
-    public function edit(PujaBooking $pujaBooking)
+    /**
+     * Show cancelled bookings.
+     */
+    public function cancelled()
     {
         $user = auth()->user();
-
-        if (
-            !$user->hasAnyRole(['Admin', 'Super Admin']) &&
-            $pujaBooking->created_by != $user->id &&
-            $pujaBooking->updated_by != $user->id
-        ) {
-            abort(403, 'You are not authorized to edit this booking.');
+        $query = PujaBooking::with([
+            'user', 'temple', 'deity', 'puja', 'pujaPackage',
+            'pujaSchedule', 'createdBy', 'updatedBy'
+        ])->where('booking_status', 'cancelled');
+        if (!$user->hasAnyRole(['Admin', 'Super Admin'])) {
+            $query->where(function ($q) use ($user) {
+                $q->where('created_by', $user->id)
+                    ->orWhere('updated_by', $user->id);
+            });
         }
-
-        $users = User::orderBy('name')->get();
-
-        $temples = Temple::where('status', 1)
-            ->orderBy('name')
-            ->get();
-
-        $deities = Deity::where('status', 1)
-            ->orderBy('name')
-            ->get();
-
-        $pujas = Puja::where('status', 1)
-            ->orderBy('name')
-            ->get();
-
-        $pujaPackages = PujaPackage::where('status', 1)
-            ->orderBy('name')
-            ->get();
-
-        $pujaSchedules = PujaSchedule::where('status', 1)
-            ->orderBy('puja_date')
-            ->get();
-
-        return view('admin.puja-bookings.edit', compact(
-            'pujaBooking',
-            'users',
-            'temples',
-            'deities',
-            'pujas',
-            'pujaPackages',
-            'pujaSchedules'
-        ));
+        $bookings = $query->latest()->paginate(10);
+        return view('admin.booking-puja-order.cancelled', compact('bookings'));
     }
-
-    public function update(Request $request, PujaBooking $pujaBooking)
-    {
-        $user = auth()->user();
-
-        if (
-            !$user->hasAnyRole(['Admin', 'Super Admin']) &&
-            $pujaBooking->created_by != $user->id &&
-            $pujaBooking->updated_by != $user->id
-        ) {
-            abort(403, 'You are not authorized to update this booking.');
-        }
-
-        $request->validate([
-            'user_id' => 'nullable|exists:users,id',
-            'temple_id' => 'required|exists:temples,id',
-            'deity_id' => 'required|exists:deities,id',
-            'puja_id' => 'required|exists:pujas,id',
-            'puja_package_id' => 'required|exists:puja_packages,id',
-            'puja_schedule_id' => 'required|exists:puja_schedules,id',
-
-            'customer_name' => 'required|string|max:255',
-            'customer_email' => 'nullable|email|max:255',
-            'customer_mobile' => 'required|string|max:20',
-
-            'address_id' => 'nullable|integer',
-
-            'package_name' => 'required|string|max:255',
-            'person_count' => 'required|integer|min:1',
-
-            'base_amount' => 'required|numeric|min:0',
-            'discount_amount' => 'nullable|numeric|min:0',
-            'coupon_discount' => 'nullable|numeric|min:0',
-            'addon_amount' => 'nullable|numeric|min:0',
-            'shipping_amount' => 'nullable|numeric|min:0',
-            'tax_amount' => 'nullable|numeric|min:0',
-            'total_amount' => 'required|numeric|min:0',
-
-            'payment_status' => 'required|in:pending,paid,failed,refunded',
-            'booking_status' => 'required|in:new,payment_verified,confirmed,cancelled,completed',
-            'sankalp_status' => 'required|in:pending,completed',
-            'puja_status' => 'required|in:pending,scheduled,completed',
-            'video_status' => 'required|in:pending,available',
-            'prasad_status' => 'required|in:pending,packed,shipped,delivered',
-        ]);
-
-        $pujaBooking->update([
-            'user_id' => $request->user_id,
-            'temple_id' => $request->temple_id,
-            'deity_id' => $request->deity_id,
-            'puja_id' => $request->puja_id,
-            'puja_package_id' => $request->puja_package_id,
-            'puja_schedule_id' => $request->puja_schedule_id,
-
-            'customer_name' => $request->customer_name,
-            'customer_email' => $request->customer_email,
-            'customer_mobile' => $request->customer_mobile,
-            'address_id' => $request->address_id,
-
-            'package_name' => $request->package_name,
-            'person_count' => $request->person_count,
-
-            'base_amount' => $request->base_amount,
-            'discount_amount' => $request->discount_amount ?? 0,
-            'coupon_discount' => $request->coupon_discount ?? 0,
-            'addon_amount' => $request->addon_amount ?? 0,
-            'shipping_amount' => $request->shipping_amount ?? 0,
-            'tax_amount' => $request->tax_amount ?? 0,
-            'total_amount' => $request->total_amount,
-
-            'payment_status' => $request->payment_status,
-            'booking_status' => $request->booking_status,
-            'sankalp_status' => $request->sankalp_status,
-            'puja_status' => $request->puja_status,
-            'video_status' => $request->video_status,
-            'prasad_status' => $request->prasad_status,
-
-            'updated_by' => auth()->id(),
-        ]);
-
-        return redirect()
-            ->route('puja-bookings.index')
-            ->with('success', 'Puja booking updated successfully.');
-    }
-
     public function destroy(PujaBooking $pujaBooking)
     {
         $user = auth()->user();
-
         if (
             !$user->hasAnyRole(['Admin', 'Super Admin']) &&
             $pujaBooking->created_by != $user->id &&
@@ -325,14 +148,10 @@ class PujaBookingController extends Controller
         ) {
             abort(403, 'You are not authorized to cancel this booking.');
         }
-
         $pujaBooking->update([
             'booking_status' => 'cancelled',
             'updated_by' => $user->id,
         ]);
-
-        return redirect()
-            ->route('puja-bookings.index')
-            ->with('success', 'Puja booking cancelled successfully.');
+        return redirect()->route('booking-puja-order.index')->with('success', 'Puja booking cancelled successfully.');
     }
 }

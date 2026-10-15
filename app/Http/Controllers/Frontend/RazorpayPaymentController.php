@@ -442,4 +442,113 @@ class RazorpayPaymentController extends Controller
             )
         );
     }
+    public function failed(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'razorpay_order_id' => ['required', 'string', 'max:100'],
+            'error_code' => ['nullable', 'string', 'max:100'],
+            'error_description' => ['nullable', 'string', 'max:1000'],
+            'error_source' => ['nullable', 'string', 'max:100'],
+            'error_step' => ['nullable', 'string', 'max:100'],
+            'error_reason' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        try {
+            $payment = DB::transaction(function () use (
+                $validated,
+                $request
+            ) {
+                $payment = PujaBookingPayment::where(
+                    'razorpay_order_id',
+                    $validated['razorpay_order_id']
+                )
+                    ->where('user_id', $request->user()->id)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (!$payment) {
+                    return null;
+                }
+
+                // Never change a paid payment to failed.
+                if ($payment->status === 'paid') {
+                    return $payment;
+                }
+
+                $payment->update([
+                    'status' => 'failed',
+                    'error_code' => $validated['error_code'] ?? null,
+                    'error_description' =>
+                        $validated['error_description'] ?? null,
+                    'error_source' => $validated['error_source'] ?? null,
+                    'error_step' => $validated['error_step'] ?? null,
+                    'error_reason' => $validated['error_reason'] ?? null,
+                ]);
+
+                return $payment;
+            });
+
+            if (!$payment) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Payment record not found.',
+                ], 404);
+            }
+
+            if ($payment->status === 'paid') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'This payment has already been completed.',
+                ], 422);
+            }
+
+            Log::warning('Razorpay payment failed.', [
+                'payment_record_id' => $payment->id,
+                'user_id' => $request->user()->id,
+                'razorpay_order_id' => $payment->razorpay_order_id,
+                'error_code' => $validated['error_code'] ?? null,
+                'error_description' =>
+                    $validated['error_description'] ?? null,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'redirect_url' => route(
+                    'razorpay.failed-page',
+                    ['payment' => $payment->id]
+                ),
+            ]);
+
+        } catch (Throwable $exception) {
+            Log::error('Razorpay failure handling failed.', [
+                'user_id' => $request->user()?->id,
+                'exception' => $exception->getMessage(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Unable to process payment failure.',
+            ], 500);
+        }
+    }
+
+
+    /**
+     * Show payment failed page.
+     */
+    public function failedPage(PujaBookingPayment $payment)
+    {
+        abort_unless(
+            (int) $payment->user_id === (int) auth()->id() &&
+            $payment->status === 'failed',
+            404
+        );
+
+        $payment->load(['puja', 'package']);
+
+        return view(
+            'frontend.checkout.payment-failed',
+            compact('payment')
+        );
+    }
 }

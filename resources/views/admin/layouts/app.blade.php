@@ -478,7 +478,7 @@
                         @endcanany
 
                         {{-- Puja --}}
-                        @canany(['puja-categories.view','pujas.view','puja-packages.view','puja-bookings.view'])
+                        @canany(['puja-categories.view','pujas.view','puja-packages.view'])
                             <li class="dropdown {{ request()->routeIs('puja-categories.*', 'pujas.*', 'puja-packages.*', 'package-features.*', 'package-addons.*', 'puja-schedules.*', 'puja-bookings.*') ? 'active' : '' }}">
 
                                 <a href="#" class="menu-toggle nav-link has-dropdown">
@@ -506,7 +506,7 @@
 
                                     @can('puja-bookings.view')
                                         <li class="{{ request()->routeIs('puja-bookings.*') ? 'active' : '' }}">
-                                            <a class="nav-link" href="{{ route('puja-bookings.index') }}">
+                                            <a class="nav-link" href="{{ route('booking-puja-order.index') }}">
                                                 Puja Bookings
                                             </a>
                                         </li>
@@ -515,83 +515,39 @@
                                 </ul>
                             </li>
                         @endcanany
-
-
-                        {{-- Pandit Puja --}}
-                        @canany(['pandit-pujas.view','puja-assignments.view'])
-                            <li class="dropdown {{ request()->routeIs('pandit-pujas.*', 'puja-assignments.*') ? 'active' : '' }}">
-
+                        @can('puja-bookings.view')
+                            <li class="dropdown {{ request()->routeIs('booking-puja-order.*') ? 'active' : '' }}">
                                 <a href="#" class="menu-toggle nav-link has-dropdown">
-                                    <i data-feather="heart"></i>
-                                    <span>Pandit</span>
+                                    <i data-feather="shopping-cart"></i>
+                                    <span>Booking Puja Order</span>
                                 </a>
-
                                 <ul class="dropdown-menu">
-
-                                    @can('pandit-pujas.view')
-                                        <li class="{{ request()->routeIs('pandit-pujas.*') ? 'active' : '' }}">
-                                            <a class="nav-link" href="{{ route('pandit-pujas.index') }}">
-                                                Pandit Pujas
-                                            </a>
-                                        </li>
-                                    @endcan
-
-                                    @can('puja-assignments.view')
-                                        <li class="{{ request()->routeIs('puja-assignments.*') ? 'active' : '' }}">
-                                            <a class="nav-link" href="{{ route('puja-assignments.index') }}">
-                                                Pandit Puja Assignments
-                                            </a>
-                                        </li>
-                                    @endcan
-
+                                    <li class="{{ request()->routeIs('booking-puja-order.successful') ? 'active' : '' }}">
+                                        <a class="nav-link" href="{{ route('booking-puja-order.successful') }}">
+                                            Successful
+                                        </a>
+                                    </li>
+                                    <li class="{{ request()->routeIs('booking-puja-order.failed') ? 'active' : '' }}">
+                                        <a class="nav-link" href="{{ route('booking-puja-order.failed') }}">
+                                            Failed
+                                        </a>
+                                    </li>
+                                    <li class="{{ request()->routeIs('booking-puja-order.cancelled') ? 'active' : '' }}">
+                                        <a class="nav-link" href="{{ route('booking-puja-order.cancelled') }}">
+                                            Cancelled
+                                        </a>
+                                    </li>
                                 </ul>
                             </li>
-                        @endcanany
-
-
-                        {{-- Festivals --}}
-                        @canany(['festivals.view','festival-pujas.view'])
-                            <li class="dropdown {{ request()->routeIs('festivals.*', 'festival-pujas.*') ? 'active' : '' }}">
-
-                                <a href="#" class="menu-toggle nav-link has-dropdown">
-                                    <i data-feather="calendar"></i>
-                                    <span>Festivals</span>
-                                </a>
-
-                                <ul class="dropdown-menu">
-
-                                    @can('festivals.view')
-                                        <li class="{{ request()->routeIs('festivals.*') ? 'active' : '' }}">
-                                            <a class="nav-link" href="{{ route('festivals.index') }}">
-                                                Festivals
-                                            </a>
-                                        </li>
-                                    @endcan
-
-                                    @can('festival-pujas.view')
-                                        <li class="{{ request()->routeIs('festival-pujas.*') ? 'active' : '' }}">
-                                            <a class="nav-link" href="{{ route('festival-pujas.index') }}">
-                                                Festival Pujas
-                                            </a>
-                                        </li>
-                                    @endcan
-
-                                </ul>
-                            </li>
-                        @endcanany
-
-
+                        @endcan
                         {{-- Booking Devotees --}}
                         @canany(['booking-devotees.view','booking-sankalps.view'])
                             <li class="dropdown {{ request()->routeIs('booking-devotees.*', 'booking-sankalps.*') ? 'active' : '' }}">
-
                                 <a href="#" class="menu-toggle nav-link has-dropdown">
                                     <i data-feather="calendar"></i>
                                     <span>Booking Devotee</span>
                                 </a>
-
                                 <ul class="dropdown-menu">
-
                                     @can('booking-devotees.view')
                                         <li class="{{ request()->routeIs('booking-devotees.*') ? 'active' : '' }}">
                                             <a class="nav-link" href="{{ route('booking-devotees.index') }}">
@@ -599,7 +555,6 @@
                                             </a>
                                         </li>
                                     @endcan
-
                                     @can('booking-sankalps.view')
                                         <li class="{{ request()->routeIs('booking-sankalps.*') ? 'active' : '' }}">
                                             <a class="nav-link" href="{{ route('booking-sankalps.index') }}">
@@ -607,11 +562,9 @@
                                             </a>
                                         </li>
                                     @endcan
-
                                 </ul>
                             </li>
                         @endcanany
-
                     </ul>
                 </aside>
             </div>

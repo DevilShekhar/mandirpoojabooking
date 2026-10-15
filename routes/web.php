@@ -115,11 +115,14 @@ Route::middleware('auth')->group(function () {
     Route::resource('pandits', PanditController::class);
     Route::resource('pandit-pujas', PanditPujaController::class);
     Route::resource('puja-assignments', PujaAssignmentController::class);
-    Route::resource('puja-bookings', PujaBookingController::class);
+    Route::resource('booking-puja-order', PujaBookingController::class);
     Route::resource('booking-devotees', BookingDevoteeController::class);
     Route::resource('booking-sankalps', BookingSankalpController::class);
     Route::get('/puja-reviews',[PujaReviewController::class, 'index'])->name('admin.puja-reviews.index');
     Route::post('/puja-reviews/{id}/approve',[PujaReviewController::class, 'approve'])->name('admin.puja-reviews.approve');
+    Route::get('booking-puja-order-successful',[PujaBookingController::class, 'successful'])->name('booking-puja-order.successful');
+    Route::get('booking-puja-order-failed',[PujaBookingController::class, 'failed'])->name('booking-puja-order.failed');
+    Route::get('booking-puja-order-cancelled',[PujaBookingController::class, 'cancelled'])->name('booking-puja-order.cancelled');
     Route::post('/puja-reviews/{id}/reject',[PujaReviewController::class, 'reject'])->name('admin.puja-reviews.reject');
     Route::resource('sanatan-events', SanatanController::class)->names('admin.sanatan-events')->parameters(['sanatan-events' => 'sanatan']);
     Route::get('/all-templae-register', [TempleRegistrationListController::class,'index'])->name('all-templae-register');
@@ -128,13 +131,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/checkout', [CheckoutController::class, 'show'])->name('frontend.checkout');
 });
 Route::middleware('auth')->prefix('payment/razorpay')->name('razorpay.')->group(function () {
-    Route::post('/create-order', [RazorpayPaymentController::class, 'createOrder'])
-        ->name('create-order');
-
-    Route::post('/verify', [RazorpayPaymentController::class, 'verifyPayment'])
-        ->name('verify');
-
-    Route::get('/success/{payment}', [RazorpayPaymentController::class, 'success'])
-        ->name('success');
+    Route::post('/create-order', [RazorpayPaymentController::class, 'createOrder'])->name('create-order');
+    Route::post('/verify', [RazorpayPaymentController::class, 'verifyPayment'])->name('verify');
+    Route::get('/success/{payment}', [RazorpayPaymentController::class, 'success'])->name('success');
+    Route::post('/failed', [RazorpayPaymentController::class, 'failed'])->name('failed');
+    Route::get('/failed/{payment}', [RazorpayPaymentController::class, 'failedPage'])->name('failed-page');
 });
 require __DIR__.'/auth.php';

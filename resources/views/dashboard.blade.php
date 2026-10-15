@@ -397,7 +397,7 @@
             {{-- Pending --}}
             @can('puja-bookings.view')
             <div class="col-xl-3 col-lg-6">
-                <a href="{{ route('puja-bookings.index') }}" class="text-decoration-none">
+                <a href="{{ route('booking-puja-order.index') }}" class="text-decoration-none">
                     <div class="card">
                         <div class="card-body card-type-3">
                             <div class="row">
@@ -428,7 +428,7 @@
             {{-- Confirmed --}}
             @can('puja-bookings.view')
             <div class="col-xl-3 col-lg-6">
-                <a href="{{ route('puja-bookings.index') }}" class="text-decoration-none">
+                <a href="{{ route('booking-puja-order.index') }}" class="text-decoration-none">
                     <div class="card">
                         <div class="card-body card-type-3">
                             <div class="row">
@@ -459,7 +459,7 @@
             {{-- In Progress --}}
             @can('puja-bookings.view')
             <div class="col-xl-3 col-lg-6">
-                <a href="{{ route('puja-bookings.index') }}" class="text-decoration-none">
+                <a href="{{ route('booking-puja-order.index') }}" class="text-decoration-none">
                     <div class="card">
                         <div class="card-body card-type-3">
                             <div class="row">
@@ -490,7 +490,7 @@
             {{-- Scheduled --}}
             @can('puja-bookings.view')
             <div class="col-xl-3 col-lg-6">
-                <a href="{{ route('puja-bookings.index') }}" class="text-decoration-none">
+                <a href="{{ route('booking-puja-order.index') }}" class="text-decoration-none">
                     <div class="card">
                         <div class="card-body card-type-3">
                             <div class="row">
@@ -521,7 +521,7 @@
             {{-- Completed --}}
             @can('puja-bookings.view')
             <div class="col-xl-3 col-lg-6">
-                <a href="{{ route('puja-bookings.index') }}" class="text-decoration-none">
+                <a href="{{ route('booking-puja-order.index') }}" class="text-decoration-none">
                     <div class="card">
                         <div class="card-body card-type-3">
                             <div class="row">
@@ -552,7 +552,7 @@
             {{-- Cancelled --}}
             @can('puja-bookings.view')
             <div class="col-xl-3 col-lg-6">
-                <a href="{{ route('puja-bookings.index') }}" class="text-decoration-none">
+                <a href="{{ route('booking-puja-order.index') }}" class="text-decoration-none">
                     <div class="card">
                         <div class="card-body card-type-3">
                             <div class="row">
@@ -583,7 +583,7 @@
             {{-- Failed --}}
             @can('puja-bookings.view')
             <div class="col-xl-3 col-lg-6">
-                <a href="{{ route('puja-bookings.index') }}" class="text-decoration-none">
+                <a href="{{ route('booking-puja-order.index') }}" class="text-decoration-none">
                     <div class="card">
                         <div class="card-body card-type-3">
                             <div class="row">
@@ -614,7 +614,7 @@
             {{-- Refunded --}}
             @can('puja-bookings.view')
             <div class="col-xl-3 col-lg-6">
-                <a href="{{ route('puja-bookings.index') }}" class="text-decoration-none">
+                <a href="{{ route('booking-puja-order.index') }}" class="text-decoration-none">
                     <div class="card">
                         <div class="card-body card-type-3">
                             <div class="row">
