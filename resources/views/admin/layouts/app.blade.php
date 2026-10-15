@@ -502,19 +502,17 @@
                                                 Pujas
                                             </a>
                                         </li>
-                                    @endcan                                   
-
-                                    @can('puja-bookings.view')
-                                        <li class="{{ request()->routeIs('puja-bookings.*') ? 'active' : '' }}">
-                                            <a class="nav-link" href="{{ route('booking-puja-order.index') }}">
-                                                Puja Bookings
-                                            </a>
-                                        </li>
                                     @endcan
-
                                 </ul>
                             </li>
                         @endcanany
+                        @can('puja-bookings.view')
+                            <li class="{{ request()->routeIs('puja-bookings.*', 'booking-puja-order.*') ? 'active' : '' }}">
+                                <a class="nav-link" href="{{ route('booking-puja-order.index') }}">
+                                   <i data-feather="shopping-cart"></i>  My Booking
+                                </a>
+                            </li>
+                        @endcan
                         @can('puja-bookings.view')
                             <li class="dropdown {{ request()->routeIs('booking-puja-order.*') ? 'active' : '' }}">
                                 <a href="#" class="menu-toggle nav-link has-dropdown">
