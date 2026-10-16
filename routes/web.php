@@ -39,6 +39,8 @@ use App\Http\Controllers\Frontend\TempleRegistrationController;
 use App\Http\Controllers\Admin\TempleRegistrationListController;
 use App\Http\Controllers\Frontend\CheckoutController;
 use App\Http\Controllers\Frontend\RazorpayPaymentController;
+use App\Http\Controllers\Admin\CustomerBookingCancellationController;
+
 
 
 Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
@@ -129,6 +131,14 @@ Route::middleware('auth')->group(function () {
     Route::post('/all-templae-register/{registrationId}/approve',[TempleRegistrationListController::class, 'approve'])->name('all-templae-register.approve');
     Route::post('/all-templae-register/{registrationId}/reject',[TempleRegistrationListController::class, 'reject'])->name('all-templae-register.reject');
     Route::get('/checkout', [CheckoutController::class, 'show'])->name('frontend.checkout');
+    Route::get('/customer-cancel-booking', [CustomerBookingCancellationController::class, 'customerIndex'])->name('customer-cancel-booking.index');
+    Route::post('/customer-cancel-booking/{booking}', [CustomerBookingCancellationController::class, 'store'])->name('customer-cancel-booking.store');
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::get('/customer-cancel-booking', [CustomerBookingCancellationController::class, 'staffIndex'])->name('customer-cancel-booking.index');
+        Route::get('/customer-cancel-booking/{cancellation}', [CustomerBookingCancellationController::class, 'show'])->name('customer-cancel-booking.show');
+        Route::post('/customer-cancel-booking/{cancellation}/approve', [CustomerBookingCancellationController::class, 'approve'])->name('customer-cancel-booking.approve');
+        Route::post('/customer-cancel-booking/{cancellation}/reject', [CustomerBookingCancellationController::class, 'reject'])->name('customer-cancel-booking.reject');
+    });
 });
 Route::middleware('auth')->prefix('payment/razorpay')->name('razorpay.')->group(function () {
     Route::post('/create-order', [RazorpayPaymentController::class, 'createOrder'])->name('create-order');
@@ -136,5 +146,7 @@ Route::middleware('auth')->prefix('payment/razorpay')->name('razorpay.')->group(
     Route::get('/success/{payment}', [RazorpayPaymentController::class, 'success'])->name('success');
     Route::post('/failed', [RazorpayPaymentController::class, 'failed'])->name('failed');
     Route::get('/failed/{payment}', [RazorpayPaymentController::class, 'failedPage'])->name('failed-page');
+    
+    
 });
 require __DIR__.'/auth.php';
