@@ -269,7 +269,21 @@
                                     {{ $package->short_description }}
                                 </p>
                             @endif
-
+                            <div class="summary-divider"></div>
+                            <div class="booking-schedule-fields">
+                                <div class="form-group">
+                                    <label for="booking_date">
+                                        <i class="fa fa-calendar"></i> Select Puja Date
+                                    </label>
+                                    <input type="date" id="booking_date" name="booking_date" class="form-control" min="{{ now()->toDateString() }}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="booking_time">
+                                        <i class="fa fa-clock-o"></i> Select Puja Time
+                                    </label>
+                                    <input type="time" id="booking_time" name="booking_time" class="form-control" required>
+                                </div>
+                            </div>
                             <div class="summary-detail">
                                 <span>
                                     <i class="fa fa-users"></i>
@@ -618,6 +632,48 @@
         line-height: 1.7;
     }
 
+    .booking-schedule-fields {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .booking-schedule-fields .form-group {
+        margin: 0;
+        min-width: 0;
+    }
+
+    .booking-schedule-fields label {
+        display: block;
+        margin-bottom: 7px;
+        color: #555;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .booking-schedule-fields label i {
+        margin-right: 5px;
+        color: #d71968;
+    }
+
+    .booking-schedule-fields .form-control {
+        width: 100%;
+        height: 44px;
+        padding: 8px 10px;
+        border: 1px solid #eadfd5;
+        border-radius: 8px;
+        background: #fff;
+        color: #29211c;
+        font-size: 13px;
+    }
+
+    .booking-schedule-fields .form-control:focus {
+        border-color: #d71968;
+        box-shadow: 0 0 0 2px rgba(215, 25, 104, .08);
+        outline: none;
+    }
+
     .summary-divider {
         margin: 20px 0;
         border-top: 1px solid #eee;
@@ -785,6 +841,10 @@
         .package-summary-body {
             padding: 20px;
         }
+
+        .booking-schedule-fields {
+            grid-template-columns: 1fr;
+        }
     }
 </style>
 @endpush
@@ -809,6 +869,8 @@
         const verifyPaymentUrl = @json(route('razorpay.verify'));
         const failedUrl = @json(route('razorpay.failed'));
         const packageId = @json($package->id);
+        const bookingDateInput = document.getElementById('booking_date');
+        const bookingTimeInput = document.getElementById('booking_time');
 
         let paymentInProgress = false;
 
@@ -907,13 +969,31 @@
                 return;
             }
 
+            const bookingDate = bookingDateInput ? bookingDateInput.value : '';
+            const bookingTime = bookingTimeInput ? bookingTimeInput.value : '';
+
+            if (!bookingDate || !bookingTime) {
+                if (!bookingDate && bookingDateInput) {
+                    bookingDateInput.focus();
+                } else if (bookingTimeInput) {
+                    bookingTimeInput.focus();
+                }
+                setLoading(false, 'Please select the puja date and time before payment.');
+                return;
+            }
+
+            const selectedSchedule = `${bookingDate} ${bookingTime}`;
+
             paymentInProgress = true;
             setLoading(true, 'Creating payment order...');
 
             try {
                 // 1. Create Razorpay order on the Laravel backend.
                 const order = await postJson(createOrderUrl, {
-                    package_id: packageId
+                    package_id: packageId,
+                    booking_date: bookingDate,
+                    booking_time: bookingTime,
+                    schedule: selectedSchedule
                 });
 
                 if (!order.order_id || !order.key) {
@@ -942,7 +1022,10 @@
                             const result = await postJson(verifyPaymentUrl, {
                                 razorpay_order_id: response.razorpay_order_id,
                                 razorpay_payment_id: response.razorpay_payment_id,
-                                razorpay_signature: response.razorpay_signature
+                                razorpay_signature: response.razorpay_signature,
+                                booking_date: bookingDate,
+                                booking_time: bookingTime,
+                                schedule: selectedSchedule
                             });
 
                             if (result.redirect_url) {

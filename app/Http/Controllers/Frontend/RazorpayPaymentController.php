@@ -31,8 +31,19 @@ class RazorpayPaymentController extends Controller
     {
         $validated = $request->validate([
             'package_id' => ['required', 'integer', 'min:1'],
+            'booking_date' => ['required', 'date', 'after_or_equal:today'],
+            'booking_time' => ['required', 'date_format:H:i'],
         ]);
         try {
+            $user = $request->user();
+
+            if (blank($user->phone)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Please add your mobile number to your account before booking a puja.',
+                ], 422);
+            }
+
             $package = PujaPackage::with('puja')->findOrFail($validated['package_id']);
             $puja = $package->puja;
             if (!$puja || (int) $puja->status !== 1) {
@@ -61,6 +72,8 @@ class RazorpayPaymentController extends Controller
                     'user_id' => (string) $request->user()->id,
                     'puja_id' => (string) $puja->id,
                     'package_id' => (string) $package->id,
+                    'booking_date' => $validated['booking_date'],
+                    'booking_time' => $validated['booking_time'],
                 ],
             ]);
             PujaBookingPayment::create([
@@ -109,6 +122,8 @@ class RazorpayPaymentController extends Controller
             'razorpay_order_id' => ['required', 'string', 'max:100'],
             'razorpay_payment_id' => ['required', 'string', 'max:100'],
             'razorpay_signature' => ['required', 'string', 'max:255'],
+            'booking_date' => ['required', 'date', 'after_or_equal:today'],
+            'booking_time' => ['required', 'date_format:H:i'],
         ]);
         $bookingPayment = PujaBookingPayment::where(
             'razorpay_order_id',
@@ -281,10 +296,11 @@ class RazorpayPaymentController extends Controller
                             ?? $puja->deity?->id,
                         'puja_id' => $puja->id,
                         'puja_package_id' => $package->id,
-                        'puja_schedule_id' => null,
+                        'schedule_date' => $validated['booking_date'],
+                        'schedule_time' => $validated['booking_time'],
                         'customer_name' => $user->name,
                         'customer_email' => $user->email,
-                        'customer_mobile' => $user->phone ?? null,
+                        'customer_mobile' => $user->phone,
                         'address_id' => null,
                         'package_name' => $package->name,
                         'person_count' => (int) (
