@@ -13,7 +13,8 @@ class PujaBooking extends Model
         'deity_id',
         'puja_id',
         'puja_package_id',
-        'puja_schedule_id',
+        'schedule_date',
+        'schedule_time',
         'pandit_id',
         'customer_name',
         'customer_email',
@@ -39,6 +40,7 @@ class PujaBooking extends Model
     ];
 
     protected $casts = [
+        'schedule_date' => 'date',
         'base_amount' => 'decimal:2',
         'discount_amount' => 'decimal:2',
         'coupon_discount' => 'decimal:2',
@@ -71,11 +73,6 @@ class PujaBooking extends Model
     public function pujaPackage()
     {
         return $this->belongsTo(PujaPackage::class);
-    }
-
-    public function pujaSchedule()
-    {
-        return $this->belongsTo(PujaSchedule::class);
     }
 
     public function pandit()
