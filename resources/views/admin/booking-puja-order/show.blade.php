@@ -179,33 +179,26 @@
     </div>
     <div class="card mb-4">
         <div class="card-header">
-            <h5 class="mb-0">Pandit Assignments</h5>
+            <h5 class="mb-0">Assigned Pandit Details</h5>
         </div>
-        <div class="card-body table-responsive">
-            @if($assignments->isNotEmpty())
-            <table class="table table-bordered table-striped">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Pandit</th>
-                        <th>Status</th>
-                        <th>Assigned At</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($assignments as $index => $assignment)
-                    <tr>
-                        <td>{{ $index + 1 }}</td>
-                        <td>{{ $assignment->pandit?->name ?? $assignment->user?->name ?? $assignment->pandit_name ?? '-' }}
-                        </td>
-                        <td>{{ ucfirst($assignment->status ?? 'assigned') }}</td>
-                        <td>{{ $assignment->created_at?->format('d M Y, h:i A') ?? '-' }}</td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
+        <div class="card-body">
+            @if($pujaBooking->pandit)
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <strong>Pandit Name</strong>
+                        <div>{{ $pujaBooking->pandit->name ?? '-' }}</div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <strong>Email</strong>
+                        <div>{{ $pujaBooking->pandit->email ?? '-' }}</div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <strong>Mobile</strong>
+                        <div>{{ $pujaBooking->pandit->phone ?? '-' }}</div>
+                    </div>
+                </div>
             @else
-            <p class="text-muted mb-0">No pandit assignments found.</p>
+                <p class="text-muted mb-0">No Pandit assigned to this booking.</p>
             @endif
         </div>
     </div>

@@ -95,7 +95,7 @@ class PujaBooking extends Model
 
     public function payments()
     {
-        return $this->hasMany(Payment::class);
+        return $this->hasMany(PujaBookingPayment::class, 'puja_booking_id');
     }
 
     public function assignments()

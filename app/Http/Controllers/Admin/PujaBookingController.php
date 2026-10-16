@@ -44,65 +44,102 @@ class PujaBookingController extends Controller
     public function show($id)
     {
         $user = auth()->user();
-        $pujaBooking = PujaBooking::query()->where('id', $id)->orWhere('booking_number', $id)->firstOrFail();
-        if (
-            !$user->hasAnyRole(['Admin', 'Super Admin']) &&
-            (int) $pujaBooking->created_by !== (int) $user->id &&
-            (int) $pujaBooking->updated_by !== (int) $user->id
+        $pujaBooking = PujaBooking::query()
+            ->where('id', $id)
+            ->orWhere('booking_number', $id)
+            ->firstOrFail();
+        $isAuthorized = $user->hasAnyRole(['Admin', 'Super Admin']);
+        if (!$isAuthorized && $user->hasRole('Temple Manager')) {
+            $panditIds = User::where('created_by', $user->id)
+                ->where('role_id', 5)
+                ->pluck('id');
+            $templeIds = \Illuminate\Support\Facades\DB::table('temple_user')
+                ->whereIn('user_id', $panditIds)
+                ->where('approval_status', 'approved')
+                ->pluck('temple_id')
+                ->unique();
+            $isAuthorized = $templeIds->contains(
+                (int) $pujaBooking->temple_id
+            );
+        }
+        if (!$isAuthorized && $user->hasRole('Pandit')) {
+            $isAuthorized = (int) $pujaBooking->pandit_id === (int) $user->id;
+        }
+        if (!$isAuthorized && (
+                (int) $pujaBooking->created_by === (int) $user->id ||
+                (int) $pujaBooking->updated_by === (int) $user->id ||
+                (int) $pujaBooking->user_id === (int) $user->id
+            )
         ) {
+            $isAuthorized = true;
+        }
+        if (!$isAuthorized) {
             abort(403, 'You are not authorized to view this booking.');
         }
-        $pujaBooking->load(['user', 'temple', 'deity', 'puja', 'pujaPackage', 'pujaSchedule']);
+        $pujaBooking->load([
+            'user',
+            'temple',
+            'deity',
+            'puja',
+            'pujaPackage',
+            'pujaSchedule',
+            'pandit',
+            'createdBy',
+            'updatedBy',
+        ]);
         $bookingPayments = collect();
         $paymentModel = new PujaBookingPayment();
         $paymentTable = $paymentModel->getTable();
         if (Schema::hasTable($paymentTable)) {
-            $paymentForeignKey = Schema::hasColumn($paymentTable, 'puja_booking_id') ? 'puja_booking_id' : (Schema::hasColumn($paymentTable, 'booking_id') ? 'booking_id' : null);
+            $paymentForeignKey = Schema::hasColumn($paymentTable, 'puja_booking_id')
+                ? 'puja_booking_id'
+                : (Schema::hasColumn($paymentTable, 'booking_id') ? 'booking_id' : null);
             if ($paymentForeignKey) {
-                $bookingPayments = PujaBookingPayment::where($paymentForeignKey, $pujaBooking->id)->latest()->get();
+                $bookingPayments = PujaBookingPayment::where(
+                    $paymentForeignKey,
+                    $pujaBooking->id
+                )->latest()->get();
             }
         }
         $assignments = collect();
-        $assignmentModel = new PujaAssignment();
-        $assignmentTable = $assignmentModel->getTable();
-        if (Schema::hasTable($assignmentTable)) {
-            $assignmentForeignKey = Schema::hasColumn($assignmentTable, 'puja_booking_id') ? 'puja_booking_id' : (Schema::hasColumn($assignmentTable, 'booking_id') ? 'booking_id' : null);
-            if ($assignmentForeignKey) {
-                $assignmentQuery = PujaAssignment::query();
-                $assignmentRelations = [];
-                if (method_exists($assignmentModel, 'pandit')) {
-                    $assignmentRelations[] = 'pandit';
-                }
-                if (method_exists($assignmentModel, 'user')) {
-                    $assignmentRelations[] = 'user';
-                }
-                if (!empty($assignmentRelations)) {
-                    $assignmentQuery->with($assignmentRelations);
-                }
-                $assignments = $assignmentQuery->where($assignmentForeignKey, $pujaBooking->id)->latest()->get();
-            }
-        }
-        return view('admin.booking-puja-order.show', compact('pujaBooking', 'bookingPayments', 'assignments'));
+        return view('admin.booking-puja-order.show', compact(
+            'pujaBooking',
+            'bookingPayments',
+            'assignments'
+        ));
     }
-    /**
-     * Show bookings with successful payments.
-     */
+
     public function successful()
     {
         $user = auth()->user();
         $query = PujaBooking::with([
-            'user', 'temple', 'deity', 'puja', 'pujaPackage',
-            'pujaSchedule', 'createdBy', 'updatedBy'
+            'user',
+            'temple',
+            'deity',
+            'puja',
+            'pujaPackage',
+            'pujaSchedule',
+            'pandit',
+            'createdBy',
+            'updatedBy',
+            'payments'
         ])->where('payment_status', 'paid');
-        if (!$user->hasAnyRole(['Admin', 'Super Admin'])) {
-            $query->where(function ($q) use ($user) {
-                $q->where('created_by', $user->id)
-                    ->orWhere('updated_by', $user->id);
-            });
+        if ($user->hasAnyRole(['Admin', 'Super Admin'])) {
+            // Show all successful bookings.
+        } elseif ($user->hasRole('Temple Manager')) {
+            $panditIds = \App\Models\User::where('created_by', $user->id)
+                ->where('role_id', 5)
+                ->pluck('id');
+            $query->whereIn('pandit_id', $panditIds);
+        } elseif ($user->hasRole('Pandit')) {
+            $query->where('pandit_id', $user->id);
+        } else {
+            $query->where('user_id', $user->id);
         }
         $bookings = $query->latest()->paginate(10);
         return view('admin.booking-puja-order.successful', compact('bookings'));
     }
+
     public function failed()
     {
         $user = auth()->user();
