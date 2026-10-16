@@ -181,6 +181,10 @@ class PermissionSeeder extends Seeder
             'home-banners.edit',
             'home-banners.index',
             'home-banners.delete',
+            'puja-bookings-my.view',
+            'puja-bookings-order.view',
+            'customer-cancellled-bookings-order.view',
+            'my-cancelled-order.view',
 
         ];
         foreach ($permissions as $permission) {

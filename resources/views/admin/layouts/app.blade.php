@@ -506,14 +506,14 @@
                                 </ul>
                             </li>
                         @endcanany
-                        @can('puja-bookings.view')
+                        @can('puja-bookings-my.view')
                             <li class="{{ request()->routeIs('puja-bookings.*', 'booking-puja-order.*') ? 'active' : '' }}">
                                 <a class="nav-link" href="{{ route('booking-puja-order.index') }}">
                                    <i data-feather="shopping-cart"></i>  My Booking
                                 </a>
                             </li>
                         @endcan
-                        @can('puja-bookings.view')
+                        @can('puja-bookings-order.view')
                             <li class="dropdown {{ request()->routeIs('booking-puja-order.*') ? 'active' : '' }}">
                                 <a href="#" class="menu-toggle nav-link has-dropdown">
                                     <i data-feather="shopping-cart"></i>
@@ -538,32 +538,22 @@
                                 </ul>
                             </li>
                         @endcan
-                        {{-- Booking Devotees --}}
-                        @canany(['booking-devotees.view','booking-sankalps.view'])
-                            <li class="dropdown {{ request()->routeIs('booking-devotees.*', 'booking-sankalps.*') ? 'active' : '' }}">
-                                <a href="#" class="menu-toggle nav-link has-dropdown">
-                                    <i data-feather="calendar"></i>
-                                    <span>Booking Devotee</span>
+                        @can('customer-cancellled-bookings-order.view')
+                            <li class="{{ request()->routeIs('admin.customer-cancel-booking.*') ? 'active' : '' }}">
+                                <a class="nav-link" href="{{ route('admin.customer-cancel-booking.index') }}">
+                                    <i data-feather="rotate-ccw"></i>
+                                    <span>Customer Cancellation </span>
                                 </a>
-                                <ul class="dropdown-menu">
-                                    @can('booking-devotees.view')
-                                        <li class="{{ request()->routeIs('booking-devotees.*') ? 'active' : '' }}">
-                                            <a class="nav-link" href="{{ route('booking-devotees.index') }}">
-                                                Booking Devotees
-                                            </a>
-                                        </li>
-                                    @endcan
-                                    @can('booking-sankalps.view')
-                                        <li class="{{ request()->routeIs('booking-sankalps.*') ? 'active' : '' }}">
-                                            <a class="nav-link" href="{{ route('booking-sankalps.index') }}">
-                                                Booking Sankalps
-                                            </a>
-                                        </li>
-                                    @endcan
-                                </ul>
                             </li>
-                        @endcanany
-                    </ul>
+                        @endcan
+                        @can('my-cancelled-order.view')
+                            <li class="{{ request()->routeIs('customer-cancel-booking.*') ? 'active' : '' }}">
+                                <a class="nav-link" href="{{ route('customer-cancel-booking.index') }}">
+                                    <i data-feather="x-circle"></i>
+                                    <span>My Cancelled Orders</span>
+                                </a>
+                            </li>
+                        @endcan
                 </aside>
             </div>
             <!-- Main Content -->
