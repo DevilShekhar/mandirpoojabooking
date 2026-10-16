@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\PujaBookingPayment;
 use App\Models\PujaPackage;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -19,56 +20,39 @@ class RazorpayPaymentController extends Controller
     {
         $key = config('services.razorpay.key');
         $secret = config('services.razorpay.secret');
-
         if (!$key || !$secret) {
             throw new \RuntimeException(
                 'Razorpay credentials are not configured.'
             );
         }
-
         return new Api($key, $secret);
     }
-
     public function createOrder(Request $request): JsonResponse
     {
         $validated = $request->validate([
             'package_id' => ['required', 'integer', 'min:1'],
         ]);
-
         try {
-            $package = PujaPackage::with('puja')
-                ->findOrFail($validated['package_id']);
-
+            $package = PujaPackage::with('puja')->findOrFail($validated['package_id']);
             $puja = $package->puja;
-
             if (!$puja || (int) $puja->status !== 1) {
                 return response()->json([
                     'success' => false,
                     'message' => 'The selected puja is not available.',
                 ], 422);
             }
-
             $baseAmount = (float) $package->price;
-
-            $finalAmount = (
-                $package->discount_price !== null &&
-                $package->discount_price !== '' &&
-                (float) $package->discount_price < $baseAmount
-            )
+            $finalAmount = ($package->discount_price !== null && $package->discount_price !== '' && (float) $package->discount_price < $baseAmount)
                 ? (float) $package->discount_price
                 : $baseAmount;
-
             $amountPaise = (int) round($finalAmount * 100);
-
             if ($amountPaise < 100) {
                 return response()->json([
                     'success' => false,
                     'message' => 'The package amount must be at least ₹1.00.',
                 ], 422);
             }
-
             $api = $this->razorpay();
-
             $order = $api->order->create([
                 'receipt' => 'puja_' . Str::lower(Str::random(20)),
                 'amount' => $amountPaise,
@@ -79,7 +63,6 @@ class RazorpayPaymentController extends Controller
                     'package_id' => (string) $package->id,
                 ],
             ]);
-
             PujaBookingPayment::create([
                 'user_id' => $request->user()->id,
                 'puja_id' => $puja->id,
@@ -89,7 +72,6 @@ class RazorpayPaymentController extends Controller
                 'razorpay_order_id' => $order['id'],
                 'status' => 'pending',
             ]);
-
             return response()->json([
                 'success' => true,
                 'key' => config('services.razorpay.key'),
@@ -115,14 +97,12 @@ class RazorpayPaymentController extends Controller
                 'file' => $exception->getFile(),
                 'line' => $exception->getLine(),
             ]);
-
             return response()->json([
                 'success' => false,
                 'message' => 'Unable to start payment right now. Please try again later.',
             ], 500);
         }
     }
-
     public function verifyPayment(Request $request): JsonResponse
     {
         $validated = $request->validate([
@@ -130,30 +110,25 @@ class RazorpayPaymentController extends Controller
             'razorpay_payment_id' => ['required', 'string', 'max:100'],
             'razorpay_signature' => ['required', 'string', 'max:255'],
         ]);
-
         $bookingPayment = PujaBookingPayment::where(
             'razorpay_order_id',
             $validated['razorpay_order_id']
         )
             ->where('user_id', $request->user()->id)
             ->firstOrFail();
-
         try {
             $secret = config('services.razorpay.secret');
-
             if (!$secret) {
                 throw new \RuntimeException(
                     'Razorpay secret is not configured.'
                 );
             }
-
             $expectedSignature = hash_hmac(
                 'sha256',
                 $validated['razorpay_order_id'] . '|' .
                     $validated['razorpay_payment_id'],
                 (string) $secret
             );
-
             if (!hash_equals(
                 $expectedSignature,
                 $validated['razorpay_signature']
@@ -162,17 +137,14 @@ class RazorpayPaymentController extends Controller
                     'payment_record_id' => $bookingPayment->id,
                     'order_id' => $validated['razorpay_order_id'],
                 ]);
-
                 return response()->json([
                     'success' => false,
                     'message' => 'Payment verification failed. If money was deducted, please contact support.',
                 ], 422);
             }
-
             $razorpayPayment = $this->razorpay()
                 ->payment
                 ->fetch($validated['razorpay_payment_id']);
-
             if (
                 ($razorpayPayment['order_id'] ?? null) !==
                     $bookingPayment->razorpay_order_id ||
@@ -187,20 +159,17 @@ class RazorpayPaymentController extends Controller
                     'message' => 'Payment has not been confirmed as captured. Please wait or contact support.',
                 ], 422);
             }
-
             $existingPayment = PujaBookingPayment::where(
                 'razorpay_payment_id',
                 $validated['razorpay_payment_id']
             )
                 ->where('id', '!=', $bookingPayment->id)
                 ->exists();
-
             if ($existingPayment) {
                 throw new \RuntimeException(
                     'This Razorpay payment ID is already associated with another payment record.'
                 );
             }
-
             $bookingId = DB::transaction(function () use (
                 $bookingPayment,
                 $validated,
@@ -211,7 +180,6 @@ class RazorpayPaymentController extends Controller
                 )
                     ->lockForUpdate()
                     ->firstOrFail();
-
                 if ($lockedPayment->puja_booking_id) {
                     $lockedPayment->update([
                         'razorpay_payment_id' =>
@@ -220,17 +188,13 @@ class RazorpayPaymentController extends Controller
                             $validated['razorpay_signature'],
                         'status' => 'paid',
                     ]);
-
+                    $this->assignPanditToBooking(
+                        (int) $lockedPayment->puja_booking_id
+                    );
                     return (int) $lockedPayment->puja_booking_id;
                 }
-
-                /*
-                 * Recover a booking created earlier for this already-paid
-                 * payment, but not linked to its payment record.
-                 */
                 if ($lockedPayment->status === 'paid') {
                     $paymentCreatedAt = $lockedPayment->created_at;
-
                     $matchingBookings = DB::table('puja_bookings')
                         ->where('user_id', $lockedPayment->user_id)
                         ->where('puja_id', $lockedPayment->puja_id)
@@ -254,16 +218,13 @@ class RazorpayPaymentController extends Controller
                         ])
                         ->lockForUpdate()
                         ->get();
-
                     if ($matchingBookings->count() > 1) {
                         throw new \RuntimeException(
                             'Multiple existing bookings match this paid payment. Manual reconciliation is required.'
                         );
                     }
-
                     if ($matchingBookings->count() === 1) {
                         $existingBooking = $matchingBookings->first();
-
                         $lockedPayment->update([
                             'puja_booking_id' => $existingBooking->id,
                             'razorpay_payment_id' =>
@@ -272,45 +233,33 @@ class RazorpayPaymentController extends Controller
                                 $validated['razorpay_signature'],
                             'status' => 'paid',
                         ]);
-
+                        $this->assignPanditToBooking(
+                            (int) $existingBooking->id
+                        );
                         return (int) $existingBooking->id;
                     }
                 }
-
-                $package = PujaPackage::with('puja')
-                    ->findOrFail($lockedPayment->puja_package_id);
-
+                $package = PujaPackage::with('puja')->findOrFail($lockedPayment->puja_package_id);
                 $puja = $package->puja;
                 $user = $request->user();
-
                 if (!$puja) {
                     throw new \RuntimeException(
                         'The puja associated with this payment could not be found.'
                     );
                 }
-
-                /*
-                 * Use the amount stored when the Razorpay order was created.
-                 * Do not reject a captured payment just because the package
-                 * price changed after the order was created.
-                 */
                 $paidAmount = $lockedPayment->amount_paise / 100;
                 $currentBaseAmount = (float) $package->price;
-
                 $baseAmount = max(
                     $currentBaseAmount,
                     $paidAmount
                 );
-
                 $discountAmount = max(
                     0,
                     $baseAmount - $paidAmount
                 );
-
                 $bookingNumber = 'PB' .
                     now()->format('YmdHis') .
                     Str::upper(Str::random(5));
-
                 while (
                     DB::table('puja_bookings')
                         ->where('booking_number', $bookingNumber)
@@ -320,7 +269,6 @@ class RazorpayPaymentController extends Controller
                         now()->format('YmdHis') .
                         Str::upper(Str::random(5));
                 }
-
                 $bookingId = DB::table('puja_bookings')
                     ->insertGetId([
                         'booking_number' => $bookingNumber,
@@ -358,7 +306,6 @@ class RazorpayPaymentController extends Controller
                         'created_at' => now(),
                         'updated_at' => now(),
                     ]);
-
                 $lockedPayment->update([
                     'puja_booking_id' => $bookingId,
                     'razorpay_payment_id' =>
@@ -367,18 +314,15 @@ class RazorpayPaymentController extends Controller
                         $validated['razorpay_signature'],
                     'status' => 'paid',
                 ]);
-
+                $this->assignPanditToBooking((int) $bookingId);
                 return (int) $bookingId;
             });
-
             $bookingPayment->refresh();
-
             if (!$bookingPayment->puja_booking_id) {
                 throw new \RuntimeException(
                     'Booking was not linked to the payment record.'
                 );
             }
-
             return response()->json([
                 'success' => true,
                 'booking_id' => $bookingId,
@@ -402,7 +346,6 @@ class RazorpayPaymentController extends Controller
                     'line' => $exception->getLine(),
                 ]
             );
-
             return response()->json([
                 'success' => false,
                 'message' => 'Payment confirmation could not be completed. Please do not pay again. Contact support with Razorpay payment ID: ' .
@@ -419,28 +362,16 @@ class RazorpayPaymentController extends Controller
             $payment->puja_booking_id !== null,
             404
         );
-
         $payment->load([
             'puja',
             'package',
             'booking',
         ]);
-
         $booking = $payment->booking;
         $puja = $payment->puja;
         $package = $payment->package;
-
         abort_unless($booking, 404);
-
-        return view(
-            'frontend.checkout.payment-success',
-            compact(
-                'payment',
-                'booking',
-                'puja',
-                'package'
-            )
-        );
+        return view('frontend.checkout.payment-success', compact('payment','booking','puja','package'));
     }
     public function failed(Request $request): JsonResponse
     {
@@ -452,7 +383,6 @@ class RazorpayPaymentController extends Controller
             'error_step' => ['nullable', 'string', 'max:100'],
             'error_reason' => ['nullable', 'string', 'max:255'],
         ]);
-
         try {
             $payment = DB::transaction(function () use (
                 $validated,
@@ -465,16 +395,13 @@ class RazorpayPaymentController extends Controller
                     ->where('user_id', $request->user()->id)
                     ->lockForUpdate()
                     ->first();
-
                 if (!$payment) {
                     return null;
                 }
-
                 // Never change a paid payment to failed.
                 if ($payment->status === 'paid') {
                     return $payment;
                 }
-
                 $payment->update([
                     'status' => 'failed',
                     'error_code' => $validated['error_code'] ?? null,
@@ -484,24 +411,20 @@ class RazorpayPaymentController extends Controller
                     'error_step' => $validated['error_step'] ?? null,
                     'error_reason' => $validated['error_reason'] ?? null,
                 ]);
-
                 return $payment;
             });
-
             if (!$payment) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Payment record not found.',
                 ], 404);
             }
-
             if ($payment->status === 'paid') {
                 return response()->json([
                     'success' => false,
                     'message' => 'This payment has already been completed.',
                 ], 422);
             }
-
             Log::warning('Razorpay payment failed.', [
                 'payment_record_id' => $payment->id,
                 'user_id' => $request->user()->id,
@@ -510,7 +433,6 @@ class RazorpayPaymentController extends Controller
                 'error_description' =>
                     $validated['error_description'] ?? null,
             ]);
-
             return response()->json([
                 'success' => true,
                 'redirect_url' => route(
@@ -518,24 +440,17 @@ class RazorpayPaymentController extends Controller
                     ['payment' => $payment->id]
                 ),
             ]);
-
         } catch (Throwable $exception) {
             Log::error('Razorpay failure handling failed.', [
                 'user_id' => $request->user()?->id,
                 'exception' => $exception->getMessage(),
             ]);
-
             return response()->json([
                 'success' => false,
                 'message' => 'Unable to process payment failure.',
             ], 500);
         }
     }
-
-
-    /**
-     * Show payment failed page.
-     */
     public function failedPage(PujaBookingPayment $payment)
     {
         abort_unless(
@@ -543,12 +458,85 @@ class RazorpayPaymentController extends Controller
             $payment->status === 'failed',
             404
         );
-
         $payment->load(['puja', 'package']);
-
         return view(
             'frontend.checkout.payment-failed',
             compact('payment')
         );
+    }
+    private function assignPanditToBooking(int $bookingId): void
+    {
+        $booking = DB::table('puja_bookings')
+            ->where('id', $bookingId)
+            ->lockForUpdate()
+            ->first();
+        if (!$booking || $booking->pandit_id || !$booking->temple_id) {
+            return;
+        }
+        // Serialize Pandit assignment for bookings belonging to this Temple.
+        DB::table('temples')
+            ->where('id', $booking->temple_id)
+            ->lockForUpdate()
+            ->first();
+        $booking = DB::table('puja_bookings')
+            ->where('id', $bookingId)
+            ->lockForUpdate()
+            ->first();
+        if (!$booking || $booking->pandit_id || !$booking->temple_id) {
+            return;
+        }
+        $panditIds = User::query()
+            ->where('status', true)
+            ->whereHas('roles', function ($query) {
+                $query->where('name', 'Pandit')
+                    ->where('guard_name', 'web');
+            })
+            ->whereHas('temples', function ($query) use ($booking) {
+                $query->where('temples.id', $booking->temple_id)
+                    ->where('temple_user.approval_status', 'approved');
+            })
+            ->orderBy('users.id')
+            ->pluck('users.id')
+            ->map(fn ($id) => (int) $id)
+            ->values()
+            ->all();
+        if (empty($panditIds)) {
+            Log::warning('No eligible Pandit found for booking.', [
+                'booking_id' => $bookingId,
+                'temple_id' => $booking->temple_id,
+            ]);
+            return;
+        }
+        $lastPanditId = DB::table('puja_bookings')
+            ->where('temple_id', $booking->temple_id)
+            ->whereNotNull('pandit_id')
+            ->where('id', '!=', $bookingId)
+            ->orderByDesc('id')
+            ->value('pandit_id');
+        $nextPanditId = $panditIds[0];
+        if ($lastPanditId !== null) {
+            $lastIndex = array_search(
+                (int) $lastPanditId,
+                $panditIds,
+                true
+            );
+            if ($lastIndex !== false) {
+                $nextPanditId = $panditIds[
+                    ($lastIndex + 1) % count($panditIds)
+                ];
+            }
+        }
+        DB::table('puja_bookings')
+            ->where('id', $bookingId)
+            ->whereNull('pandit_id')
+            ->update([
+                'pandit_id' => $nextPanditId,
+                'updated_at' => now(),
+            ]);
+        Log::info('Pandit assigned to Puja booking.', [
+            'booking_id' => $bookingId,
+            'temple_id' => $booking->temple_id,
+            'pandit_id' => $nextPanditId,
+        ]);
     }
 }
