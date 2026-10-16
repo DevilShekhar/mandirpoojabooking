@@ -14,6 +14,7 @@ class PujaBooking extends Model
         'puja_id',
         'puja_package_id',
         'puja_schedule_id',
+        'pandit_id',
         'customer_name',
         'customer_email',
         'customer_mobile',
@@ -77,6 +78,11 @@ class PujaBooking extends Model
         return $this->belongsTo(PujaSchedule::class);
     }
 
+    public function pandit()
+    {
+        return $this->belongsTo(User::class, 'pandit_id');
+    }
+
     public function devotees()
     {
         return $this->hasMany(BookingDevotee::class);
@@ -96,6 +102,7 @@ class PujaBooking extends Model
     {
         return $this->hasMany(PujaAssignment::class);
     }
+
     public function createdBy()
     {
         return $this->belongsTo(User::class, 'created_by');
@@ -105,5 +112,4 @@ class PujaBooking extends Model
     {
         return $this->belongsTo(User::class, 'updated_by');
     }
-
 }

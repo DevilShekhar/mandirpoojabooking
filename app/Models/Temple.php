@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Models;
-
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -80,5 +78,16 @@ class Temple extends Model
         return $this->belongsToMany(User::class, 'temple_user')
             ->withPivot('approval_status')
             ->withTimestamps();
+    }
+    public function pandits()
+    {
+        return $this->belongsToMany(User::class, 'temple_user')
+            ->withPivot('approval_status')
+            ->withTimestamps()
+            ->wherePivot('approval_status', 'approved')
+            ->whereHas('roles', function ($query) {
+                $query->where('name', 'Pandit')
+                    ->where('guard_name', 'web');
+            });
     }
 }
