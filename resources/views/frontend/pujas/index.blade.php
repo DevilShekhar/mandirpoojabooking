@@ -80,29 +80,7 @@
                                 </div>
                                 <input type="hidden" name="puja" value="">
                             </div>
-                        </div>
-                        <div class="filter-group">
-                            <label>Pandit</label>
-                            <div class="searchable-select" data-name="pandit">
-                                <button type="button" class="searchable-select-button">
-                                    <span>All Pandits</span>
-                                    <i class="fa fa-angle-down"></i>
-                                </button>
-                                <div class="searchable-select-dropdown">
-                                    <div class="searchable-select-search">
-                                        <i class="fa fa-search"></i>
-                                        <input type="text" placeholder="Search pandit..." autocomplete="off">
-                                    </div>
-                                    <div class="searchable-select-options">
-                                        <div class="searchable-option active" data-value="">All Pandits</div>
-                                        @foreach($pandits as $pandit)
-                                            <div class="searchable-option" data-value="{{ $pandit->id }}">{{ $pandit->name }}</div>
-                                        @endforeach
-                                    </div>
-                                </div>
-                                <input type="hidden" name="pandit" value="">
-                            </div>
-                        </div>
+                        </div>                        
                         <button type="button" id="resetFilters" class="puja-reset-btn"><i class="fa fa-refresh"></i> Reset Filters</button>
                     </div>
                 </div>

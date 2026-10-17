@@ -418,11 +418,9 @@ class PujaController extends Controller
         }
         $originalSlug = $slug;
         $counter = 1;
-        while (
-            PujaPackage::where('puja_id', $pujaId)
-                ->where('slug', $slug)
-                ->exists()
-        ) {
+        // Package names may repeat across any puja.
+        // Keep slugs unique globally in case the database has a unique index on `slug`.
+        while (PujaPackage::where('slug', $slug)->exists()) {
             $slug = $originalSlug . '-' . $counter;
             $counter++;
         }
