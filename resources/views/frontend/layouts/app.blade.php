@@ -253,7 +253,7 @@
                         <!-- Begin Header Logo Area -->
                         <div class="col-lg-3">
                             <div class="logo pb-sm-30 pb-xs-30">
-                                <a href="index.html">
+                                <a href="{{ url('/') }}">
                                     <img src="{{ asset('assets/frontend/assets/images/menu/logo/logo.png') }}"
                                         alt="Footer Logo" alt="">
                                 </a>
