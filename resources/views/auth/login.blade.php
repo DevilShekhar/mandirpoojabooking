@@ -529,7 +529,7 @@
                     <div class="register-divider">
                         New to our temple community?
                     </div>
-                    <a href="{{ route('register') }}" class="register-button">
+                    <a href="{{ route('customer.register') }}" class="register-button">
                        Create Your Account
                     </a>
                     @endif
