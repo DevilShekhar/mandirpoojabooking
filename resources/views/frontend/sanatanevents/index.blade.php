@@ -113,27 +113,51 @@
                                         @endif
                                     </div>
                                     <div class="sanatan-card-body">
-                                        @if($sanatan->program_type)
-                                            <span class="sanatan-event-type">{{ $sanatan->program_type }}</span>
-                                        @endif
-                                        <h5>{{ $sanatan->name }}</h5>
-                                        <p class="sanatan-card-description">{{ $sanatan->short_description ?: \Illuminate\Support\Str::limit(strip_tags($sanatan->description ?? ''), 130) }}</p>
-                                        <div class="sanatan-meta">
-                                            @if($sanatan->duration)
-                                                <p><i class="far fa-clock me-1"></i> {{ $sanatan->duration }}</p>
-                                            @endif
-                                            <p><i class="far fa-user me-1"></i> Created by: {{ $sanatan->creator_name ?? 'N/A' }}</p>
-                                            @if(!empty($sanatan->languages))
-                                                <div class="sanatan-languages">
-                                                    @foreach($sanatan->languages as $language)
-                                                        <span class="sanatan-language-badge">{{ $language }}</span>
-                                                    @endforeach
-                                                </div>
-                                            @endif
-                                        </div>
-                                        <div class="sanatan-price">₹{{ number_format((float) $sanatan->price, 2) }}</div>
-                                        <a href="{{ route('frontend.sanatanevents.show', $sanatan->slug) }}" class="sanatan-view-btn">View Details</a>
-                                    </div>
+    @if($sanatan->program_type)
+        <span class="sanatan-event-type">{{ $sanatan->program_type }}</span>
+    @endif
+
+    <h5>{{ $sanatan->name }}</h5>
+
+    <p class="sanatan-card-description">
+        {{ $sanatan->short_description ?: \Illuminate\Support\Str::limit(strip_tags($sanatan->description ?? ''), 130) }}
+    </p>
+
+    <div class="sanatan-meta">
+        @if($sanatan->duration)
+            <p><i class="far fa-clock me-1"></i> {{ $sanatan->duration }}</p>
+        @endif
+
+        <p>
+            <i class="far fa-user me-1"></i>
+            Created by: {{ $sanatan->creator_name ?? 'N/A' }}
+        </p>
+
+        @if(!empty($sanatan->languages))
+            <div class="sanatan-languages">
+                @foreach($sanatan->languages as $language)
+                    <span class="sanatan-language-badge">{{ $language }}</span>
+                @endforeach
+            </div>
+        @endif
+    </div>
+
+    <div class="sanatan-price">
+        ₹{{ number_format((float) $sanatan->price, 2) }}
+    </div>
+
+    <div class="d-flex gap-2 mt-auto">
+        <a href="{{ route('frontend.sanatanevents.buy', $sanatan->slug) }}"
+           class="sanatan-view-btn flex-fill">
+            <i class="fas fa-shopping-cart me-1"></i> Add to Cart
+        </a>
+
+        <a href="{{ route('frontend.sanatanevents.show', $sanatan->slug) }}"
+           class="sanatan-view-btn flex-fill">
+            View Details
+        </a>
+    </div>
+</div>
                                 </div>
                             </div>
                         @empty
@@ -156,6 +180,7 @@
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
 <script>
 $(document).ready(function () {
     const listingUrl = @json(route('frontend.sanatanevents'));
@@ -163,6 +188,7 @@ $(document).ready(function () {
     let currentRequest = null;
     let requestId = 0;
 
+    // Initialize Select2 filters
     $('#created_by').select2({
         width: '100%',
         placeholder: 'Search or select user',
@@ -177,10 +203,12 @@ $(document).ready(function () {
         minimumResultsForSearch: 0
     });
 
+    // Escape HTML to safely render dynamic values
     function escapeHtml(value) {
         return $('<div>').text(value ?? '').html();
     }
 
+    // Format event price
     function formatPrice(value) {
         return Number(value || 0).toLocaleString('en-IN', {
             minimumFractionDigits: 2,
@@ -188,49 +216,129 @@ $(document).ready(function () {
         });
     }
 
+    // Render event languages
     function renderLanguages(languages) {
         if (!Array.isArray(languages) || languages.length === 0) {
             return '';
         }
 
-        return `<div class="sanatan-languages">${languages.map(language => `<span class="sanatan-language-badge">${escapeHtml(language)}</span>`).join('')}</div>`;
+        return `
+            <div class="sanatan-languages">
+                ${languages.map(language => `
+                    <span class="sanatan-language-badge">
+                        ${escapeHtml(language)}
+                    </span>
+                `).join('')}
+            </div>
+        `;
     }
 
+    // Render event cards
     function renderEvents(events) {
         if (!events || events.length === 0) {
-            return `<div class="col-12"><div class="sanatan-empty"><h5>No Events Found</h5><p>No Sanatan events are currently available for the selected filters.</p></div></div>`;
+            return `
+                <div class="col-12">
+                    <div class="sanatan-empty">
+                        <h5>No Events Found</h5>
+                        <p>No Sanatan events are currently available for the selected filters.</p>
+                    </div>
+                </div>
+            `;
         }
 
         return events.map(event => {
             const image = event.image
-                ? `<img src="${escapeHtml(event.image)}" alt="${escapeHtml(event.name)}">`
-                : `<div class="sanatan-card-placeholder"><i class="fas fa-om"></i></div>`;
+                ? `
+                    <img
+                        src="${escapeHtml(event.image)}"
+                        alt="${escapeHtml(event.name)}"
+                    >
+                `
+                : `
+                    <div class="sanatan-card-placeholder">
+                        <i class="fas fa-om"></i>
+                    </div>
+                `;
 
             const eventType = event.program_type
-                ? `<span class="sanatan-event-type">${escapeHtml(event.program_type)}</span>`
+                ? `
+                    <span class="sanatan-event-type">
+                        ${escapeHtml(event.program_type)}
+                    </span>
+                `
                 : '';
 
             const duration = event.duration
-                ? `<p><i class="far fa-clock me-1"></i> ${escapeHtml(event.duration)}</p>`
+                ? `
+                    <p>
+                        <i class="far fa-clock me-1"></i>
+                        ${escapeHtml(event.duration)}
+                    </p>
+                `
                 : '';
 
-            const detailUrl = event.detail_url || `${detailsBaseUrl}/${encodeURIComponent(event.slug)}`;
+            const detailUrl = event.detail_url
+                || `${detailsBaseUrl}/${encodeURIComponent(event.slug)}`;
+
+            // Controller can return the exact Add to Cart URL.
+            const buyUrl = event.buy_url
+                || `${detailsBaseUrl}/${encodeURIComponent(event.slug)}/buy`;
 
             return `
                 <div class="col-md-6 col-xl-4">
                     <div class="sanatan-card">
-                        <div class="sanatan-card-image">${image}</div>
+
+                        <div class="sanatan-card-image">
+                            ${image}
+                        </div>
+
                         <div class="sanatan-card-body">
+
                             ${eventType}
+
                             <h5>${escapeHtml(event.name)}</h5>
-                            <p class="sanatan-card-description">${escapeHtml(event.short_description || '')}</p>
+
+                            <p class="sanatan-card-description">
+                                ${escapeHtml(event.short_description || '')}
+                            </p>
+
                             <div class="sanatan-meta">
+
                                 ${duration}
-                                <p><i class="far fa-user me-1"></i> Created by: ${escapeHtml(event.creator_name || 'N/A')}</p>
+
+                                <p>
+                                    <i class="far fa-user me-1"></i>
+                                    Created by:
+                                    ${escapeHtml(event.creator_name || 'N/A')}
+                                </p>
+
                                 ${renderLanguages(event.languages)}
+
                             </div>
-                            <div class="sanatan-price">₹${formatPrice(event.price)}</div>
-                            <a href="${escapeHtml(detailUrl)}" class="sanatan-view-btn">View Details</a>
+
+                            <div class="sanatan-price">
+                                ₹${formatPrice(event.price)}
+                            </div>
+
+                            <div class="d-flex gap-2 mt-auto">
+
+                                <a
+                                    href="${escapeHtml(buyUrl)}"
+                                    class="sanatan-view-btn flex-fill text-center"
+                                >
+                                    <i class="fas fa-shopping-cart me-1"></i>
+                                    Add to Cart
+                                </a>
+
+                                <a
+                                    href="${escapeHtml(detailUrl)}"
+                                    class="sanatan-view-btn flex-fill text-center"
+                                >
+                                    View Details
+                                </a>
+
+                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -238,34 +346,78 @@ $(document).ready(function () {
         }).join('');
     }
 
+    // Render pagination
     function renderPagination(pagination) {
         if (!pagination || pagination.last_page <= 1) {
             $('#sanatanPagination').html('');
             return;
         }
 
-        let html = '<nav aria-label="Sanatan events pagination"><ul class="pagination">';
+        let html = `
+            <nav aria-label="Sanatan events pagination">
+                <ul class="pagination">
+        `;
 
         if (pagination.current_page > 1) {
-            html += `<li class="page-item"><a class="page-link" href="#" data-page="${pagination.current_page - 1}">&laquo;</a></li>`;
+            html += `
+                <li class="page-item">
+                    <a
+                        class="page-link"
+                        href="#"
+                        data-page="${pagination.current_page - 1}"
+                    >&laquo;</a>
+                </li>
+            `;
         }
 
         for (let page = 1; page <= pagination.last_page; page++) {
-            if (page === 1 || page === pagination.last_page || Math.abs(page - pagination.current_page) <= 2) {
-                html += `<li class="page-item ${page === pagination.current_page ? 'active' : ''}"><a class="page-link" href="#" data-page="${page}">${page}</a></li>`;
-            } else if (page === pagination.current_page - 3 || page === pagination.current_page + 3) {
-                html += '<li class="page-item disabled"><span class="page-link">...</span></li>';
+            if (
+                page === 1 ||
+                page === pagination.last_page ||
+                Math.abs(page - pagination.current_page) <= 2
+            ) {
+                html += `
+                    <li class="page-item ${page === pagination.current_page ? 'active' : ''}">
+                        <a
+                            class="page-link"
+                            href="#"
+                            data-page="${page}"
+                        >${page}</a>
+                    </li>
+                `;
+            } else if (
+                page === pagination.current_page - 3 ||
+                page === pagination.current_page + 3
+            ) {
+                html += `
+                    <li class="page-item disabled">
+                        <span class="page-link">...</span>
+                    </li>
+                `;
             }
         }
 
         if (pagination.current_page < pagination.last_page) {
-            html += `<li class="page-item"><a class="page-link" href="#" data-page="${pagination.current_page + 1}">&raquo;</a></li>`;
+            html += `
+                <li class="page-item">
+                    <a
+                        class="page-link"
+                        href="#"
+                        data-page="${pagination.current_page + 1}"
+                    >&raquo;</a>
+                </li>
+            `;
         }
 
-        html += '</ul></nav>';
+        html += `
+                </ul>
+            </nav>
+        `;
+
         $('#sanatanPagination').html(html);
     }
 
+    // Load events using AJAX
     function loadEvents(page = 1) {
         const thisRequestId = ++requestId;
 
@@ -279,29 +431,49 @@ $(document).ready(function () {
             url: listingUrl,
             type: 'GET',
             dataType: 'json',
+
             data: {
                 program_type: $('#program_type').val(),
                 created_by: $('#created_by').val(),
                 page: page
             },
+
             success: function (response) {
                 if (thisRequestId !== requestId) {
                     return;
                 }
 
-                $('#sanatanCards').html(renderEvents(response.events));
+                $('#sanatanCards').html(
+                    renderEvents(response.events)
+                );
 
                 const pagination = response.pagination || {};
+
                 renderPagination(pagination);
 
-                $('#sanatanResultsCount').text(`Showing ${pagination.from || 0}–${pagination.to || 0} of ${pagination.total || 0} events`);
+                $('#sanatanResultsCount').text(
+                    `Showing ${pagination.from || 0}–${pagination.to || 0} of ${pagination.total || 0} events`
+                );
             },
+
             error: function (xhr, status) {
-                if (status !== 'abort' && thisRequestId === requestId) {
-                    $('#sanatanCards').html(`<div class="col-12"><div class="sanatan-empty"><h5>Unable to Load Events</h5><p>Please refresh the page and try again.</p></div></div>`);
+                if (
+                    status !== 'abort' &&
+                    thisRequestId === requestId
+                ) {
+                    $('#sanatanCards').html(`
+                        <div class="col-12">
+                            <div class="sanatan-empty">
+                                <h5>Unable to Load Events</h5>
+                                <p>Please refresh the page and try again.</p>
+                            </div>
+                        </div>
+                    `);
+
                     $('#sanatanPagination').html('');
                 }
             },
+
             complete: function () {
                 if (thisRequestId === requestId) {
                     $('#sanatanResults').removeClass('sanatan-loading');
@@ -313,25 +485,36 @@ $(document).ready(function () {
         currentRequest = request;
     }
 
+    // Apply filters
     $('#program_type, #created_by').on('change', function () {
         loadEvents(1);
     });
 
+    // Reset filters
     $('#resetSanatanFilters').on('click', function () {
         $('#program_type').val('').trigger('change.select2');
         $('#created_by').val('').trigger('change.select2');
+
         loadEvents(1);
     });
 
-    $(document).on('click', '#sanatanPagination a[data-page]', function (event) {
-        event.preventDefault();
+    // Pagination click
+    $(document).on(
+        'click',
+        '#sanatanPagination a[data-page]',
+        function (event) {
+            event.preventDefault();
 
-        const page = parseInt($(this).attr('data-page'), 10);
+            const page = parseInt(
+                $(this).attr('data-page'),
+                10
+            );
 
-        if (page > 0) {
-            loadEvents(page);
+            if (page > 0) {
+                loadEvents(page);
+            }
         }
-    });
+    );
 });
 </script>
 @endpush
