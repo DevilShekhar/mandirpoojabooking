@@ -1,3 +1,5 @@
+@can('all-templae-register.list')
+
 @extends('admin.layouts.app')
 
 @section('title', 'Temple Registration Management')
@@ -555,3 +557,8 @@
 </script>
 
 @endpush
+@else
+    @php
+        abort(403);
+    @endphp
+@endcan
