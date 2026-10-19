@@ -50,9 +50,30 @@ Route::get('/puja', [OurPujaController::class, 'index'])->name('frontend.puja');
 Route::post('/puja/filter', [OurPujaController::class, 'filter'])->name('frontend.puja.filter');
 Route::get('/puja/{slug}', [OurPujaController::class, 'show'])->name('frontend.puja.show');
 Route::post('/our-puja/{pujaId}/review', [OurPujaController::class, 'storeReview'])->name('our-puja.review.store');
-Route::get('/sanatanevents/type/{typeSlug}', [SanatanEventsController::class, 'type'])->name('frontend.sanatanevents.type');
-Route::get('/sanatanevents', [SanatanEventsController::class, 'index'])->name('frontend.sanatanevents');
-Route::get('/sanatanevents/{slug}', [SanatanEventsController::class, 'show'])->name('frontend.sanatanevents.show');
+Route::get('/sanatanevents/type/{typeSlug}', [
+    SanatanEventsController::class,
+    'type'
+])->name('frontend.sanatanevents.type');
+
+Route::get('/sanatanevents', [
+    SanatanEventsController::class,
+    'index'
+])->name('frontend.sanatanevents');
+
+Route::get('/sanatanevents/{slug}/buy', [
+    SanatanEventsController::class,
+    'buy'
+])->name('frontend.sanatanevents.buy');
+
+Route::get('/sanatanevents/{slug}/checkout', [
+    SanatanEventsController::class,
+    'checkout'
+])->middleware('auth')->name('frontend.sanatanevents.checkout');
+
+Route::get('/sanatanevents/{slug}', [
+    SanatanEventsController::class,
+    'show'
+])->name('frontend.sanatanevents.show');
 Route::get('/customer-registration', [CustomerRegistrationController::class, 'create'])->name('customer.register');
 Route::post('/customer-registration', [CustomerRegistrationController::class, 'store'])->name('customer.register.store');
 Route::get('/auth/google/redirect', [ CustomerRegistrationController::class,'redirectToGoogle',])->name('auth.google.redirect');

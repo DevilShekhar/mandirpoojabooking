@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Sanatan;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class SanatanEventsController extends Controller
@@ -40,36 +41,76 @@ class SanatanEventsController extends Controller
             ->orderBy('name')
             ->get(['id', 'name']);
 
-        $usersById = User::whereIn('id', $sanatans->getCollection()->pluck('created_by')->filter()->unique())
-            ->get(['id', 'name'])
-            ->keyBy('id');
+        $usersById = User::whereIn(
+            'id',
+            $sanatans->getCollection()
+                ->pluck('created_by')
+                ->filter()
+                ->unique()
+        )->get(['id', 'name'])->keyBy('id');
 
-        $sanatans->getCollection()->transform(function ($sanatan) use ($usersById) {
-            $sanatan->languages = $this->decodeLanguages($sanatan->language);
-            $sanatan->creator_name = $usersById->get($sanatan->created_by)?->name ?? 'N/A';
+        $sanatans->getCollection()->transform(
+            function ($sanatan) use ($usersById) {
+                $sanatan->languages = $this->decodeLanguages(
+                    $sanatan->language
+                );
 
-            return $sanatan;
-        });
+                $sanatan->creator_name =
+                    $usersById->get($sanatan->created_by)?->name ?? 'N/A';
+
+                return $sanatan;
+            }
+        );
 
         if ($request->ajax()) {
             return response()->json([
-                'events' => $sanatans->getCollection()->map(function ($sanatan) {
-                    return [
-                        'id' => $sanatan->id,
-                        'name' => $sanatan->name,
-                        'slug' => $sanatan->slug,
-                        'program_type' => $sanatan->program_type,
-                        'short_description' => $sanatan->short_description ?: \Illuminate\Support\Str::limit(strip_tags($sanatan->description ?? ''), 130),
-                        'image' => $sanatan->banner_image
-                            ? asset('storage/' . $sanatan->banner_image)
-                            : ($sanatan->image ? asset('storage/' . $sanatan->image) : null),
-                        'duration' => $sanatan->duration,
-                        'price' => number_format((float) $sanatan->price, 2, '.', ''),
-                        'languages' => $sanatan->languages,
-                        'creator_name' => $sanatan->creator_name,
-                        'detail_url' => route('frontend.sanatanevents.show', $sanatan->slug),
-                    ];
-                })->values(),
+                'events' => $sanatans->getCollection()->map(
+                    function ($sanatan) {
+                        return [
+                            'id' => $sanatan->id,
+                            'name' => $sanatan->name,
+                            'slug' => $sanatan->slug,
+                            'program_type' => $sanatan->program_type,
+
+                            'short_description' => $sanatan->short_description
+                                ?: Str::limit(
+                                    strip_tags($sanatan->description ?? ''),
+                                    130
+                                ),
+
+                            'image' => $sanatan->banner_image
+                                ? asset('storage/' . $sanatan->banner_image)
+                                : (
+                                    $sanatan->image
+                                        ? asset('storage/' . $sanatan->image)
+                                        : null
+                                ),
+
+                            'duration' => $sanatan->duration,
+
+                            'price' => number_format(
+                                (float) $sanatan->price,
+                                2,
+                                '.',
+                                ''
+                            ),
+
+                            'languages' => $sanatan->languages,
+                            'creator_name' => $sanatan->creator_name,
+
+                            'detail_url' => route(
+                                'frontend.sanatanevents.show',
+                                $sanatan->slug
+                            ),
+
+                            'buy_url' => route(
+                                'frontend.sanatanevents.buy',
+                                $sanatan->slug
+                            ),
+                        ];
+                    }
+                )->values(),
+
                 'pagination' => [
                     'current_page' => $sanatans->currentPage(),
                     'last_page' => $sanatans->lastPage(),
@@ -80,9 +121,32 @@ class SanatanEventsController extends Controller
             ]);
         }
 
-        return view('frontend.sanatanevents.index', compact('sanatans', 'programTypes', 'creators'));
+        return view(
+            'frontend.sanatanevents.index',
+            compact('sanatans', 'programTypes', 'creators')
+        );
     }
-     public function type(Request $request, string $typeSlug)
+
+    public function buy(string $slug)
+    {
+        $sanatan = Sanatan::where('slug', $slug)
+            ->where('status', 1)
+            ->firstOrFail();
+
+        $checkoutUrl = route(
+            'frontend.sanatanevents.checkout',
+            $sanatan->slug
+        );
+
+        if (!Auth::check()) {
+            return redirect()
+                ->guest($checkoutUrl);
+        }
+
+        return redirect()->to($checkoutUrl);
+    }
+
+    public function type(Request $request, string $typeSlug)
     {
         $programTypes = Sanatan::where('status', 1)
             ->whereNotNull('program_type')
@@ -90,9 +154,11 @@ class SanatanEventsController extends Controller
             ->distinct()
             ->pluck('program_type');
 
-        $programType = $programTypes->first(function ($type) use ($typeSlug) {
-            return Str::slug($type) === $typeSlug;
-        });
+        $programType = $programTypes->first(
+            function ($type) use ($typeSlug) {
+                return Str::slug($type) === $typeSlug;
+            }
+        );
 
         abort_if(!$programType, 404);
 
@@ -117,29 +183,40 @@ class SanatanEventsController extends Controller
 
         $usersById = User::whereIn(
             'id',
-            $sanatans->getCollection()->pluck('created_by')->filter()->unique()
+            $sanatans->getCollection()
+                ->pluck('created_by')
+                ->filter()
+                ->unique()
         )->get(['id', 'name'])->keyBy('id');
 
-        $sanatans->getCollection()->transform(function ($sanatan) use ($usersById) {
-            $sanatan->languages = $this->decodeLanguages($sanatan->language);
-            $sanatan->creator_name = $usersById->get($sanatan->created_by)?->name ?? 'N/A';
+        $sanatans->getCollection()->transform(
+            function ($sanatan) use ($usersById) {
+                $sanatan->languages = $this->decodeLanguages(
+                    $sanatan->language
+                );
 
-            return $sanatan;
-        });
+                $sanatan->creator_name =
+                    $usersById->get($sanatan->created_by)?->name ?? 'N/A';
 
-        return view('frontend.sanatanevents.type', compact(
-            'sanatans',
-            'programType',
-            'creators'
-        ));
+                return $sanatan;
+            }
+        );
+
+        return view(
+            'frontend.sanatanevents.type',
+            compact('sanatans', 'programType', 'creators')
+        );
     }
+
     public function show(string $slug)
     {
         $sanatan = Sanatan::where('slug', $slug)
             ->where('status', 1)
             ->firstOrFail();
 
-        $sanatan->languages = $this->decodeLanguages($sanatan->language);
+        $sanatan->languages = $this->decodeLanguages(
+            $sanatan->language
+        );
 
         $relatedSanatans = Sanatan::where('status', 1)
             ->where('id', '!=', $sanatan->id)
@@ -149,10 +226,15 @@ class SanatanEventsController extends Controller
             ->get();
 
         foreach ($relatedSanatans as $relatedSanatan) {
-            $relatedSanatan->languages = $this->decodeLanguages($relatedSanatan->language);
+            $relatedSanatan->languages = $this->decodeLanguages(
+                $relatedSanatan->language
+            );
         }
 
-        return view('frontend.sanatanevents.show', compact('sanatan', 'relatedSanatans'));
+        return view(
+            'frontend.sanatanevents.show',
+            compact('sanatan', 'relatedSanatans')
+        );
     }
 
     private function decodeLanguages($language): array
@@ -168,5 +250,20 @@ class SanatanEventsController extends Controller
         $decoded = json_decode($language, true);
 
         return is_array($decoded) ? $decoded : [$language];
+    }
+    public function checkout(string $slug)
+    {
+        $sanatan = Sanatan::where('slug', $slug)
+            ->where('status', 1)
+            ->firstOrFail();
+
+        $sanatan->languages = $this->decodeLanguages(
+            $sanatan->language
+        );
+
+        return view(
+            'frontend.sanatanevents.checkout',
+            compact('sanatan')
+        );
     }
 }
