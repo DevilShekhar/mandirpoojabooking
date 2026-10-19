@@ -185,6 +185,7 @@ class PermissionSeeder extends Seeder
             'puja-bookings-order.view',
             'customer-cancellled-bookings-order.view',
             'my-cancelled-order.view',
+            'all-templae-register.list',
 
         ];
         foreach ($permissions as $permission) {
