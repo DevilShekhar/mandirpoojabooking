@@ -33,7 +33,7 @@ class PaymentSanatanController extends Controller
             ->where('status', 1)
             ->firstOrFail();
 
-        if (!Auth::user()->hasRole('Customer')) {
+        if (!Auth::user() || !Auth::user()->hasRole('Customer')) {
             abort(403, 'Only customers can book events.');
         }
 
@@ -46,40 +46,82 @@ class PaymentSanatanController extends Controller
         }
 
         try {
-            $receipt = 'SE' . strtoupper(Str::random(12));
+            /*
+             * Lock the Sanatan row while checking and reserving the date.
+             * This serializes booking attempts for the same event when the
+             * database uses transactions and InnoDB.
+             */
+            $result = DB::transaction(function () use ($sanatan, $validated, $amount) {
+                $lockedSanatan = Sanatan::whereKey($sanatan->id)
+                    ->lockForUpdate()
+                    ->firstOrFail();
 
-            $order = $this->razorpay()->order->create([
-                'receipt' => $receipt,
-                'amount' => (int) round($amount * 100),
-                'currency' => 'INR',
-                'notes' => [
-                    'sanatan_id' => (string) $sanatan->id,
-                    'user_id' => (string) Auth::id(),
-                ],
-            ]);
+                $existingBooking = DB::table('sanatan_event_orders')
+                    ->where('sanatan_id', $lockedSanatan->id)
+                    ->where('event_date', $validated['event_date'])
+                    ->whereIn('booking_status', ['pending', 'confirmed'])
+                    ->exists();
 
-            $bookingId = DB::table('sanatan_event_orders')->insertGetId([
-                'sanatan_id' => $sanatan->id,
-                'user_id' => Auth::id(),
-                'created_by' => $sanatan->created_by,
-                'event_date' => $validated['event_date'],
-                'event_time' => $validated['event_time'],
-                'amount' => $amount,
-                'currency' => 'INR',
-                'razorpay_order_id' => $order['id'],
-                'payment_status' => 'pending',
-                'booking_status' => 'pending',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+                if ($existingBooking) {
+                    return ['conflict' => true];
+                }
+
+                $receipt = 'SE' . strtoupper(Str::random(12));
+
+                $order = $this->razorpay()->order->create([
+                    'receipt' => $receipt,
+                    'amount' => (int) round($amount * 100),
+                    'currency' => 'INR',
+                    'notes' => [
+                        'sanatan_id' => (string) $lockedSanatan->id,
+                        'user_id' => (string) Auth::id(),
+                        'event_date' => $validated['event_date'],
+                        'event_time' => $validated['event_time'],
+                    ],
+                ]);
+
+                $bookingId = DB::table('sanatan_event_orders')->insertGetId([
+                    'sanatan_id' => $lockedSanatan->id,
+                    'user_id' => Auth::id(),
+                    'created_by' => $lockedSanatan->created_by,
+                    'event_date' => $validated['event_date'],
+                    'event_time' => $validated['event_time'],
+                    'amount' => $amount,
+                    'currency' => 'INR',
+                    'razorpay_order_id' => $order['id'],
+                    'payment_status' => 'pending',
+                    'booking_status' => 'pending',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+
+                return [
+                    'conflict' => false,
+                    'booking_id' => $bookingId,
+                    'order_id' => $order['id'],
+                    'amount' => (int) round($amount * 100),
+                    'event_name' => $lockedSanatan->name,
+                ];
+            }, 3);
+
+            if ($result['conflict']) {
+                return response()->json([
+                    'message' => 'This Katha is already booked for the selected date. Please select another date.',
+                    'errors' => [
+                        'event_date' => [
+                            'This Katha is already booked for the selected date.',
+                        ],
+                    ],
+                ], 422);
+            }
 
             return response()->json([
-                'booking_id' => $bookingId,
+                'booking_id' => $result['booking_id'],
                 'key' => config('services.razorpay.key'),
-                'order_id' => $order['id'],
-                'amount' => (int) round($amount * 100),
+                'order_id' => $result['order_id'],
+                'amount' => $result['amount'],
                 'currency' => 'INR',
-                'event_name' => $sanatan->name,
+                'event_name' => $result['event_name'],
                 'customer_name' => Auth::user()->name,
                 'customer_email' => Auth::user()->email,
             ]);
@@ -87,6 +129,7 @@ class PaymentSanatanController extends Controller
             Log::error('Sanatan Razorpay order creation failed.', [
                 'user_id' => Auth::id(),
                 'sanatan_id' => $sanatan->id,
+                'event_date' => $validated['event_date'],
                 'error' => $e->getMessage(),
             ]);
 
@@ -115,7 +158,10 @@ class PaymentSanatanController extends Controller
             ], 404);
         }
 
-        if ($booking->payment_status === 'paid') {
+        if (
+            $booking->payment_status === 'paid' &&
+            $booking->booking_status === 'confirmed'
+        ) {
             return response()->json([
                 'message' => 'This booking is already paid.',
                 'redirect_url' => route(
@@ -203,15 +249,32 @@ class PaymentSanatanController extends Controller
                     return;
                 }
 
+                /*
+                 * The date is reserved when the pending booking row is created.
+                 * Do not confirm if another active booking already occupies it.
+                 */
+                $conflict = DB::table('sanatan_event_orders')
+                    ->where('sanatan_id', $currentBooking->sanatan_id)
+                    ->where('event_date', $currentBooking->event_date)
+                    ->where('id', '!=', $currentBooking->id)
+                    ->whereIn('booking_status', ['pending', 'confirmed'])
+                    ->exists();
+
+                if ($conflict) {
+                    throw new \RuntimeException(
+                        'The selected Katha date is already occupied by another booking.'
+                    );
+                }
+
                 DB::table('sanatan_event_orders')
-                    ->where('id', $booking->id)
+                    ->where('id', $currentBooking->id)
                     ->update([
                         'razorpay_payment_id' => $validated['razorpay_payment_id'],
                         'payment_status' => 'paid',
                         'booking_status' => 'confirmed',
                         'updated_at' => now(),
                     ]);
-            });
+            }, 3);
 
             return response()->json([
                 'message' => 'Payment verified and booking confirmed.',
@@ -269,7 +332,6 @@ class PaymentSanatanController extends Controller
     public function bookingFailed(Request $request)
     {
         $bookingId = $request->query('booking_id');
-
         $booking = null;
 
         if ($bookingId) {
