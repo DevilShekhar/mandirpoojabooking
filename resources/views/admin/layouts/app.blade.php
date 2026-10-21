@@ -515,6 +515,12 @@
                                 </a>
                             </li>
                         @endcan
+                        <li class="{{ request()->routeIs('customer.sanatan-event-bookings.*') ? 'active' : '' }}">
+                            <a href="{{ route('customer.sanatan-event-bookings.index') }}" class="nav-link">
+                                <i data-feather="clipboard"></i>
+                                <span>Event Bookings</span>
+                            </a>
+                        </li>
                         @can('puja-bookings-order.view')
                             <li class="dropdown {{ request()->routeIs('booking-puja-order.*') ? 'active' : '' }}">
                                 <a href="#" class="menu-toggle nav-link has-dropdown">
