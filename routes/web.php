@@ -41,8 +41,7 @@ use App\Http\Controllers\Admin\TempleRegistrationListController;
 use App\Http\Controllers\Frontend\CheckoutController;
 use App\Http\Controllers\Frontend\RazorpayPaymentController;
 use App\Http\Controllers\Admin\CustomerBookingCancellationController;
-
-
+use App\Http\Controllers\Admin\SanatanEventBookingController;
 
 Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
 Route::get('our-temples', [OurTemplesContoller::class, 'index'])->name('frontend.our-temples');
@@ -58,10 +57,9 @@ Route::get('/sanatanevents/{slug}/checkout', [SanatanEventsController::class,'ch
 Route::post('/sanatanevents/{slug}/payment/order', [PaymentSanatanController::class,'createOrder'])->middleware('auth')->name('frontend.sanatanevents.payment.order');
 Route::post('/sanatanevents/payment/verify', [PaymentSanatanController::class,'verifyPayment'])->middleware('auth')->name('frontend.sanatanevents.payment.verify');
 Route::get('/sanatanevents/booking/success', [PaymentSanatanController::class,'bookingSuccess'])->middleware('auth')->name('frontend.sanatanevents.booking.success');
- Route::get('/sanatanevents/booking/failed', [
-        PaymentSanatanController::class,
-        'bookingFailed'
-    ])->name('frontend.sanatanevents.booking.failed');
+ Route::get('/sanatanevents/booking/failed', [PaymentSanatanController::class,'bookingFailed'])->name('frontend.sanatanevents.booking.failed');
+ Route::get('/sanatan-event-bookings', [SanatanEventBookingController::class, 'index'])->name('customer.sanatan-event-bookings.index');
+  Route::get('/sanatan-event-bookings/{id}', [SanatanEventBookingController::class, 'show'])->whereNumber('id')->name('customer.sanatan-event-bookings.show');
 Route::get('/sanatanevents/{slug}', [SanatanEventsController::class,'show'])->name('frontend.sanatanevents.show');
 Route::get('/customer-registration', [CustomerRegistrationController::class, 'create'])->name('customer.register');
 Route::post('/customer-registration', [CustomerRegistrationController::class, 'store'])->name('customer.register.store');
