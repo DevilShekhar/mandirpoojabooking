@@ -34,6 +34,7 @@ use App\Http\Controllers\Frontend\OurTemplesContoller;
 use App\Http\Controllers\Frontend\OurPujaController;
 use App\Http\Controllers\Admin\SanatanController;
 use App\Http\Controllers\Frontend\SanatanEventsController;
+use App\Http\Controllers\Frontend\PaymentSanatanController;
 use App\Http\Controllers\Auth\CustomerRegistrationController;
 use App\Http\Controllers\Frontend\TempleRegistrationController;
 use App\Http\Controllers\Admin\TempleRegistrationListController;
@@ -50,30 +51,18 @@ Route::get('/puja', [OurPujaController::class, 'index'])->name('frontend.puja');
 Route::post('/puja/filter', [OurPujaController::class, 'filter'])->name('frontend.puja.filter');
 Route::get('/puja/{slug}', [OurPujaController::class, 'show'])->name('frontend.puja.show');
 Route::post('/our-puja/{pujaId}/review', [OurPujaController::class, 'storeReview'])->name('our-puja.review.store');
-Route::get('/sanatanevents/type/{typeSlug}', [
-    SanatanEventsController::class,
-    'type'
-])->name('frontend.sanatanevents.type');
-
-Route::get('/sanatanevents', [
-    SanatanEventsController::class,
-    'index'
-])->name('frontend.sanatanevents');
-
-Route::get('/sanatanevents/{slug}/buy', [
-    SanatanEventsController::class,
-    'buy'
-])->name('frontend.sanatanevents.buy');
-
-Route::get('/sanatanevents/{slug}/checkout', [
-    SanatanEventsController::class,
-    'checkout'
-])->middleware('auth')->name('frontend.sanatanevents.checkout');
-
-Route::get('/sanatanevents/{slug}', [
-    SanatanEventsController::class,
-    'show'
-])->name('frontend.sanatanevents.show');
+Route::get('/sanatanevents/type/{typeSlug}', [SanatanEventsController::class,'type'])->name('frontend.sanatanevents.type');
+Route::get('/sanatanevents', [SanatanEventsController::class,'index'])->name('frontend.sanatanevents');
+Route::get('/sanatanevents/{slug}/buy', [SanatanEventsController::class,'buy'])->name('frontend.sanatanevents.buy');
+Route::get('/sanatanevents/{slug}/checkout', [SanatanEventsController::class,'checkout'])->middleware('auth')->name('frontend.sanatanevents.checkout');
+Route::post('/sanatanevents/{slug}/payment/order', [PaymentSanatanController::class,'createOrder'])->middleware('auth')->name('frontend.sanatanevents.payment.order');
+Route::post('/sanatanevents/payment/verify', [PaymentSanatanController::class,'verifyPayment'])->middleware('auth')->name('frontend.sanatanevents.payment.verify');
+Route::get('/sanatanevents/booking/success', [PaymentSanatanController::class,'bookingSuccess'])->middleware('auth')->name('frontend.sanatanevents.booking.success');
+ Route::get('/sanatanevents/booking/failed', [
+        PaymentSanatanController::class,
+        'bookingFailed'
+    ])->name('frontend.sanatanevents.booking.failed');
+Route::get('/sanatanevents/{slug}', [SanatanEventsController::class,'show'])->name('frontend.sanatanevents.show');
 Route::get('/customer-registration', [CustomerRegistrationController::class, 'create'])->name('customer.register');
 Route::post('/customer-registration', [CustomerRegistrationController::class, 'store'])->name('customer.register.store');
 Route::get('/auth/google/redirect', [ CustomerRegistrationController::class,'redirectToGoogle',])->name('auth.google.redirect');

@@ -5,13 +5,14 @@
 $user = auth()->user();
 $eventName = $sanatan->name ?? 'Sanatan Event';
 $price = (float) ($sanatan->price ?? 0);
-$languages = $languages ?? [];
+$languages = $sanatan->languages ?? ($languages ?? []);
 $image = $sanatan->image ?? null;
 $imageUrl = $image
 ? (\Illuminate\Support\Str::startsWith($image, ['http://', 'https://'])
 ? $image
 : asset('storage/' . ltrim($image, '/')))
 : null;
+$creatorNames = $creatorNames ?? [];
 $creatorName = $creatorNames[$sanatan->created_by] ?? 'Sanatan Team';
 @endphp
 <style>
@@ -398,7 +399,7 @@ $creatorName = $creatorNames[$sanatan->created_by] ?? 'Sanatan Team';
     font-size: 14px;
     font-weight: 850;
     cursor: pointer;
-    transition: background .2s, transform .2s;
+    transition: *background* .2s, transform .2s;
 }
 .se-primary-btn:hover {
     background: var(--se-primary-dark);
@@ -613,9 +614,15 @@ $creatorName = $creatorNames[$sanatan->created_by] ?? 'Sanatan Team';
                             <span>Event price</span>
                             <strong>₹{{ number_format($price, 2) }}</strong>
                         </div>
-                        <div class="se-price-row">
-                            <span>Quantity</span>
-                            <strong>1</strong>
+                        <div class="mb-3">
+                            <label for="event_date" class="se-field-label">Select event date</label>
+                            <input type="date" id="event_date" name="event_date"
+                                class="form-control" min="{{ now()->toDateString() }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="event_time" class="se-field-label">Select event time</label>
+                            <input type="time" id="event_time" name="event_time"
+                                class="form-control" required>
                         </div>
                         <div class="se-total">
                             <span class="se-total-label">Total payable</span>
@@ -632,4 +639,110 @@ $creatorName = $creatorNames[$sanatan->created_by] ?? 'Sanatan Team';
         </div>
     </div>
 </section>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const button = document.getElementById('confirm-booking-btn');
+    const dateInput = document.getElementById('event_date');
+    const timeInput = document.getElementById('event_time');
+    if (!button || !dateInput || !timeInput) return;
+    const csrfToken = @json(csrf_token());
+    const orderUrl = @json(route('frontend.sanatanevents.payment.order', $sanatan->slug));
+    const verifyUrl = @json(route('frontend.sanatanevents.payment.verify'));
+    function resetButton() {
+        button.disabled = false;
+        button.innerHTML = 'Confirm booking <i class="fas fa-arrow-right"></i>';
+    }
+    button.addEventListener('click', async function () {
+        if (!dateInput.value || !timeInput.value) {
+            alert('Please select the event date and time.');
+            return;
+        }
+        if (dateInput.value < dateInput.min) {
+            alert('Please select a valid event date.');
+            return;
+        }
+        if (typeof Razorpay === 'undefined') {
+            alert('Payment checkout could not load. Please refresh and try again.');
+            return;
+        }
+        button.disabled = true;
+        button.innerHTML = 'Preparing payment...';
+        try {
+            const response = await fetch(orderUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({
+                    event_date: dateInput.value,
+                    event_time: timeInput.value
+                })
+            });
+            const order = await response.json();
+            if (!response.ok) {
+                const validationErrors = Object.values(order.errors || {}).flat().join('\n');
+                throw new Error(order.message || validationErrors || 'Unable to create payment order.');
+            }
+            const options = {
+                key: order.key,
+                amount: order.amount,
+                currency: order.currency,
+                name: 'Sanatan Events',
+                description: order.event_name,
+                order_id: order.order_id,
+                prefill: {
+                    name: order.customer_name || '',
+                    email: order.customer_email || ''
+                },
+                theme: { color: '#5b45e0' },
+                handler: async function (paymentResponse) {
+                    button.innerHTML = 'Verifying payment...';
+                    try {
+                        const verifyResponse = await fetch(verifyUrl, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': csrfToken
+                            },
+                            body: JSON.stringify(paymentResponse)
+                        });
+                        const result = await verifyResponse.json();
+                        if (result.redirect_url) {
+                            window.location.href = result.redirect_url;
+                            return;
+                        }
+                        if (!verifyResponse.ok) {
+                            throw new Error(result.message || 'Payment verification failed.');
+                        }
+                        throw new Error(result.message || 'Unexpected payment response.');
+                    } catch (error) {
+                        alert(error.message || 'Payment verification failed. If money was deducted, contact support.');
+                        resetButton();
+                    }
+                },
+                modal: {
+                    ondismiss: resetButton
+                }
+            };
+            const razorpay = new Razorpay(options);
+            razorpay.on('payment.failed', function (paymentError) {
+                alert(
+                    paymentError.error && paymentError.error.description
+                        ? paymentError.error.description
+                        : 'Payment failed. Please try again.'
+                );
+                resetButton();
+            });
+            razorpay.open();
+        } catch (error) {
+            alert(error.message || 'Unable to start payment.');
+            resetButton();
+        }
+    });
+});
+</script>
 @endsection
