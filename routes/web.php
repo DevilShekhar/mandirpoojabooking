@@ -60,6 +60,7 @@ Route::get('/sanatanevents/booking/success', [PaymentSanatanController::class,'b
  Route::get('/sanatanevents/booking/failed', [PaymentSanatanController::class,'bookingFailed'])->name('frontend.sanatanevents.booking.failed');
  Route::get('/sanatan-event-bookings', [SanatanEventBookingController::class, 'index'])->name('customer.sanatan-event-bookings.index');
   Route::get('/sanatan-event-bookings/{id}', [SanatanEventBookingController::class, 'show'])->whereNumber('id')->name('customer.sanatan-event-bookings.show');
+  Route::post('/sanatan-event-bookings/{id}/cancel', [SanatanEventBookingController::class, 'cancel'])->whereNumber('id')->name('customer.sanatan-event-bookings.cancel');
 Route::get('/sanatanevents/{slug}', [SanatanEventsController::class,'show'])->name('frontend.sanatanevents.show');
 Route::get('/customer-registration', [CustomerRegistrationController::class, 'create'])->name('customer.register');
 Route::post('/customer-registration', [CustomerRegistrationController::class, 'store'])->name('customer.register.store');
