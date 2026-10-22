@@ -13,7 +13,7 @@ class SanatanController extends Controller
 {
     public function index()
     {
-        $sanatans = Sanatan::latest()->paginate(10);
+        $sanatans = Sanatan::where('created_by', Auth::id())->latest()->paginate(10);
         return view('admin.sanatans.index', compact('sanatans'));
     }
 
