@@ -272,18 +272,22 @@
                                 </a>
                             </li>
                         @endcan
+                        @can('puja-review-rating')
                         <li class="{{ request()->routeIs('admin.puja-reviews.*') ? 'active' : '' }}">
                             <a href="{{ route('admin.puja-reviews.index') }}" class="nav-link">
                                 <i data-feather="star"></i>
                                 <span>Reviews & Ratings</span>
                             </a>
                         </li>
+                        @endcan
+                        @can('santan-event-view')
                         <li class="{{ request()->routeIs('admin.sanatan-events.*') ? 'active' : '' }}">
                             <a href="{{ route('admin.sanatan-events.index') }}" class="nav-link">
                                 <i data-feather="calendar"></i>
                                 <span>Sanatan Events</span>
                             </a>
                         </li>
+                        @endcan
                         @can('all-templae-register.list')
                         <li class="{{ request()->routeIs('all-templae-register*') ? 'active' : '' }}">
                             <a href="{{ route('all-templae-register') }}" class="nav-link">
@@ -515,12 +519,22 @@
                                 </a>
                             </li>
                         @endcan
-                        <li class="{{ request()->routeIs('customer.sanatan-event-bookings.*') ? 'active' : '' }}">
-                            <a href="{{ route('customer.sanatan-event-bookings.index') }}" class="nav-link">
-                                <i data-feather="clipboard"></i>
-                                <span>Event Bookings</span>
-                            </a>
-                        </li>
+                        @can('view-event-bookings')
+                            <li class="{{ request()->routeIs('customer.sanatan-event-bookings.*') ? 'active' : '' }}">
+                                <a href="{{ route('customer.sanatan-event-bookings.index') }}" class="nav-link">
+                                    <i data-feather="clipboard"></i>
+                                    <span>Event Bookings</span>
+                                </a>
+                            </li>
+                        @endcan
+                        @can('view-event-calendar')
+                            <li class="{{ request()->routeIs('admin.sanatan-events-calendar.*') ? 'active' : '' }}">
+                                <a href="{{ route('admin.sanatan-events-calendar.index') }}" class="nav-link">
+                                    <i data-feather="calendar"></i>
+                                    <span>Event Calendar</span>
+                                </a>
+                            </li>
+                        @endcan
                         @can('puja-bookings-order.view')
                             <li class="dropdown {{ request()->routeIs('booking-puja-order.*') ? 'active' : '' }}">
                                 <a href="#" class="menu-toggle nav-link has-dropdown">

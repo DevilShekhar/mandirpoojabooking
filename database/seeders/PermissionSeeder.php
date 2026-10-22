@@ -186,6 +186,10 @@ class PermissionSeeder extends Seeder
             'customer-cancellled-bookings-order.view',
             'my-cancelled-order.view',
             'all-templae-register.list',
+            'view-event-bookings',
+            'view-event-calendar',
+            'puja-review-rating',
+            'santan-event-view'
 
         ];
         foreach ($permissions as $permission) {
