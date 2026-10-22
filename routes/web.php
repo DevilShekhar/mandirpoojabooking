@@ -43,6 +43,8 @@ use App\Http\Controllers\Frontend\RazorpayPaymentController;
 use App\Http\Controllers\Admin\CustomerBookingCancellationController;
 use App\Http\Controllers\Admin\SanatanEventBookingController;
 use App\Http\Controllers\Admin\SanatanEventCalendarController;
+use App\Http\Controllers\Frontend\EventCreatorRegistrationController;
+
 
 Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
 Route::get('our-temples', [OurTemplesContoller::class, 'index'])->name('frontend.our-temples');
@@ -73,6 +75,8 @@ Route::post('/temple-register', [TempleRegistrationController::class, 'store'])-
 Route::get('/temple-register/get-states/{country}', [TempleRegistrationController::class,'getStates',])->name('temple.register.states');
 Route::get('/temple-register/get-districts/{state}', [TempleRegistrationController::class,'getDistricts',])->name('temple.register.districts');
 Route::get('/temple-register/get-cities/{district}', [TempleRegistrationController::class,'getCities',])->name('temple.register.cities');
+Route::get('/event-creator/register', [EventCreatorRegistrationController::class, 'create'])->name('event-creator.register');
+Route::post('/event-creator/register', [EventCreatorRegistrationController::class, 'store'])->name('event-creator.register.store');
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
