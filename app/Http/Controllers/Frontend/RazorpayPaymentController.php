@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Mail\PujaBookingCustomerMail;
+use App\Mail\PujaBookingPanditMail;
+use App\Models\Puja;
 use App\Models\PujaBookingPayment;
 use App\Models\PujaPackage;
 use App\Models\User;
@@ -10,6 +13,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Razorpay\Api\Api;
 use Throwable;
@@ -338,6 +342,134 @@ class RazorpayPaymentController extends Controller
                 throw new \RuntimeException(
                     'Booking was not linked to the payment record.'
                 );
+            }
+            try {
+                $claimed = DB::table('puja_booking_payments')
+                    ->where('id', $bookingPayment->id)
+                    ->where('status', 'paid')
+                    ->whereNotNull('puja_booking_id')
+                    ->whereNull('emails_sent_at')
+                    ->update([
+                        'emails_sent_at' => now(),
+                    ]);
+
+                if ($claimed === 1) {
+                    $booking = DB::table('puja_bookings')
+                        ->where('id', $bookingPayment->puja_booking_id)
+                        ->first();
+
+                    if (!$booking) {
+                        throw new \RuntimeException(
+                            'Booking not found while preparing email notifications.'
+                        );
+                    }
+
+                    $customer = User::find($booking->user_id);
+                    $pandit = $booking->pandit_id
+                        ? User::find($booking->pandit_id)
+                        : null;
+
+                    // Load the puja and package details required by both emails.
+                    $puja = Puja::find($booking->puja_id);
+                    $package = PujaPackage::with('features')
+                        ->find($booking->puja_package_id);
+
+                    // Convert package features into a simple array for the Blade email.
+                    // The fallback field names help accommodate common PackageFeature schemas.
+                    $packageFeatures = $package
+                        ? $package->features->map(function ($feature) {
+                            $name = $feature->getAttribute('name')
+                                ?? $feature->getAttribute('title')
+                                ?? $feature->getAttribute('feature_name')
+                                ?? $feature->getAttribute('feature')
+                                ?? 'Feature';
+
+                            $description = $feature->getAttribute('description')
+                                ?? $feature->getAttribute('details')
+                                ?? null;
+
+                            return [
+                                'name' => $name,
+                                'description' => $description,
+                            ];
+                        })->values()->toArray()
+                        : [];
+
+                    $details = [
+                        // Booking and customer details
+                        'booking_number' => $booking->booking_number,
+                        'customer_name' => $booking->customer_name,
+                        'customer_email' => $booking->customer_email,
+                        'customer_mobile' => $booking->customer_mobile,
+                        'booking_date' => $booking->schedule_date,
+                        'booking_time' => $booking->schedule_time,
+                        'amount' => (float) $booking->total_amount,
+                        'payment_id' => $validated['razorpay_payment_id'],
+
+                        // Puja details
+                        'puja_name' => $puja?->name ?? 'Puja',
+                        'puja_description' => $puja?->description,
+                        'puja_benefits' => $puja?->benefits,
+                        'ritual_details' => $puja?->ritual_details,
+                        'puja_samagri_details' => $puja?->samagri_details,
+                        'puja_duration' => $puja?->duration,
+
+                        // Package details
+                        'package_name' => $booking->package_name
+                            ?? $package?->name
+                            ?? 'Package',
+                        'package_short_description' => $package?->short_description,
+                        'package_description' => $package?->description,
+                        'person_count' => $booking->person_count
+                            ?? $package?->person_count,
+                        'package_price' => $package?->price,
+                        'discount_price' => $package?->discount_price,
+                        'includes_sankalp' => (bool) ($package?->includes_sankalp ?? false),
+                        'includes_prasad' => (bool) ($package?->includes_prasad ?? false),
+                        'includes_video' => (bool) ($package?->includes_video ?? false),
+                        'includes_certificate' => (bool) ($package?->includes_certificate ?? false),
+                        'package_samagri' => $package?->puja_samagri ?? [],
+                        'package_features' => $packageFeatures,
+                    ];
+
+                    // Send the customer confirmation email.
+                    if ($customer && filled($customer->email)) {
+                        Mail::to($customer->email)->send(
+                            new PujaBookingCustomerMail($details)
+                        );
+                    } else {
+                        Log::warning(
+                            'Customer booking email skipped: customer email is missing.',
+                            ['booking_id' => $booking->id]
+                        );
+                    }
+
+                    // Send a separate notification to the assigned pandit.
+                    if ($pandit && filled($pandit->email)) {
+                        Mail::to($pandit->email)->send(
+                            new PujaBookingPanditMail(array_merge(
+                                $details,
+                                ['pandit_name' => $pandit->name]
+                            ))
+                        );
+                    } else {
+                        Log::warning(
+                            'Pandit booking email skipped: no assigned pandit or pandit email.',
+                            [
+                                'booking_id' => $booking->id,
+                                'pandit_id' => $booking->pandit_id,
+                            ]
+                        );
+                    }
+                }
+            } catch (Throwable $mailException) {
+                // Do not turn a verified, paid booking into a failed payment
+                // response merely because email delivery failed.
+                Log::error('Puja booking email notification failed.', [
+                    'payment_record_id' => $bookingPayment->id,
+                    'booking_id' => $bookingPayment->puja_booking_id,
+                    'exception' => $mailException->getMessage(),
+                ]);
             }
             return response()->json([
                 'success' => true,
