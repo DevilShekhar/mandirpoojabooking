@@ -12,32 +12,46 @@
                             </div>
                             <form action="{{ route('pujas.store') }}" method="POST" enctype="multipart/form-data">
                                 @csrf
+                                @if(session('Success'))
+                                    <div class="alert alert-success alert-dismissible fade show m-3" role="alert">
+                                        {{ session('Success') }}
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                    </div>
+                                @endif
+                                @if(session('Error'))
+                                    <div class="alert alert-danger alert-dismissible fade show m-3" role="alert">
+                                        <strong>Warning:</strong> {{ session('Error') }}
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                    </div>
+                                @endif
+                                @if($errors->any())
+                                    <div class="alert alert-danger m-3" role="alert">
+                                        <strong>Please correct the following errors:</strong>
+                                        <ul class="mb-0 mt-2">
+                                            @foreach($errors->all() as $error)
+                                                <li>{{ $error }}</li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                @endif
                                 <div class="card-body">
                                     <div id="wizard_horizontal">
                                         <h2>Basic Information</h2>
                                         <section>
                                             <div class="row">
                                                 <div class="form-group col-md-4">
-                                                    <label>
-                                                        Temple
-                                                        <span class="text-danger">*</span>
-                                                    </label>
-                                                    <select name="temple_id"
-                                                        class="form-control @error('temple_id') is-invalid @enderror">
-                                                        <option value="">
-                                                            Select Temple
-                                                        </option>
+                                                    <label>Temple <span class="text-danger">*</span></label>
+                                                    <select name="temple_id" class="form-control @error('temple_id') is-invalid @enderror">
+                                                        <option value="">Select Temple</option>
                                                         @foreach($temples as $temple)
-                                                        <option value="{{ $temple->id }}"
-                                                            {{ old('temple_id') == $temple->id ? 'selected' : '' }}>
-                                                            {{ $temple->name }}
-                                                        </option>
+                                                            <option value="{{ $temple->id }}"
+                                                                {{ old('temple_id', $selectedTempleId ?? '') == $temple->id ? 'selected' : '' }}>
+                                                                {{ $temple->name }}
+                                                            </option>
                                                         @endforeach
                                                     </select>
                                                     @error('temple_id')
-                                                    <div class="invalid-feedback">
-                                                        {{ $message }}
-                                                    </div>
+                                                        <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
                                                 </div>
                                                 <div class="form-group col-md-4">
@@ -302,6 +316,9 @@
                                                             <input type="hidden"
                                                                 name="packages[{{ $index }}][includes_certificate]"
                                                                 value="{{ $package['includes_certificate'] ?? 0 }}">
+                                                            @foreach(($package['puja_samagri'] ?? []) as $item)
+                                                                <input type="hidden" name="packages[{{ $index }}][puja_samagri][]" value="{{ $item }}">
+                                                            @endforeach
                                                             <input type="hidden" name="packages[{{ $index }}][is_featured]"
                                                                 value="{{ $package['is_featured'] ?? 0 }}">
                                                             <div class="package-card-header">
@@ -396,6 +413,14 @@
                                                                     </div>
                                                                     @endif
                                                                 </div>
+                                                                @if(!empty($package['puja_samagri']))
+                                                                    <div class="mt-3">
+                                                                        <strong>Essential Puja Samagri:</strong>
+                                                                        @foreach($package['puja_samagri'] as $item)
+                                                                            <span class="badge badge-light border">{{ $item }}</span>
+                                                                        @endforeach
+                                                                    </div>
+                                                                @endif
                                                             </div>
                                                         </div>
                                                         @endforeach
@@ -708,6 +733,21 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="col-md-12 mt-3">
+                                <label>Essential Puja Samagri</label>
+                                <small class="form-text text-muted mb-2">Enter each required item and click Add Item. You can add different items for every package.</small>
+                                <div id="samagriInputContainer">
+                                    <div class="input-group mb-2 samagri-input-row">
+                                        <input type="text" class="form-control samagri-name-input" placeholder="Enter item name (e.g. Sadi, Khan, Nariyal)">
+                                        <div class="input-group-append">
+                                            <button type="button" class="btn btn-outline-danger remove-samagri-item" title="Remove item"><i class="fas fa-times"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-outline-primary" id="addSamagriItem">
+                                    <i class="fas fa-plus"></i> Add Item
+                                </button>
+                            </div>
                             <div class="col-md-12 mt-4">
                                 <div class="custom-control custom-checkbox">
                                     <input type="checkbox" class="custom-control-input" id="package_is_featured" value="1">
@@ -784,6 +824,37 @@
             $(document).ready(function() {
                 let packageIndex = @json(count(old('packages', [])));
 
+                function escapeHtml(value) {
+                    return String(value ?? '').replace(/[&<>"']/g, function(character) {
+                        return {
+                            '&': '&amp;',
+                            '<': '&lt;',
+                            '>': '&gt;',
+                            '"': '&quot;',
+                            "'": '&#039;'
+                        }[character];
+                    });
+                }
+
+                $('#addSamagriItem').on('click', function() {
+                    $('#samagriInputContainer').append(`
+                        <div class="input-group mb-2 samagri-input-row">
+                            <input type="text" class="form-control samagri-name-input" placeholder="Enter item name">
+                            <div class="input-group-append">
+                                <button type="button" class="btn btn-outline-danger remove-samagri-item" title="Remove item"><i class="fas fa-times"></i></button>
+                            </div>
+                        </div>
+                    `);
+                });
+
+                $(document).on('click', '.remove-samagri-item', function() {
+                    if ($('#samagriInputContainer .samagri-input-row').length > 1) {
+                        $(this).closest('.samagri-input-row').remove();
+                    } else {
+                        $(this).closest('.samagri-input-row').find('.samagri-name-input').val('');
+                    }
+                });
+
                 $(document).on(
                     'click',
                     '#addPackageBtn, #addFirstPackageBtn',
@@ -813,6 +884,14 @@
                     $('#package_prasad').prop('checked', false);
                     $('#package_video').prop('checked', false);
                     $('#package_certificate').prop('checked', false);
+                    $('#samagriInputContainer').html(`
+                        <div class="input-group mb-2 samagri-input-row">
+                            <input type="text" class="form-control samagri-name-input" placeholder="Enter item name (e.g. Sadi, Khan, Nariyal)">
+                            <div class="input-group-append">
+                                <button type="button" class="btn btn-outline-danger remove-samagri-item" title="Remove item"><i class="fas fa-times"></i></button>
+                            </div>
+                        </div>
+                    `);
                     $('#package_is_featured').prop('checked', false);
                     $('#package_image').val('');
                 }
@@ -829,6 +908,15 @@
                     let prasad = $('#package_prasad').is(':checked') ? 1 : 0;
                     let video = $('#package_video').is(':checked') ? 1 : 0;
                     let certificate = $('#package_certificate').is(':checked') ? 1 : 0;
+                    let pujaSamagri = $('.samagri-name-input').map(function() {
+                        return $.trim($(this).val());
+                    }).get().filter(function(item) {
+                        return item !== '';
+                    }).filter(function(item, index, items) {
+                        return items.findIndex(function(value) {
+                            return value.toLowerCase() === item.toLowerCase();
+                        }) === index;
+                    });
                     let featured = $('#package_is_featured').is(':checked') ? 1 : 0;
                     let imageInput = document.getElementById('package_image');
                     let packageFile = imageInput && imageInput.files.length
@@ -875,7 +963,7 @@
                             <div class="d-flex justify-content-between align-items-start">
                                 <div>
                                     <h6 class="mb-1">
-                                        ${name}
+                                        ${escapeHtml(name)}
                                     </h6>
                                     <small class="text-muted">
                                         ${personCount}
@@ -910,7 +998,7 @@
                                 ? `
                                     <div class="mt-2">
                                         <strong>Short Description:</strong>
-                                        ${shortDescription}
+                                        ${escapeHtml(shortDescription)}
                                     </div>
                                 `
                                 : ''
@@ -937,6 +1025,11 @@
                                     : ''
                                 }
                                 ${
+                                    pujaSamagri.length
+                                    ? '<div class="mt-2"><strong>Essential Puja Samagri:</strong> ' + pujaSamagri.map(function(item) { return $('<span>').text(item).html(); }).join(', ') + '</div>'
+                                    : ''
+                                }
+                                ${
                                     featured
                                     ? '<span class="badge badge-dark mr-1">Featured</span>'
                                     : ''
@@ -955,7 +1048,7 @@
                             }
                             <input type="hidden"
                                 name="packages[${currentIndex}][name]"
-                                value="${name}">
+                                value="${escapeHtml(name)}">
                             <input type="hidden"
                                 name="packages[${currentIndex}][person_count]"
                                 value="${personCount}">
@@ -970,10 +1063,10 @@
                                 value="${sortOrder}">
                             <input type="hidden"
                                 name="packages[${currentIndex}][short_description]"
-                                value="${shortDescription}">
+                                value="${escapeHtml(shortDescription)}">
                             <input type="hidden"
                                 name="packages[${currentIndex}][description]"
-                                value="${description}">
+                                value="${escapeHtml(description)}">
                             <input type="hidden"
                                 name="packages[${currentIndex}][includes_sankalp]"
                                 value="${sankalp}">
@@ -986,6 +1079,9 @@
                             <input type="hidden"
                                 name="packages[${currentIndex}][includes_certificate]"
                                 value="${certificate}">
+                            ${pujaSamagri.map(function(item) {
+                                return `<input type="hidden" name="packages[${currentIndex}][puja_samagri][]" value="${$('<div>').text(item).html()}">`;
+                            }).join('')}
                             <input type="hidden"
                                 name="packages[${currentIndex}][is_featured]"
                                 value="${featured}">

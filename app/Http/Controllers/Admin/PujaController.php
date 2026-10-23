@@ -9,6 +9,7 @@ use App\Models\Deity;
 use App\Models\PujaCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 class PujaController extends Controller
@@ -25,11 +26,14 @@ class PujaController extends Controller
     }
     public function create()
     {
-        $temples = Temple::where('status', 1)->latest()->get();
+        $user = Auth::user();
+        $temples = Temple::where('created_by', $user->id)->where('status', 1)->latest()->get();
+        $selectedTempleId = $temples->first()?->id;
         $deities = Deity::where('status', 1)->latest()->get();
         $pujaCategories = PujaCategory::where('status', 1)->orderBy('sort_order')->get();
-        return view('admin.pujas.create', compact('temples','deities','pujaCategories'));
+        return view('admin.pujas.create', compact('temples','deities','pujaCategories','selectedTempleId'));
     }
+    
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -58,6 +62,7 @@ class PujaController extends Controller
                 'nullable',
                 'numeric',
                 'min:0',
+                'lte:packages.*.price',
             ],
             'packages.*.sort_order' => 'nullable|integer|min:0',
             'packages.*.short_description' => 'nullable|string|max:500',
@@ -66,6 +71,8 @@ class PujaController extends Controller
             'packages.*.includes_prasad' => 'nullable|boolean',
             'packages.*.includes_video' => 'nullable|boolean',
             'packages.*.includes_certificate' => 'nullable|boolean',
+            'packages.*.puja_samagri' => 'nullable|array',
+            'packages.*.puja_samagri.*' => 'required|string|max:255',
             'packages.*.is_featured' => 'nullable|boolean',
             'packages.*.package_image' => [
                 'nullable',
@@ -74,36 +81,45 @@ class PujaController extends Controller
                 'max:2048',
             ],
         ]);
+
         DB::beginTransaction();
+
         $image = null;
         $bannerImage = null;
         $uploadedPackageImages = [];
+
         try {
             $lastPuja = Puja::latest('id')->first();
+
             if ($lastPuja && $lastPuja->puja_code) {
                 $lastNumber = (int) str_replace(
                     'PUJA-',
                     '',
                     $lastPuja->puja_code
                 );
+
                 $nextNumber = $lastNumber + 1;
             } else {
                 $nextNumber = 1;
             }
+
             $pujaCode = 'PUJA-' . str_pad(
                 $nextNumber,
                 5,
                 '0',
                 STR_PAD_LEFT
             );
+
             if ($request->hasFile('image')) {
                 $image = $request->file('image')
                     ->store('puja_image', 'public');
             }
+
             if ($request->hasFile('banner_image')) {
                 $bannerImage = $request->file('banner_image')
                     ->store('puja_banner', 'public');
             }
+
             $puja = Puja::create([
                 'temple_id' => $validated['temple_id'],
                 'deity_id' => $validated['deity_id'],
@@ -120,19 +136,21 @@ class PujaController extends Controller
                 'banner_image' => $bannerImage,
                 'is_online' => $validated['is_online'],
                 'is_offline' => $validated['is_offline'],
-                'status' => array_key_exists('status', $validated)
-                    ? $validated['status']
-                    : 1,
+                'status' => $validated['status'] ?? 1,
                 'created_by' => auth()->id(),
             ]);
+
             foreach ($validated['packages'] ?? [] as $index => $package) {
                 $packageImage = null;
+
                 if ($request->hasFile("packages.$index.package_image")) {
                     $packageImage = $request
                         ->file("packages.$index.package_image")
                         ->store('puja_packages', 'public');
+
                     $uploadedPackageImages[] = $packageImage;
                 }
+
                 PujaPackage::create([
                     'puja_id' => $puja->id,
                     'name' => $package['name'],
@@ -150,11 +168,19 @@ class PujaController extends Controller
                     'includes_prasad' => !empty($package['includes_prasad']),
                     'includes_video' => !empty($package['includes_video']),
                     'includes_certificate' => !empty($package['includes_certificate']),
+                    'puja_samagri' => array_values(array_unique(array_filter(
+                        array_map(
+                            fn ($item) => trim($item),
+                            $package['puja_samagri'] ?? []
+                        ),
+                        fn ($item) => $item !== ''
+                    ))),
                     'is_featured' => !empty($package['is_featured']),
                     'sort_order' => $package['sort_order'] ?? $index,
                     'status' => 1,
                 ]);
             }
+
             foreach ($validated['faq'] ?? [] as $index => $faq) {
                 PujaFaq::create([
                     'puja_id' => $puja->id,
@@ -164,31 +190,39 @@ class PujaController extends Controller
                     'status' => 1,
                 ]);
             }
+
             DB::commit();
+
             return redirect()
                 ->route('pujas.index')
                 ->with('Success', 'Puja Created Successfully');
         } catch (\Throwable $e) {
             DB::rollBack();
+
             if ($image && Storage::disk('public')->exists($image)) {
                 Storage::disk('public')->delete($image);
             }
+
             if ($bannerImage && Storage::disk('public')->exists($bannerImage)) {
                 Storage::disk('public')->delete($bannerImage);
             }
+
             foreach ($uploadedPackageImages as $packageImage) {
                 if (Storage::disk('public')->exists($packageImage)) {
                     Storage::disk('public')->delete($packageImage);
                 }
             }
+
+            report($e);
+
             return back()
                 ->withInput()
-                ->with(
-                    'Error',
-                    'Unable to create Puja. ' . $e->getMessage()
-                );
+                ->with('Error', app()->environment('local')
+                    ? 'Unable to create Puja: ' . $e->getMessage()
+                    : 'Unable to create Puja. Please check the Laravel log for details.');
         }
     }
+
     public function edit(Puja $puja)
     {
         $user = auth()->user();
@@ -196,17 +230,24 @@ class PujaController extends Controller
             abort(403);
         }
         $puja->load([
-            'faqs' => function ($query) {
+            'faqs' => function ($query) 
+            {
                 $query->orderBy('sort_order');
             },
-            'packages' => function ($query) {
+            'packages' => function ($query) 
+            {
                 $query->orderBy('sort_order');
             },
         ]);
-        $temples = Temple::where('status', 1)->latest()->get();
+        $templesQuery = Temple::where('status', 1);
+        if (!$user->hasAnyRole(['Super Admin', 'Admin'])) 
+        {
+            $templesQuery->where('created_by', $user->id);
+        }
+        $temples = $templesQuery->latest()->get();
         $deities = Deity::where('status', 1)->latest()->get();
         $pujaCategories = PujaCategory::where('status', 1)->orderBy('sort_order')->get();
-        return view('admin.pujas.edit', compact('puja', 'temples', 'deities', 'pujaCategories'));
+        return view('admin.pujas.edit', compact('puja','temples','deities','pujaCategories'));
     }
     public function update(Request $request, Puja $puja)
     {
@@ -240,6 +281,8 @@ class PujaController extends Controller
             'packages.*.includes_prasad' => 'nullable|boolean',
             'packages.*.includes_video' => 'nullable|boolean',
             'packages.*.includes_certificate' => 'nullable|boolean',
+            'packages.*.puja_samagri' => 'nullable|array',
+            'packages.*.puja_samagri.*' => 'required|string|max:255',
             'packages.*.is_featured' => 'nullable|boolean',
             'packages.*.package_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'packages.*.existing_package_image' => 'nullable|string|max:500',
@@ -322,6 +365,13 @@ class PujaController extends Controller
                     'includes_prasad' => !empty($package['includes_prasad']),
                     'includes_video' => !empty($package['includes_video']),
                     'includes_certificate' => !empty($package['includes_certificate']),
+                    'puja_samagri' => array_values(array_unique(array_filter(
+                        array_map(
+                            fn ($item) => trim($item),
+                            $package['puja_samagri'] ?? []
+                        ),
+                        fn ($item) => $item !== ''
+                    ))),
                     'is_featured' => !empty($package['is_featured']),
                     'sort_order' => $package['sort_order'] ?? $index,
                     'status' => 1,
