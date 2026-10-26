@@ -288,6 +288,7 @@
                             </a>
                         </li>
                         @endcan
+                        
                         @can('all-templae-register.list')
                         <li class="{{ request()->routeIs('all-templae-register*') ? 'active' : '' }}">
                             <a href="{{ route('all-templae-register') }}" class="nav-link">
@@ -560,6 +561,7 @@
                                 </ul>
                             </li>
                         @endcan
+                        
                         @can('customer-cancellled-bookings-order.view')
                             <li class="{{ request()->routeIs('admin.customer-cancel-booking.*') ? 'active' : '' }}">
                                 <a class="nav-link" href="{{ route('admin.customer-cancel-booking.index') }}">
@@ -573,6 +575,14 @@
                                 <a class="nav-link" href="{{ route('customer-cancel-booking.index') }}">
                                     <i data-feather="x-circle"></i>
                                     <span>My Cancelled Orders</span>
+                                </a>
+                            </li>
+                        @endcan
+                        @can('ticket-prices.index')
+                            <li class="{{ request()->routeIs('ticket-prices.*') ? 'active' : '' }}">
+                                <a href="{{ route('ticket-prices.index') }}" class="nav-link">
+                                    <i data-feather="tag"></i>
+                                    <span>Ticket Management</span>
                                 </a>
                             </li>
                         @endcan
