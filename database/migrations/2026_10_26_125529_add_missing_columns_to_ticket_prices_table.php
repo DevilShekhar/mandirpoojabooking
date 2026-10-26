@@ -22,6 +22,7 @@ return new class extends Migration
                 $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
                 $table->boolean('status')->default(true);
                 $table->timestamps();
+
                 $table->unique(
                     ['temple_id', 'ticket_type', 'type'],
                     'ticket_prices_temple_ticket_type_unique'
@@ -45,7 +46,7 @@ return new class extends Migration
 
         if (!Schema::hasColumn('ticket_prices', 'type')) {
             Schema::table('ticket_prices', function (Blueprint $table) {
-                $table->string('type', 100);
+                $table->string('type', 100)->default('Adult');
             });
         }
 
@@ -67,12 +68,6 @@ return new class extends Migration
             });
         }
 
-        if (!Schema::hasColumn('ticket_prices', 'status')) {
-            Schema::table('ticket_prices', function (Blueprint $table) {
-                $table->boolean('status')->default(true);
-            });
-        }
-
         if (!Schema::hasColumn('ticket_prices', 'created_by')) {
             Schema::table('ticket_prices', function (Blueprint $table) {
                 $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
@@ -85,7 +80,14 @@ return new class extends Migration
             });
         }
 
-        if (!Schema::hasColumn('ticket_prices', 'created_at')) {
+        if (!Schema::hasColumn('ticket_prices', 'status')) {
+            Schema::table('ticket_prices', function (Blueprint $table) {
+                $table->boolean('status')->default(true);
+            });
+        }
+
+        if (!Schema::hasColumn('ticket_prices', 'created_at')
+            && !Schema::hasColumn('ticket_prices', 'updated_at')) {
             Schema::table('ticket_prices', function (Blueprint $table) {
                 $table->timestamps();
             });
