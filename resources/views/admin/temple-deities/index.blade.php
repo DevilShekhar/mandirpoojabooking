@@ -1,8 +1,6 @@
 @can('temple-deities.view')
 @extends('admin.layouts.app')
-
 @section('title', 'Temple Deities')
-
 @section('content')
 <section class="section">
     <div class="section-body">
@@ -17,7 +15,6 @@
                             </a>
                         </div>
                     </div>
-
                     <div class="card-body">
                         <div class="table-responsive">
                             <table class="table table-striped" id="table-1">
@@ -32,20 +29,16 @@
                                         <th>Action</th>
                                     </tr>
                                 </thead>
-
                                 <tbody>
                                     @foreach($templeDeities as $templeDeity)
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
-
                                             <td>
                                                 {{ $templeDeity->temple->name ?? '-' }}
                                             </td>
-
                                             <td>
                                                 {{ $templeDeity->deity->name ?? '-' }}
                                             </td>
-
                                             <td>
                                                 @if($templeDeity->is_primary)
                                                     <span class="badge badge-success">Yes</span>
@@ -53,11 +46,9 @@
                                                     <span class="badge badge-secondary">No</span>
                                                 @endif
                                             </td>
-
                                             <td>
                                                 {{ $templeDeity->display_order }}
                                             </td>
-
                                             <td>
                                                 @if($templeDeity->status)
                                                     <span class="badge badge-success">Active</span>
@@ -65,19 +56,16 @@
                                                     <span class="badge badge-danger">Inactive</span>
                                                 @endif
                                             </td>
-
                                             <td>
                                                 <a href="{{ route('temple-deities.edit', $templeDeity->id) }}"
                                                    class="btn btn-sm btn-primary">
                                                     <i class="fas fa-edit"></i>
                                                 </a>
-
                                                 <form action="{{ route('temple-deities.destroy', $templeDeity->id) }}"
                                                       method="POST"
                                                       class="d-inline delete-form">
                                                     @csrf
                                                     @method('DELETE')
-
                                                     <button type="submit"
                                                             class="btn btn-sm btn-danger">
                                                         <i class="fas fa-trash"></i>
@@ -96,17 +84,13 @@
     </div>
 </section>
 @endsection
-
 @push('scripts')
 <script>
 $(document).ready(function () {
     $('#table-1').DataTable();
-
     $('.delete-form').on('submit', function (e) {
         e.preventDefault();
-
         let form = this;
-
         Swal.fire({
             title: 'Are you sure?',
             text: "This temple deity will be deactivated.",

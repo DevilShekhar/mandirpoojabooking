@@ -189,7 +189,14 @@ class PermissionSeeder extends Seeder
             'view-event-bookings',
             'view-event-calendar',
             'puja-review-rating',
-            'santan-event-view'
+            'santan-event-view',
+
+            // Ticket Prices
+            'ticket-prices.view',
+            'ticket-prices.create',
+            'ticket-prices.edit',
+            'ticket-prices.index',
+            'ticket-prices.delete',
 
         ];
         foreach ($permissions as $permission) {

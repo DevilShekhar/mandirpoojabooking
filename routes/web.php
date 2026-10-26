@@ -44,7 +44,7 @@ use App\Http\Controllers\Admin\CustomerBookingCancellationController;
 use App\Http\Controllers\Admin\SanatanEventBookingController;
 use App\Http\Controllers\Admin\SanatanEventCalendarController;
 use App\Http\Controllers\Frontend\EventCreatorRegistrationController;
-
+use App\Http\Controllers\Admin\TicketPriceController;
 
 Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
 Route::get('our-temples', [OurTemplesContoller::class, 'index'])->name('frontend.our-temples');
@@ -154,6 +154,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/customer-cancel-booking/{cancellation}/approve', [CustomerBookingCancellationController::class, 'approve'])->name('customer-cancel-booking.approve');
         Route::post('/customer-cancel-booking/{cancellation}/reject', [CustomerBookingCancellationController::class, 'reject'])->name('customer-cancel-booking.reject');
     });
+    Route::resource('ticket-prices', TicketPriceController::class);
 });
 Route::middleware('auth')->prefix('payment/razorpay')->name('razorpay.')->group(function () {
     Route::post('/create-order', [RazorpayPaymentController::class, 'createOrder'])->name('create-order');
