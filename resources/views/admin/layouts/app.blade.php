@@ -585,15 +585,15 @@
                                     <span>Ticket Management</span>
                                 </a>
                             </li>
+                        @endcan   
+                        @can('temple-daily-ticket-limits.view')                     
+                        <li class="{{ request()->routeIs('temple-daily-ticket-limits.*') ? 'active' : '' }}">
+                            <a href="{{ route('temple-daily-ticket-limits.index') }}" class="nav-link">
+                                <i data-feather="calendar"></i>
+                                <span>Daily Ticket Booking Limit</span>
+                            </a>
+                        </li>
                         @endcan
-                        
-<li class="{{ request()->routeIs('temple-daily-ticket-limits.*') ? 'active' : '' }}">
-    <a href="{{ route('temple-daily-ticket-limits.index') }}" class="nav-link">
-        <i data-feather="calendar"></i>
-        <span>Daily Ticket Booking Limit</span>
-    </a>
-</li>
-
                 </aside>
             </div>
             <!-- Main Content -->
