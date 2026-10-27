@@ -1,13 +1,15 @@
+
 @extends('frontend.layouts.app')
 
 @section('title', 'My Ticket Cart')
 
 @section('content')
 <div class="container py-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
         <div>
             <h2>My Ticket Cart</h2>
-            <p class="text-muted mb-0">Review your temple ticket members.</p>
+            <p class="text-muted mb-0">Review your temple ticket members before payment.</p>
         </div>
 
         <a href="{{ route('frontend.our-temples') }}" class="btn btn-outline-secondary">
@@ -23,11 +25,23 @@
         <div class="alert alert-danger">{{ session('error') }}</div>
     @endif
 
+    @if($errors->any())
+        <div class="alert alert-danger">
+            <ul class="mb-0">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     @if($cartItems->isEmpty())
-        <div class="card shadow-sm">
+        <div class="card shadow-sm border-0">
             <div class="card-body text-center py-5">
                 <h4>Your cart is empty</h4>
-                <p class="text-muted">Choose a temple and add ticket members to continue.</p>
+                <p class="text-muted">
+                    Choose a temple and add ticket members to continue.
+                </p>
 
                 <a href="{{ route('frontend.our-temples') }}" class="btn btn-danger">
                     Browse Temples
@@ -35,16 +49,23 @@
             </div>
         </div>
     @else
+
+        <div class="alert alert-info" role="status">
+            <strong>Important:</strong>
+            Ticket availability is checked again before payment.
+            Your booking is confirmed only after payment verification succeeds.
+        </div>
+
         <div class="table-responsive">
-            <table class="table table-bordered align-middle bg-white">
+            <table class="table table-bordered table-hover align-middle bg-white">
                 <thead class="table-light">
                     <tr>
                         <th>#</th>
                         <th>Temple</th>
                         <th>Visit Date</th>
                         <th>Member</th>
-                        <th>Ticket</th>
-                        <th>Visitor Type</th>
+                        <th>Ticket Type</th>
+                        <th>Visitor Category</th>
                         <th>Age</th>
                         <th>Price</th>
                         <th>Action</th>
@@ -55,13 +76,31 @@
                     @foreach($cartItems as $item)
                         <tr>
                             <td>{{ $loop->iteration }}</td>
-                            <td>{{ $item->temple->name ?? 'N/A' }}</td>
-                            <td>{{ $item->booking_date->format('d M Y') }}</td>
+
+                            <td>
+                                {{ $item->temple->name ?? 'N/A' }}
+                            </td>
+
+                            <td>
+                                {{ \Carbon\Carbon::parse($item->booking_date)->format('d M Y') }}
+                            </td>
+
                             <td>{{ $item->member_name }}</td>
-                            <td>{{ strtoupper($item->ticket_type) }}</td>
+
+                            <td>
+                                <span class="badge {{ strtolower($item->ticket_type) === 'vip' ? 'bg-warning text-dark' : 'bg-secondary' }}">
+                                    {{ strtoupper($item->ticket_type) }}
+                                </span>
+                            </td>
+
                             <td>{{ $item->type }}</td>
+
                             <td>{{ $item->age }}</td>
-                            <td>₹{{ number_format((float) $item->price, 2) }}</td>
+
+                            <td>
+                                ₹{{ number_format((float) $item->price, 2) }}
+                            </td>
+
                             <td>
                                 <form
                                     action="{{ route('frontend.ticket-cart.remove', $item->id) }}"
@@ -80,9 +119,9 @@
                     @endforeach
                 </tbody>
 
-                <tfoot>
+                <tfoot class="table-light">
                     <tr>
-                        <th colspan="7" class="text-end">Total</th>
+                        <th colspan="7" class="text-end">Total Amount</th>
                         <th colspan="2">
                             ₹{{ number_format((float) $totalAmount, 2) }}
                         </th>
@@ -91,15 +130,34 @@
             </table>
         </div>
 
-        <div class="d-flex justify-content-end mt-4">
-            <button type="button" id="proceed-payment" class="btn btn-danger">
-                Proceed to Payment
-            </button>
+        <div class="card border-0 shadow-sm mt-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                    <div>
+                        <h5 class="mb-1">Booking Summary</h5>
+                        <p class="text-muted mb-1">
+                            Total members: {{ $cartItems->count() }}
+                        </p>
+                        <h4 class="text-danger mb-0">
+                            ₹{{ number_format((float) $totalAmount, 2) }}
+                        </h4>
+                    </div>
+
+                    <button
+                        type="button"
+                        id="proceed-payment"
+                        class="btn btn-danger btn-lg"
+                        @disabled((float) $totalAmount <= 0)
+                    >
+                        <i class="fa fa-lock me-1"></i>
+                        Proceed to Payment
+                    </button>
+                </div>
+
+                <div id="payment-message" class="mt-3" role="status" aria-live="polite"></div>
+            </div>
         </div>
 
-        <p class="text-muted text-end mt-2">
-            Complete your ticket booking securely using Razorpay.
-        </p>
     @endif
 </div>
 
@@ -107,104 +165,188 @@
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
     <script>
-        document.getElementById('proceed-payment').addEventListener('click', async function () {
-            const button = this;
-            const originalText = button.textContent;
+        document.addEventListener('DOMContentLoaded', function () {
+            const button = document.getElementById('proceed-payment');
+            const messageBox = document.getElementById('payment-message');
 
-            button.disabled = true;
-            button.textContent = 'Preparing Payment...';
+            if (!button || !messageBox) {
+                return;
+            }
 
-            try {
-                const response = await fetch(
-                    @json(route('frontend.ticket-payment.create-order')),
-                    {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json',
-                            'X-CSRF-TOKEN': @json(csrf_token())
-                        },
-                        body: JSON.stringify({})
-                    }
-                );
+            const createOrderUrl = @json(route('frontend.ticket-payment.create-order'));
+            const verifyPaymentUrl = @json(route('frontend.ticket-payment.verify'));
+            const csrfToken = @json(csrf_token());
+            const appName = @json(config('app.name'));
 
-                const data = await response.json();
+            const originalButtonHtml = button.innerHTML;
+            let paymentInProgress = false;
 
-                if (!response.ok || !data.success) {
-                    throw new Error(data.message || 'Unable to create payment order.');
-                }
+            function showMessage(message, type = 'danger') {
+                messageBox.className = 'alert alert-' + type + ' mt-3';
+                messageBox.textContent = message;
+            }
 
-                const options = {
-                    key: data.key,
-                    amount: data.amount,
-                    currency: data.currency,
-                    name: @json(config('app.name')),
-                    description: 'Temple Ticket Booking',
-                    order_id: data.order_id,
+            function clearMessage() {
+                messageBox.className = 'mt-3';
+                messageBox.textContent = '';
+            }
 
-                    handler: async function (payment) {
-                        button.textContent = 'Verifying Payment...';
+            function resetButton() {
+                paymentInProgress = false;
+                button.disabled = false;
+                button.innerHTML = originalButtonHtml;
+            }
 
-                        try {
-                            const verifyResponse = await fetch(
-                                @json(route('frontend.ticket-payment.verify')),
-                                {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                        'Accept': 'application/json',
-                                        'X-CSRF-TOKEN': @json(csrf_token())
-                                    },
-                                    body: JSON.stringify({
-                                        razorpay_order_id: payment.razorpay_order_id,
-                                        razorpay_payment_id: payment.razorpay_payment_id,
-                                        razorpay_signature: payment.razorpay_signature
-                                    })
-                                }
-                            );
-
-                            const result = await verifyResponse.json();
-
-                            if (!verifyResponse.ok || !result.success) {
-                                throw new Error(
-                                    result.message || 'Payment verification failed.'
-                                );
-                            }
-
-                            window.location.href = result.redirect_url;
-                        } catch (error) {
-                            alert(error.message);
-                            button.disabled = false;
-                            button.textContent = originalText;
-                        }
+            async function postJson(url, payload = {}) {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest'
                     },
-
-                    modal: {
-                        ondismiss: function () {
-                            button.disabled = false;
-                            button.textContent = originalText;
-                        }
-                    },
-
-                    theme: {
-                        color: '#dc3545'
-                    }
-                };
-
-                const razorpay = new Razorpay(options);
-
-                razorpay.on('payment.failed', function () {
-                    button.disabled = false;
-                    button.textContent = originalText;
-                    alert('Payment failed. Your cart has not been cleared.');
+                    body: JSON.stringify(payload)
                 });
 
-                razorpay.open();
-            } catch (error) {
-                alert(error.message);
-                button.disabled = false;
-                button.textContent = originalText;
+                let data;
+
+                try {
+                    data = await response.json();
+                } catch (error) {
+                    throw new Error('The server returned an invalid response. Please try again.');
+                }
+
+                if (!response.ok || !data.success) {
+                    const error = new Error(
+                        data.message || 'The request could not be completed.'
+                    );
+
+                    error.paymentCaptured = data.payment_captured === true;
+                    error.refundRequired = data.refund_required === true;
+
+                    throw error;
+                }
+
+                return data;
             }
+
+            button.addEventListener('click', async function () {
+                if (paymentInProgress) {
+                    return;
+                }
+
+                if (typeof Razorpay === 'undefined') {
+                    showMessage('Razorpay checkout could not load. Please refresh and try again.');
+                    return;
+                }
+
+                clearMessage();
+
+                paymentInProgress = true;
+                button.disabled = true;
+                button.textContent = 'Checking Availability...';
+
+                try {
+                    /*
+                     * The server must check daily ticket limits before
+                     * creating the Razorpay order. Never trust client totals.
+                     */
+                    const order = await postJson(createOrderUrl);
+
+                    const options = {
+                        key: order.key,
+                        amount: order.amount,
+                        currency: order.currency,
+                        name: appName,
+                        description: 'Temple Ticket Booking',
+                        order_id: order.order_id,
+
+                        handler: async function (paymentResponse) {
+                            button.disabled = true;
+                            button.textContent = 'Verifying Payment...';
+
+                            try {
+                                /*
+                                 * The server verifies the signature, fetches
+                                 * payment status and rechecks availability
+                                 * before confirming any bookings.
+                                 */
+                                const result = await postJson(verifyPaymentUrl, {
+                                    razorpay_order_id: paymentResponse.razorpay_order_id,
+                                    razorpay_payment_id: paymentResponse.razorpay_payment_id,
+                                    razorpay_signature: paymentResponse.razorpay_signature
+                                });
+
+                                showMessage(
+                                    result.message || 'Payment successful. Your tickets are booked.',
+                                    'success'
+                                );
+
+                                if (result.redirect_url) {
+                                    window.location.assign(result.redirect_url);
+                                    return;
+                                }
+
+                                resetButton();
+                            } catch (error) {
+                                if (error.paymentCaptured || error.refundRequired) {
+                                    showMessage(
+                                        error.message +
+                                        ' Do not retry payment immediately. Contact support to reconcile the captured payment and refund if required.',
+                                        'warning'
+                                    );
+                                } else {
+                                    showMessage(error.message);
+                                }
+
+                                resetButton();
+                            }
+                        },
+
+                        modal: {
+                            ondismiss: function () {
+                                if (paymentInProgress) {
+                                    resetButton();
+                                    showMessage(
+                                        'Checkout was closed. Your cart has not been cleared. Check your payment status before trying again.',
+                                        'info'
+                                    );
+                                }
+                            },
+                            escape: true,
+                            confirm_close: true
+                        },
+
+                        theme: {
+                            color: '#dc3545'
+                        }
+                    };
+
+                    const razorpay = new Razorpay(options);
+
+                    razorpay.on('payment.failed', function (response) {
+                        resetButton();
+
+                        const description =
+                            response.error && response.error.description
+                                ? response.error.description
+                                : 'Payment was not completed.';
+
+                        showMessage(
+                            description +
+                            ' Your cart has not been cleared. If money was deducted, check the payment status before retrying.'
+                        );
+                    });
+
+                    razorpay.open();
+
+                } catch (error) {
+                    showMessage(error.message || 'Unable to start payment. Please try again.');
+                    resetButton();
+                }
+            });
         });
     </script>
 @endif

@@ -1682,6 +1682,9 @@ body.ticket-modal-open {
                     <div class="ticket-field">
                         <label for="bookingDate">Visit Date <span>*</span></label>
                         <input type="date" id="bookingDate" name="booking_date" required>
+                        <p class="ticket-price-note" id="ticketAvailabilityMessage">
+                            Select a visit date to check available tickets.
+                        </p>
                     </div>
                     <input type="hidden" id="memberCount" name="member_count" value="1">
                 </div>
@@ -1993,18 +1996,129 @@ document.addEventListener('DOMContentLoaded', function () {
             status: price.status
         };
     }).filter(function (price) {
-        return Number.isFinite(price.price) && price.price >= 0 &&
-            (!('status' in price) || price.status === true || price.status === 1 || price.status === '1');
+        const status = normalizeValue(price.status);
+        const isActive = !('status' in price) ||
+            status === '' ||
+            status === '1' ||
+            status === 'active' ||
+            status === 'true';
+
+        return Number.isFinite(price.price) && price.price >= 0 && isActive;
     });
 
     const visitorTypes = ['Adult', 'Child', 'Senior Citizen'];
     const ticketTypes = ['normal', 'vip'];
+    const availabilityMessage = document.getElementById('ticketAvailabilityMessage');
+    const submitButton = form.querySelector('button[type="submit"]');
+
+    let ticketAvailability = {
+        normal: { available: false, remaining: 0 },
+        vip: { available: false, remaining: 0 }
+    };
+
+    function getAvailableTicketTypes() {
+        return ticketTypes.filter(function (type) {
+            return ticketAvailability[type]?.available === true ||
+                Number(ticketAvailability[type]?.remaining || 0) > 0;
+        });
+    }
+
+    function getTicketTypeOptions(selectedType) {
+        const availableTypes = getAvailableTicketTypes();
+        const effectiveSelected = availableTypes.includes(selectedType)
+            ? selectedType
+            : (availableTypes[0] || '');
+
+        return ticketTypes.map(function (type) {
+            const info = ticketAvailability[type] || { available: false, remaining: 0 };
+            const remaining = Math.max(0, Number(info.remaining || 0));
+            const available = info.available === true || remaining > 0;
+            const selected = effectiveSelected === type && available ? ' selected' : '';
+            const disabled = available ? '' : ' disabled';
+            const label = type.toUpperCase() + (available
+                ? ' (' + remaining + ' available)'
+                : ' (Sold out)');
+            return '<option value="' + type + '"' + selected + disabled + '>' + label + '</option>';
+        }).join('');
+    }
+
+    async function checkTicketAvailability() {
+        const selectedDate = bookingDate.value;
+
+        ticketAvailability = {
+            normal: { available: false, remaining: 0 },
+            vip: { available: false, remaining: 0 }
+        };
+
+        submitButton.disabled = true;
+
+        if (!selectedDate) {
+            availabilityMessage.textContent = 'Select a visit date to check available tickets.';
+            renderMembers();
+            return;
+        }
+
+        availabilityMessage.textContent = 'Checking ticket availability...';
+
+        try {
+            const csrfToken = form.querySelector('input[name="_token"]')?.value;
+            const response = await fetch(form.action, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': csrfToken || ''
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify({
+                    availability_only: true,
+                    booking_date: selectedDate
+                })
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                const errorMessage = result.errors
+                    ? Object.values(result.errors).flat().join(' ')
+                    : (result.message || 'Unable to check ticket availability.');
+                throw new Error(errorMessage);
+            }
+
+            ticketAvailability = result.ticket_types || ticketAvailability;
+            const availableTypes = getAvailableTicketTypes();
+
+            renderMembers();
+
+            if (availableTypes.length === 0) {
+                availabilityMessage.textContent = 'Normal and VIP tickets are fully booked for this date.';
+                return;
+            }
+
+            availabilityMessage.textContent = availableTypes.map(function (type) {
+                return type.toUpperCase() + ': ' + ticketAvailability[type].remaining + ' tickets available';
+            }).join(' | ');
+
+            submitButton.disabled = false;
+        } catch (error) {
+            availabilityMessage.textContent = error.message || 'Unable to check availability. Please try again.';
+            renderMembers();
+        }
+    }
 
     function openModal() {
         modal.classList.add('is-open');
         modal.setAttribute('aria-hidden', 'false');
         document.body.classList.add('ticket-modal-open');
+        submitButton.disabled = true;
         renderMembers();
+
+        if (bookingDate.value) {
+            checkTicketAvailability();
+        } else {
+            availabilityMessage.textContent = 'Select a visit date to check available tickets.';
+        }
     }
 
     function closeModal() {
@@ -2047,27 +2161,19 @@ document.addEventListener('DOMContentLoaded', function () {
             return price.ticket_type === normalizeValue(ticketType) &&
                 price.type === normalizeValue(visitorType);
         });
-        const ages = new Set();
-
-        applicable.forEach(function (price) {
-            const min = Math.max(0, price.min_age);
-            const max = Math.min(120, price.max_age);
-            for (let age = min; age <= max; age++) {
-                ages.add(age);
-            }
-        });
-
-        const sortedAges = Array.from(ages).sort(function (a, b) {
-            return a - b;
-        });
 
         let options = '<option value="">Select age</option>';
-        sortedAges.forEach(function (age) {
-            options += '<option value="' + age + '"' + (String(age) === String(selectedAge) ? ' selected' : '') + '>' + age + ' years</option>';
-        });
 
-        if (sortedAges.length === 0) {
-            options += '<option value="" disabled>No age range configured</option>';
+        for (let age = 1; age <= 120; age++) {
+            const hasPrice = applicable.some(function (price) {
+                return age >= price.min_age && age <= price.max_age;
+            });
+            const selected = String(age) === String(selectedAge) ? ' selected' : '';
+            const label = age + (age === 1 ? ' Year' : ' Years');
+
+            options += '<option value="' + age + '"' + selected +
+                (hasPrice ? '' : ' data-price-unavailable="true"') +
+                '>' + label + '</option>';
         }
 
         return options;
@@ -2127,9 +2233,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     <div class="ticket-field">
                         <label for="member_${index}_ticket_type">Ticket Type <span>*</span></label>
                         <select id="member_${index}_ticket_type" data-field="ticket_type" name="members[${index}][ticket_type]" required>
-                            ${ticketTypes.map(function (type) {
-                                return '<option value="' + type + '"' + (old.ticketType === type ? ' selected' : '') + '>' + type.toUpperCase() + '</option>';
-                            }).join('')}
+                            ${getTicketTypeOptions(old.ticketType)}
                         </select>
                     </div>
                     <div class="ticket-field">
@@ -2324,6 +2428,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const today = new Date();
     const localDate = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().split('T')[0];
     bookingDate.min = localDate;
+    submitButton.disabled = true;
+    bookingDate.addEventListener('change', checkTicketAvailability);
 
     form.addEventListener('submit', async function (event) {
         event.preventDefault();
@@ -2348,7 +2454,30 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        const submitButton = form.querySelector('button[type="submit"]');
+        if (!bookingDate.value || !getAvailableTicketTypes().length) {
+            message.textContent = 'Select a visit date with available tickets before continuing.';
+            message.classList.add('is-visible');
+            submitButton.disabled = true;
+            return;
+        }
+
+        const selectedCounts = {};
+        cards.forEach(function (card) {
+            const type = card.querySelector('[data-field="ticket_type"]').value;
+            selectedCounts[type] = (selectedCounts[type] || 0) + 1;
+        });
+
+        const exceedsAvailability = Object.keys(selectedCounts).some(function (type) {
+            return !ticketAvailability[type]?.available ||
+                selectedCounts[type] > ticketAvailability[type].remaining;
+        });
+
+        if (exceedsAvailability) {
+            message.textContent = 'The selected member count exceeds the available tickets. Please change ticket types or select another date.';
+            message.classList.add('is-visible');
+            return;
+        }
+
         const originalButtonText = submitButton.textContent;
         submitButton.disabled = true;
         submitButton.textContent = 'Please wait...';
@@ -2384,7 +2513,7 @@ document.addEventListener('DOMContentLoaded', function () {
             message.textContent = error.message || 'Something went wrong. Please try again.';
             message.classList.add('is-visible');
         } finally {
-            submitButton.disabled = false;
+            submitButton.disabled = !bookingDate.value || !getAvailableTicketTypes().length;
             submitButton.textContent = originalButtonText;
         }
     });
