@@ -48,6 +48,7 @@ use App\Http\Controllers\Admin\TicketPriceController;
 use App\Http\Controllers\Frontend\TicketCartController;
 use App\Http\Controllers\Frontend\RazorpayTicketController;
 use App\Http\Controllers\Admin\TempleDailyTicketLimitController;
+use App\Http\Controllers\Admin\TicketBookingHistoryController;
 
 Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
 Route::get('our-temples', [OurTemplesContoller::class, 'index'])->name('frontend.our-temples');
@@ -80,10 +81,7 @@ Route::get('/temple-register/get-districts/{state}', [TempleRegistrationControll
 Route::get('/temple-register/get-cities/{district}', [TempleRegistrationController::class,'getCities',])->name('temple.register.cities');
 Route::get('/event-creator/register', [EventCreatorRegistrationController::class, 'create'])->name('event-creator.register');
 Route::post('/event-creator/register', [EventCreatorRegistrationController::class, 'store'])->name('event-creator.register.store');
-Route::post(
-    '/temples/{temple}/ticket-cart',
-    [TicketCartController::class, 'store']
-)->name('frontend.ticket-cart.store');
+Route::post('/temples/{temple}/ticket-cart',[TicketCartController::class, 'store'])->name('frontend.ticket-cart.store');
 
 Route::middleware('auth')
     ->prefix('ticket-cart')
@@ -190,6 +188,12 @@ Route::middleware('auth')->group(function () {
     });
     Route::resource('ticket-prices', TicketPriceController::class);
     Route::resource('temple-daily-ticket-limits',TempleDailyTicketLimitController::class);
+    Route::get('/my-tickit-booking',[TicketBookingHistoryController::class, 'myBookings'])->name('admin.my-tickit-booking');
+    Route::get('/my-tickit-booking/{orderId}',[TicketBookingHistoryController::class, 'myBookingDetails'])->name('admin.my-tickit-booking.show');
+    // Temple Manager: Ticket Booking History
+    Route::get('/tickit-booking-history',[TicketBookingHistoryController::class, 'managerHistory'])->name('admin.tickit-booking-history');
+    Route::get('/tickit-booking-history/{bookingReference}',[TicketBookingHistoryController::class, 'managerBookingDetails'])->name('admin.tickit-booking-history.show');
+
 });
 Route::middleware('auth')->prefix('payment/razorpay')->name('razorpay.')->group(function () {
     Route::post('/create-order', [RazorpayPaymentController::class, 'createOrder'])->name('create-order');

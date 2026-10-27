@@ -594,6 +594,32 @@
                             </a>
                         </li>
                         @endcan
+                        @canany(['my-tickit-booking.index', 'all-tickit-booking.view'])
+                        <li class="dropdown {{ request()->routeIs('admin.my-tickit-booking*', 'admin.tickit-booking-history*') ? 'active' : '' }}">
+                            <a href="#" class="menu-toggle nav-link has-dropdown">
+                               <i class="fas fa-ticket-alt"></i>
+                                <span>Ticket Booking</span>
+                            </a>
+
+                            <ul class="dropdown-menu">
+                                @can('my-tickit-booking.index')
+                                <li class="{{ request()->routeIs('admin.my-tickit-booking*') ? 'active' : '' }}">
+                                    <a class="nav-link" href="{{ route('admin.my-tickit-booking') }}">
+                                        My Tickets
+                                    </a>
+                                </li>
+                                @endcan
+
+                                @can('all-tickit-booking.view')
+                                <li class="{{ request()->routeIs('admin.tickit-booking-history*') ? 'active' : '' }}">
+                                    <a class="nav-link" href="{{ route('admin.tickit-booking-history') }}">
+                                        All Booking History
+                                    </a>
+                                </li>
+                                @endcan
+                            </ul>
+                        </li>
+                        @endcanany
                 </aside>
             </div>
             <!-- Main Content -->

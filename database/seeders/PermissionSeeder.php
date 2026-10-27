@@ -203,6 +203,13 @@ class PermissionSeeder extends Seeder
             'temple-daily-ticket-limits.edit',
             'temple-daily-ticket-limits.index',
             'temple-daily-ticket-limits.delete',
+            // Ticket Booking
+            'my-tickit-booking.view',
+            'all-tickit-booking.view',
+            'my-tickit-booking.index',
+            'all-tickit-booking.index',
+            'my-tickit-booking.details',
+            'all-tickit-booking.details',
 
         ];
         foreach ($permissions as $permission) {
