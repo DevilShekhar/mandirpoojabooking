@@ -47,6 +47,7 @@ use App\Http\Controllers\Frontend\EventCreatorRegistrationController;
 use App\Http\Controllers\Admin\TicketPriceController;
 use App\Http\Controllers\Frontend\TicketCartController;
 use App\Http\Controllers\Frontend\RazorpayTicketController;
+use App\Http\Controllers\Admin\TempleDailyTicketLimitController;
 
 Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
 Route::get('our-temples', [OurTemplesContoller::class, 'index'])->name('frontend.our-temples');
@@ -188,6 +189,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/customer-cancel-booking/{cancellation}/reject', [CustomerBookingCancellationController::class, 'reject'])->name('customer-cancel-booking.reject');
     });
     Route::resource('ticket-prices', TicketPriceController::class);
+    Route::resource('temple-daily-ticket-limits',TempleDailyTicketLimitController::class);
 });
 Route::middleware('auth')->prefix('payment/razorpay')->name('razorpay.')->group(function () {
     Route::post('/create-order', [RazorpayPaymentController::class, 'createOrder'])->name('create-order');

@@ -198,6 +198,12 @@ class PermissionSeeder extends Seeder
             'ticket-prices.index',
             'ticket-prices.delete',
 
+            'temple-daily-ticket-limits.view',
+            'temple-daily-ticket-limits.create',
+            'temple-daily-ticket-limits.edit',
+            'temple-daily-ticket-limits.index',
+            'temple-daily-ticket-limits.delete',
+
         ];
         foreach ($permissions as $permission) {
             Permission::firstOrCreate([
