@@ -45,6 +45,8 @@ use App\Http\Controllers\Admin\SanatanEventBookingController;
 use App\Http\Controllers\Admin\SanatanEventCalendarController;
 use App\Http\Controllers\Frontend\EventCreatorRegistrationController;
 use App\Http\Controllers\Admin\TicketPriceController;
+use App\Http\Controllers\Frontend\TicketCartController;
+use App\Http\Controllers\Frontend\RazorpayTicketController;
 
 Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
 Route::get('our-temples', [OurTemplesContoller::class, 'index'])->name('frontend.our-temples');
@@ -77,7 +79,38 @@ Route::get('/temple-register/get-districts/{state}', [TempleRegistrationControll
 Route::get('/temple-register/get-cities/{district}', [TempleRegistrationController::class,'getCities',])->name('temple.register.cities');
 Route::get('/event-creator/register', [EventCreatorRegistrationController::class, 'create'])->name('event-creator.register');
 Route::post('/event-creator/register', [EventCreatorRegistrationController::class, 'store'])->name('event-creator.register.store');
-Route::get('/dashboard', function () {
+Route::post(
+    '/temples/{temple}/ticket-cart',
+    [TicketCartController::class, 'store']
+)->name('frontend.ticket-cart.store');
+
+Route::middleware('auth')
+    ->prefix('ticket-cart')
+    ->name('frontend.ticket-cart.')
+    ->group(function () {
+        Route::get('/', [TicketCartController::class, 'index'])
+            ->name('index');
+
+        Route::get('/claim-pending', [
+            TicketCartController::class,
+            'claimPendingCart',
+        ])->name('claim');
+
+        Route::delete('/{ticketCart}', [
+            TicketCartController::class,
+            'remove',
+        ])->name('remove');
+    });
+    
+
+Route::middleware('auth')->group(function () {
+    Route::post('/ticket-payment/create-order',[RazorpayTicketController::class, 'createOrder'])->name('frontend.ticket-payment.create-order');
+    Route::post('/ticket-payment/verify',[RazorpayTicketController::class, 'verifyPayment'])->name('frontend.ticket-payment.verify');
+    Route::get('/ticket-payment/failed',[RazorpayTicketController::class, 'paymentFailed'])->name('frontend.ticket-payment.failed');
+    Route::get('/ticket-booking/success',[RazorpayTicketController::class, 'success'])->name('frontend.ticket-booking.success');
+});
+
+    Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 

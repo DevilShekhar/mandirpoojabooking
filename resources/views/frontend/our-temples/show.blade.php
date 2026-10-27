@@ -1670,7 +1670,13 @@ body.ticket-modal-open {
             </div>
             <button type="button" class="ticket-modal-close" aria-label="Close popup" data-close-ticket-modal>&times;</button>
         </div>
-        <form id="ticketBookingForm" enctype="multipart/form-data">
+        <form
+            id="ticketBookingForm"
+            action="{{ route('frontend.ticket-cart.store', $temple->id) }}"
+            method="POST"
+            enctype="multipart/form-data"
+        >
+            @csrf
             <div class="ticket-modal-body">
                 <div class="ticket-booking-top-fields">
                     <div class="ticket-field">
@@ -2319,7 +2325,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const localDate = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().split('T')[0];
     bookingDate.min = localDate;
 
-    form.addEventListener('submit', function (event) {
+    form.addEventListener('submit', async function (event) {
         event.preventDefault();
         message.classList.remove('is-visible');
 
@@ -2342,8 +2348,45 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        message.textContent = 'Visitor details validated successfully. Estimated total: ' + totalAmount.textContent + '. Booking and payment will be completed after the Laravel booking and payment routes are connected.';
-        message.classList.add('is-visible');
+        const submitButton = form.querySelector('button[type="submit"]');
+        const originalButtonText = submitButton.textContent;
+        submitButton.disabled = true;
+        submitButton.textContent = 'Please wait...';
+
+        try {
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: new FormData(form),
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                credentials: 'same-origin'
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                const errorMessage = result.errors
+                    ? Object.values(result.errors).flat().join(' ')
+                    : (result.message || 'Unable to add members to the cart.');
+                throw new Error(errorMessage);
+            }
+
+            if (result.redirect_url) {
+                window.location.href = result.redirect_url;
+                return;
+            }
+
+            message.textContent = result.message || 'Members added successfully.';
+            message.classList.add('is-visible');
+        } catch (error) {
+            message.textContent = error.message || 'Something went wrong. Please try again.';
+            message.classList.add('is-visible');
+        } finally {
+            submitButton.disabled = false;
+            submitButton.textContent = originalButtonText;
+        }
     });
 
     renderMembers();
