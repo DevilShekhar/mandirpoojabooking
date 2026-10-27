@@ -366,9 +366,22 @@
                                                 @endforelse
                                             </ul>
                                         </li>
-                                        <li>
-                                            <a href="">My Bookings</a>
-                                        </li>
+                                        @auth
+                                            <li class="dropdown-holder">
+                                                <a href="javascript:void(0)">My Bookings</a>
+                                                <ul class="hb-dropdown">
+                                                    <li>
+                                                        <a href="{{ url('/ticket-cart') }}">Ticket Cart</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{ url('/sanatan-event-bookings') }}">Sanatan Event Bookings</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{ url('/booking-puja-order') }}">Puja Bookings</a>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                        @endauth
                                     </ul>
                                 </nav>
                             </div>
