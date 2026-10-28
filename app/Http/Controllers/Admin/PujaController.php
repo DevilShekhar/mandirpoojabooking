@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Str;
 class PujaController extends Controller
 {
@@ -31,7 +32,8 @@ class PujaController extends Controller
         $selectedTempleId = $temples->first()?->id;
         $deities = Deity::where('status', 1)->latest()->get();
         $pujaCategories = PujaCategory::where('status', 1)->orderBy('sort_order')->get();
-        return view('admin.pujas.create', compact('temples','deities','pujaCategories','selectedTempleId'));
+        $templeProducts = DB::table('temple_products')->whereIn('temple_id', $temples->pluck('id'))->where('status', 1)->orderBy('name')->get(['id', 'temple_id', 'name', 'price', 'qty', 'unit']);
+        return view('admin.pujas.create', compact('temples','deities','pujaCategories','selectedTempleId','templeProducts'));
     }
     
     public function store(Request $request)
@@ -44,7 +46,6 @@ class PujaController extends Controller
             'description' => 'nullable|string',
             'benefits' => 'nullable|string',
             'ritual_details' => 'nullable|string',
-            'samagri_details' => 'nullable|string',
             'duration' => 'nullable|string|max:100',
             'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'banner_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
@@ -57,22 +58,14 @@ class PujaController extends Controller
             'packages' => 'nullable|array',
             'packages.*.name' => 'required|string|max:150',
             'packages.*.person_count' => 'required|integer|min:1',
-            'packages.*.price' => 'required|numeric|min:0',
-            'packages.*.discount_price' => [
-                'nullable',
-                'numeric',
-                'min:0',
-                'lte:packages.*.price',
-            ],
+            'packages.*.pandit_price' => 'required|numeric|min:0',
+            'packages.*.products' => 'nullable|array',
+            'packages.*.products.*.product_id' => 'required|integer|min:1',
+            'packages.*.products.*.quantity' => 'required|integer|min:1',
+            'packages.*.discount_price' => 'nullable|numeric|min:0',
             'packages.*.sort_order' => 'nullable|integer|min:0',
             'packages.*.short_description' => 'nullable|string|max:500',
             'packages.*.description' => 'nullable|string',
-            'packages.*.includes_sankalp' => 'nullable|boolean',
-            'packages.*.includes_prasad' => 'nullable|boolean',
-            'packages.*.includes_video' => 'nullable|boolean',
-            'packages.*.includes_certificate' => 'nullable|boolean',
-            'packages.*.puja_samagri' => 'nullable|array',
-            'packages.*.puja_samagri.*' => 'required|string|max:255',
             'packages.*.is_featured' => 'nullable|boolean',
             'packages.*.package_image' => [
                 'nullable',
@@ -130,7 +123,6 @@ class PujaController extends Controller
                 'description' => $this->getNullableText($request, 'description'),
                 'benefits' => $this->getNullableText($request, 'benefits'),
                 'ritual_details' => $this->getNullableText($request, 'ritual_details'),
-                'samagri_details' => $this->getNullableText($request, 'samagri_details'),
                 'duration' => $validated['duration'] ?? null,
                 'image' => $image,
                 'banner_image' => $bannerImage,
@@ -151,6 +143,15 @@ class PujaController extends Controller
                     $uploadedPackageImages[] = $packageImage;
                 }
 
+                $packageProducts = $this->validateAndPriceProducts((int) $validated['temple_id'], $package['products'] ?? []);
+                $panditPrice = (float) $package['pandit_price'];
+                $finalPrice = round($panditPrice + collect($packageProducts)->sum(fn ($item) => $item['line_total']), 2);
+                $discountPrice = isset($package['discount_price']) && $package['discount_price'] !== '' ? (float) $package['discount_price'] : null;
+                if ($discountPrice !== null && $discountPrice > $finalPrice) {
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        'packages' => 'Discount price cannot be greater than the calculated final package price.',
+                    ]);
+                }
                 PujaPackage::create([
                     'puja_id' => $puja->id,
                     'name' => $package['name'],
@@ -159,22 +160,13 @@ class PujaController extends Controller
                         $puja->id
                     ),
                     'person_count' => $package['person_count'],
-                    'price' => $package['price'],
-                    'discount_price' => $package['discount_price'] ?? null,
+                    'price' => $finalPrice,
+                    'pandit_price' => $panditPrice,
+                    'products' => $packageProducts,
+                    'discount_price' => $discountPrice,
                     'package_image' => $packageImage,
                     'short_description' => $package['short_description'] ?? null,
                     'description' => $package['description'] ?? null,
-                    'includes_sankalp' => !empty($package['includes_sankalp']),
-                    'includes_prasad' => !empty($package['includes_prasad']),
-                    'includes_video' => !empty($package['includes_video']),
-                    'includes_certificate' => !empty($package['includes_certificate']),
-                    'puja_samagri' => array_values(array_unique(array_filter(
-                        array_map(
-                            fn ($item) => trim($item),
-                            $package['puja_samagri'] ?? []
-                        ),
-                        fn ($item) => $item !== ''
-                    ))),
                     'is_featured' => !empty($package['is_featured']),
                     'sort_order' => $package['sort_order'] ?? $index,
                     'status' => 1,
@@ -213,6 +205,10 @@ class PujaController extends Controller
                 }
             }
 
+            if ($e instanceof ValidationException) {
+                throw $e;
+            }
+
             report($e);
 
             return back()
@@ -247,7 +243,8 @@ class PujaController extends Controller
         $temples = $templesQuery->latest()->get();
         $deities = Deity::where('status', 1)->latest()->get();
         $pujaCategories = PujaCategory::where('status', 1)->orderBy('sort_order')->get();
-        return view('admin.pujas.edit', compact('puja','temples','deities','pujaCategories'));
+        $templeProducts = DB::table('temple_products')->whereIn('temple_id', $temples->pluck('id'))->where('status', 1)->orderBy('name')->get(['id', 'temple_id', 'name', 'price', 'qty', 'unit']);
+        return view('admin.pujas.edit', compact('puja','temples','deities','pujaCategories','templeProducts'));
     }
     public function update(Request $request, Puja $puja)
     {
@@ -259,7 +256,6 @@ class PujaController extends Controller
             'description' => 'nullable|string',
             'benefits' => 'nullable|string',
             'ritual_details' => 'nullable|string',
-            'samagri_details' => 'nullable|string',
             'duration' => 'nullable|string|max:100',
             'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'banner_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
@@ -272,17 +268,14 @@ class PujaController extends Controller
             'packages' => 'nullable|array',
             'packages.*.name' => 'required|string|max:150',
             'packages.*.person_count' => 'required|integer|min:1',
-            'packages.*.price' => 'required|numeric|min:0',
+            'packages.*.pandit_price' => 'required|numeric|min:0',
+            'packages.*.products' => 'nullable|array',
+            'packages.*.products.*.product_id' => 'required|integer|min:1',
+            'packages.*.products.*.quantity' => 'required|integer|min:1',
             'packages.*.discount_price' => 'nullable|numeric|min:0',
             'packages.*.sort_order' => 'nullable|integer|min:0',
             'packages.*.short_description' => 'nullable|string|max:500',
             'packages.*.description' => 'nullable|string',
-            'packages.*.includes_sankalp' => 'nullable|boolean',
-            'packages.*.includes_prasad' => 'nullable|boolean',
-            'packages.*.includes_video' => 'nullable|boolean',
-            'packages.*.includes_certificate' => 'nullable|boolean',
-            'packages.*.puja_samagri' => 'nullable|array',
-            'packages.*.puja_samagri.*' => 'required|string|max:255',
             'packages.*.is_featured' => 'nullable|boolean',
             'packages.*.package_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'packages.*.existing_package_image' => 'nullable|string|max:500',
@@ -290,7 +283,6 @@ class PujaController extends Controller
         $description = $request->input('description');
         $benefits = $request->input('benefits');
         $ritualDetails = $request->input('ritual_details');
-        $samagriDetails = $request->input('samagri_details');
         $description = $description !== null && trim($description) !== ''
             ? trim($description)
             : null;
@@ -299,9 +291,6 @@ class PujaController extends Controller
             : null;
         $ritualDetails = $ritualDetails !== null && trim($ritualDetails) !== ''
             ? trim($ritualDetails)
-            : null;
-        $samagriDetails = $samagriDetails !== null && trim($samagriDetails) !== ''
-            ? trim($samagriDetails)
             : null;
         DB::beginTransaction();
         $oldImage = $puja->image;
@@ -326,7 +315,6 @@ class PujaController extends Controller
                 'description' => $description,
                 'benefits' => $benefits,
                 'ritual_details' => $ritualDetails,
-                'samagri_details' => $samagriDetails,
                 'duration' => $validated['duration'] ?? null,
                 'image' => $newImage,
                 'banner_image' => $newBannerImage,
@@ -337,11 +325,8 @@ class PujaController extends Controller
 
             ]);
             $oldPackages = PujaPackage::where('puja_id', $puja->id)->get();
-            foreach ($oldPackages as $oldPackage) {
-                if ($oldPackage->package_image && Storage::disk('public')->exists($oldPackage->package_image)) {
-                    Storage::disk('public')->delete($oldPackage->package_image);
-                }
-            }
+            $oldPackageImages = $oldPackages->pluck('package_image')->filter()->unique()->values()->all();
+            $usedPackageImages = [];
             PujaPackage::where('puja_id', $puja->id)->delete();
             foreach ($validated['packages'] ?? [] as $index => $package) {
                 $packageImage = $package['existing_package_image'] ?? null;
@@ -351,27 +336,30 @@ class PujaController extends Controller
                         ->store('puja_packages', 'public');
                     $newPackageImages[] = $packageImage;
                 }
+                if ($packageImage) {
+                    $usedPackageImages[] = $packageImage;
+                }
+                $packageProducts = $this->validateAndPriceProducts((int) $validated['temple_id'], $package['products'] ?? []);
+                $panditPrice = (float) $package['pandit_price'];
+                $finalPrice = round($panditPrice + collect($packageProducts)->sum(fn ($item) => $item['line_total']), 2);
+                $discountPrice = isset($package['discount_price']) && $package['discount_price'] !== '' ? (float) $package['discount_price'] : null;
+                if ($discountPrice !== null && $discountPrice > $finalPrice) {
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        'packages' => 'Discount price cannot be greater than the calculated final package price.',
+                    ]);
+                }
                 PujaPackage::create([
                     'puja_id' => $puja->id,
                     'name' => $package['name'],
                     'slug' => $this->generatePackageSlug($package['name'], $puja->id),
                     'person_count' => $package['person_count'],
-                    'price' => $package['price'],
-                    'discount_price' => $package['discount_price'] ?? null,
+                    'price' => $finalPrice,
+                    'pandit_price' => $panditPrice,
+                    'products' => $packageProducts,
+                    'discount_price' => $discountPrice,
                     'package_image' => $packageImage,
                     'short_description' => $package['short_description'] ?? null,
                     'description' => $package['description'] ?? null,
-                    'includes_sankalp' => !empty($package['includes_sankalp']),
-                    'includes_prasad' => !empty($package['includes_prasad']),
-                    'includes_video' => !empty($package['includes_video']),
-                    'includes_certificate' => !empty($package['includes_certificate']),
-                    'puja_samagri' => array_values(array_unique(array_filter(
-                        array_map(
-                            fn ($item) => trim($item),
-                            $package['puja_samagri'] ?? []
-                        ),
-                        fn ($item) => $item !== ''
-                    ))),
                     'is_featured' => !empty($package['is_featured']),
                     'sort_order' => $package['sort_order'] ?? $index,
                     'status' => 1,
@@ -388,6 +376,11 @@ class PujaController extends Controller
                 ]);
             }
             DB::commit();
+            foreach (array_diff($oldPackageImages ?? [], $usedPackageImages ?? []) as $oldPackageImage) {
+                if (Storage::disk('public')->exists($oldPackageImage)) {
+                    Storage::disk('public')->delete($oldPackageImage);
+                }
+            }
             if ($oldImage && $newImage !== $oldImage && Storage::disk('public')->exists($oldImage)) {
                 Storage::disk('public')->delete($oldImage);
             }
@@ -410,6 +403,10 @@ class PujaController extends Controller
                     Storage::disk('public')->delete($packageImage);
                 }
             }
+            if ($e instanceof ValidationException) {
+                throw $e;
+            }
+            report($e);
             return back()
                 ->withInput()
                 ->with('Error', 'Unable to update Puja. ' . $e->getMessage());
@@ -424,6 +421,47 @@ class PujaController extends Controller
             ->route('pujas.index')
             ->with('Success', 'Puja Deleted Successfully');
     }
+
+    private function validateAndPriceProducts(int $templeId, array $items): array
+    {
+        $productIds = collect($items)->pluck('product_id')->map(fn ($id) => (int) $id)->filter()->unique()->values();
+        if ($productIds->isEmpty()) {
+            return [];
+        }
+        $products = DB::table('temple_products')
+            ->where('temple_id', $templeId)
+            ->where('status', 1)
+            ->whereIn('id', $productIds)
+            ->get()
+            ->keyBy('id');
+        if ($products->count() !== $productIds->count()) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'packages' => 'One or more selected products are invalid or do not belong to the selected temple.',
+            ]);
+        }
+        $pricedItems = [];
+        foreach ($items as $item) {
+            $productId = (int) ($item['product_id'] ?? 0);
+            $quantity = (int) ($item['quantity'] ?? 0);
+            if (!$productId || $quantity < 1 || !$products->has($productId)) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'packages' => 'Please select valid products and quantities for every package.',
+                ]);
+            }
+            $product = $products->get($productId);
+            $lineTotal = round((float) $product->price * $quantity, 2);
+            $pricedItems[] = [
+                'product_id' => (int) $product->id,
+                'name' => $product->name,
+                'price' => (float) $product->price,
+                'quantity' => $quantity,
+                'unit' => $product->unit,
+                'line_total' => $lineTotal,
+            ];
+        }
+        return $pricedItems;
+    }
+
     private function getNullableText(Request $request, string $key): ?string
     {
         $value = $request->input($key);
@@ -468,8 +506,6 @@ class PujaController extends Controller
         }
         $originalSlug = $slug;
         $counter = 1;
-        // Package names may repeat across any puja.
-        // Keep slugs unique globally in case the database has a unique index on `slug`.
         while (PujaPackage::where('slug', $slug)->exists()) {
             $slug = $originalSlug . '-' . $counter;
             $counter++;

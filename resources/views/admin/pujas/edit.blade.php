@@ -170,20 +170,6 @@
                                                     </div>
                                                     @enderror
                                                 </div>
-                                                <div class="form-group col-md-12">
-                                                    <label>
-                                                        Samagri Details
-                                                    </label>
-                                                    <textarea name="samagri_details"
-                                                        class="form-control @error('samagri_details') is-invalid @enderror"
-                                                        rows="5"
-                                                        placeholder="Enter required puja samagri">{{ old('samagri_details', $puja->samagri_details) }}</textarea>
-                                                    @error('samagri_details')
-                                                    <div class="invalid-feedback">
-                                                        {{ $message }}
-                                                    </div>
-                                                    @enderror
-                                                </div>
                                                 <div class="form-group col-md-6">
                                                     <label>
                                                         Puja Image
@@ -340,152 +326,61 @@
                                                     </div>
                                                     <div id="packageContainer">
                                                         @foreach($oldPackages as $index => $package)
-                                                        <div class="package-card" data-package-index="{{ $index }}">
-                                                            <input type="hidden" name="packages[{{ $index }}][name]"
-                                                                value="{{ $package['name'] ?? '' }}">
-                                                            <input type="hidden" name="packages[{{ $index }}][person_count]"
-                                                            value="{{ $package['person_count'] ?? '' }}">
-                                                            <input type="hidden" name="packages[{{ $index }}][sort_order]"
-                                                                value="{{ $package['sort_order'] ?? 0 }}">
-                                                            <input type="hidden" name="packages[{{ $index }}][price]"
-                                                                value="{{ $package['price'] ?? '' }}">
-                                                            <input type="hidden" name="packages[{{ $index }}][discount_price]"
-                                                                value="{{ $package['discount_price'] ?? '' }}">
-                                                            <input type="hidden"
-                                                                name="packages[{{ $index }}][short_description]"
-                                                                value="{{ $package['short_description'] ?? '' }}">
-                                                            <input type="hidden" name="packages[{{ $index }}][description]"
-                                                                value="{{ $package['description'] ?? '' }}">
-                                                            <input type="hidden" name="packages[{{ $index }}][includes_sankalp]"
-                                                                value="{{ $package['includes_sankalp'] ?? 0 }}">
-                                                            <input type="hidden" name="packages[{{ $index }}][includes_prasad]"
-                                                                value="{{ $package['includes_prasad'] ?? 0 }}">
-                                                            <input type="hidden" name="packages[{{ $index }}][includes_video]"
-                                                                value="{{ $package['includes_video'] ?? 0 }}">
-                                                            <input type="hidden"
-                                                                name="packages[{{ $index }}][includes_certificate]"
-                                                                value="{{ $package['includes_certificate'] ?? 0 }}">
-                                                            @foreach(($package['puja_samagri'] ?? []) as $item)
-                                                            <input type="hidden" name="packages[{{ $index }}][puja_samagri][]" value="{{ $item }}">
-                                                            @endforeach
-                                                            <input type="hidden" name="packages[{{ $index }}][is_featured]"
-                                                                value="{{ $package['is_featured'] ?? 0 }}">
-                                                            @if(!empty($package['package_image']))
-                                                            <input type="hidden" class="existing-package-image"
-                                                                name="packages[{{ $index }}][existing_package_image]" value="{{ $package['package_image'] }}">
-                                                            @endif
-                                                            <input type="file" name="packages[{{ $index }}][package_image]"
-                                                                class="package-image-input d-none" accept="image/*">
-                                                            @if(!empty($package['package_image']))
-                                                            <div class="mt-2">
-                                                                <small class="text-muted">Current Package Image</small><br>
-                                                                <img src="{{ asset('storage/' . $package['package_image']) }}"
-                                                                    width="90" height="60"
-                                                                    style="object-fit:cover;border-radius:5px;">
-                                                            </div>
-                                                            @endif
-                                                            <div class="package-card-header">
-                                                                <div>
-                                                                    <span class="package-number">
-                                                                        Package {{ $index + 1 }}
-                                                                    </span>
-                                                                    @if(!empty($package['is_featured']))
-                                                                    <span class="badge badge-warning ml-2">
-                                                                        Featured
-                                                                    </span>
-                                                                    @endif
-                                                                </div>
-                                                                <div>
-                                                                    <button type="button"
-                                                                        class="btn btn-sm btn-outline-primary edit-package">
-                                                                        <i class="fas fa-edit"></i>
-                                                                    </button>
-                                                                    <button type="button"
-                                                                        class="btn btn-sm btn-outline-danger removePackage">
-                                                                        <i class="fas fa-trash"></i>
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-                                                            <div class="package-card-body">
-                                                                <div class="row">
-                                                                    <div class="col-md-4">
-                                                                        <strong>Package Name</strong>
-                                                                        <div class="package-value package-title">
-                                                                            {{ $package['name'] ?? '-' }}
-                                                                        </div>
+                                                            @php
+                                                                $packageProducts = $package['products'] ?? [];
+                                                                if (is_string($packageProducts)) {
+                                                                    $packageProducts = json_decode($packageProducts, true) ?: [];
+                                                                }
+                                                            @endphp
+                                                            <div class="package-card border rounded p-3 mb-3" data-package-index="{{ $index }}">
+                                                                <div class="d-flex justify-content-between align-items-start">
+                                                                    <div>
+                                                                        <h6 class="mb-1 package-title">{{ $package['name'] ?? 'Package' }}</h6>
+                                                                        <small class="text-muted package-person-count">{{ $package['person_count'] ?? 1 }} {{ (int)($package['person_count'] ?? 1) === 1 ? 'Person' : 'Persons' }}</small>
                                                                     </div>
-                                                                    <div class="col-md-2">
-                                                                        <strong>Persons</strong>
-                                                                        <div class="package-value package-person-count">
-                                                                            {{ $package['person_count'] ?? '-' }}
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="col-md-3">
-                                                                        <strong>Price</strong>
-                                                                        <div class="package-value package-price">
-                                                                            ₹{{ $package['price'] ?? '0' }}
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="col-md-3">
-                                                                        <strong>Discount Price</strong>
-                                                                        <div class="package-value package-discount-price">
-                                                                            ₹{{ $package['discount_price'] ?? '0' }}
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                                <hr>
-                                                                <div class="row">
-                                                                    <div class="col-md-12">
-                                                                        <strong>Short Description</strong>
-                                                                        <div class="package-value package-short-description">
-                                                                            {{ $package['short_description'] ?? '-' }}
-                                                                        </div>
+                                                                    <div>
+                                                                        <button type="button" class="btn btn-outline-primary btn-sm edit-package mr-1"><i class="fas fa-edit"></i></button>
+                                                                        <button type="button" class="btn btn-outline-danger btn-sm removePackage"><i class="fas fa-trash"></i></button>
                                                                     </div>
                                                                 </div>
                                                                 <div class="row mt-3">
-                                                                    @if(!empty($package['includes_sankalp']))
-                                                                    <div class="col-md-3">
-                                                                        <span class="badge badge-success">
-                                                                            <i class="fas fa-check"></i>
-                                                                            Sankalp
-                                                                        </span>
-                                                                    </div>
-                                                                    @endif
-                                                                    @if(!empty($package['includes_prasad']))
-                                                                    <div class="col-md-3">
-                                                                        <span class="badge badge-success">
-                                                                            <i class="fas fa-check"></i>
-                                                                            Prasad
-                                                                        </span>
-                                                                    </div>
-                                                                    @endif
-                                                                    @if(!empty($package['includes_video']))
-                                                                    <div class="col-md-3">
-                                                                        <span class="badge badge-success">
-                                                                            <i class="fas fa-check"></i>
-                                                                            Video
-                                                                        </span>
-                                                                    </div>
-                                                                    @endif
-                                                                    @if(!empty($package['includes_certificate']))
-                                                                    <div class="col-md-3">
-                                                                        <span class="badge badge-success">
-                                                                            <i class="fas fa-check"></i>
-                                                                            Certificate
-                                                                        </span>
-                                                                    </div>
-                                                                    @endif
+                                                                    <div class="col-md-3"><strong>Pandit Price:</strong> <span class="package-pandit-price">₹{{ number_format((float)($package['pandit_price'] ?? 0), 2) }}</span></div>
+                                                                    <div class="col-md-3"><strong>Package Total:</strong> <span class="package-price">₹{{ number_format((float)($package['price'] ?? 0), 2) }}</span></div>
+                                                                    <div class="col-md-3"><strong>Discount Price:</strong> <span class="package-discount-price">{{ !empty($package['discount_price']) ? '₹'.number_format((float)$package['discount_price'], 2) : '—' }}</span></div>
+                                                                    <div class="col-md-3"><strong>Sort Order:</strong> <span class="package-sort-order">{{ $package['sort_order'] ?? 0 }}</span></div>
                                                                 </div>
-                                                                @if(!empty($package['puja_samagri']))
-                                                                <div class="mt-3 package-samagri-summary">
-                                                                    <strong>Essential Puja Samagri:</strong>
-                                                                    @foreach($package['puja_samagri'] as $item)
-                                                                    <span class="badge badge-light border">{{ $item }}</span>
-                                                                    @endforeach
+                                                                <div class="mt-2 package-short-description">{{ $package['short_description'] ?? '' }}</div>
+                                                                <div class="mt-2 package-badges">@if(!empty($package['is_featured']))<span class="badge badge-dark mr-1">Featured</span>@endif</div>
+                                                                <div class="mt-3 package-products-summary">
+                                                                    <strong>Selected Products:</strong>
+                                                                    @forelse($packageProducts as $product)
+                                                                        <span class="badge badge-light border mr-1">{{ $product['name'] ?? ('Product #'.($product['product_id'] ?? '')) }} × {{ $product['quantity'] ?? 1 }} (₹{{ number_format((float)($product['line_total'] ?? (($product['price'] ?? 0) * ($product['quantity'] ?? 1))), 2) }})</span>
+                                                                    @empty
+                                                                        <span class="text-muted">No products selected</span>
+                                                                    @endforelse
                                                                 </div>
+                                                                <input type="hidden" name="packages[{{ $index }}][name]" value="{{ $package['name'] ?? '' }}">
+                                                                <input type="hidden" name="packages[{{ $index }}][person_count]" value="{{ $package['person_count'] ?? 1 }}">
+                                                                <input type="hidden" name="packages[{{ $index }}][pandit_price]" value="{{ $package['pandit_price'] ?? 0 }}">
+                                                                <input type="hidden" name="packages[{{ $index }}][price]" value="{{ $package['price'] ?? 0 }}">
+                                                                <input type="hidden" name="packages[{{ $index }}][discount_price]" value="{{ $package['discount_price'] ?? '' }}">
+                                                                <input type="hidden" name="packages[{{ $index }}][sort_order]" value="{{ $package['sort_order'] ?? 0 }}">
+                                                                <input type="hidden" name="packages[{{ $index }}][short_description]" value="{{ $package['short_description'] ?? '' }}">
+                                                                <input type="hidden" name="packages[{{ $index }}][description]" value="{{ $package['description'] ?? '' }}">
+                                                                <input type="hidden" name="packages[{{ $index }}][is_featured]" value="{{ $package['is_featured'] ?? 0 }}">
+                                                                @foreach($packageProducts as $productIndex => $product)
+                                                                    <input type="hidden" name="packages[{{ $index }}][products][{{ $productIndex }}][product_id]" value="{{ $product['product_id'] ?? $product['id'] ?? '' }}">
+                                                                    <input type="hidden" name="packages[{{ $index }}][products][{{ $productIndex }}][quantity]" value="{{ $product['quantity'] ?? 1 }}">
+                                                                    <input type="hidden" name="packages[{{ $index }}][products][{{ $productIndex }}][name]" value="{{ $product['name'] ?? '' }}">
+                                                                    <input type="hidden" name="packages[{{ $index }}][products][{{ $productIndex }}][price]" value="{{ $product['price'] ?? 0 }}">
+                                                                    <input type="hidden" name="packages[{{ $index }}][products][{{ $productIndex }}][unit]" value="{{ $product['unit'] ?? 'piece' }}">
+                                                                @endforeach
+                                                                @if(!empty($package['package_image']))
+                                                                    <input type="hidden" class="existing-package-image" name="packages[{{ $index }}][existing_package_image]" value="{{ $package['package_image'] }}">
+                                                                    <div class="mt-2"><small class="text-muted">Current Package Image</small><br><img src="{{ asset('storage/' . $package['package_image']) }}" width="90" height="60" style="object-fit:cover;border-radius:5px;"></div>
                                                                 @endif
+                                                                <input type="file" name="packages[{{ $index }}][package_image]" class="package-image-input d-none" accept="image/*">
                                                             </div>
-                                                        </div>
                                                         @endforeach
                                                     </div>
                                                 </div>
@@ -694,121 +589,73 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label>
-                                        Price
-                                        <span class="text-danger">*</span>
-                                    </label>
+                                    <label>Pandit Price <span class="text-danger">*</span></label>
                                     <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text">₹</span>
-                                        </div>
-                                        <input type="number" min="0" step="0.01" class="form-control" id="package_price"
-                                            placeholder="0.00">
+                                        <div class="input-group-prepend"><span class="input-group-text">₹</span></div>
+                                        <input type="number" min="0" step="0.01" class="form-control" id="package_pandit_price" value="0.00" placeholder="0.00">
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label>
-                                        Discount Price
-                                    </label>
+                                    <label>Calculated Package Total</label>
                                     <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text">₹</span>
-                                        </div>
-                                        <input type="number" min="0" step="0.01" class="form-control"
-                                            id="package_discount_price" placeholder="0.00">
+                                        <div class="input-group-prepend"><span class="input-group-text">₹</span></div>
+                                        <input type="number" min="0" step="0.01" class="form-control" id="package_price" value="0.00" readonly>
                                     </div>
+                                    <small class="form-text text-muted">Pandit price + selected product totals.</small>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label>
-                                        Sort Order
-                                    </label>
-                                    <input type="number" min="0" class="form-control" id="package_sort_order" value="0">
+                                    <label for="package_image">Package Image</label>
+                                    <input type="file" class="form-control-file" id="package_image" accept="image/jpeg,image/png,image/webp">
+                                    <small class="form-text text-muted">Leave empty to keep the current image.</small>
                                 </div>
                             </div>
-                            <div class="col-md-12">
+                            <div class="col-md-4">
                                 <div class="form-group">
-                                    <label>
-                                        Package Image
-                                    </label>
-                                    <input type="file" class="form-control" id="package_image" accept="image/*">
-                                    <small class="text-muted">
-                                        JPG, JPEG, PNG.
-                                    </small>
-                                </div>
-                            </div>
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <label>
-                                        Short Description
-                                    </label>
-                                    <textarea class="form-control" id="package_short_description" rows="3"
-                                        placeholder="Enter short description"></textarea>
-                                </div>
-                            </div>
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <label>
-                                        Description
-                                    </label>
-                                    <textarea class="form-control" id="package_description" rows="5"
-                                        placeholder="Enter package description"></textarea>
-                                </div>
-                            </div>
-                            <div class="col-md-12">
-                                <label>
-                                    Package Includes
-                                </label>
-                                <div class="row">
-                                    <div class="col-md-3">
-                                        <div class="custom-control custom-checkbox">
-                                            <input type="checkbox" class="custom-control-input" id="package_sankalp">
-                                            <label class="custom-control-label" for="package_sankalp">
-                                                Sankalp
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="custom-control custom-checkbox">
-                                            <input type="checkbox" class="custom-control-input" id="package_prasad">
-                                            <label class="custom-control-label" for="package_prasad">
-                                                Prasad
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="custom-control custom-checkbox">
-                                            <input type="checkbox" class="custom-control-input" id="package_video">
-                                            <label class="custom-control-label" for="package_video">
-                                                Video
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="custom-control custom-checkbox">
-                                            <input type="checkbox" class="custom-control-input" id="package_certificate">
-                                            <label class="custom-control-label" for="package_certificate">
-                                                Certificate
-                                            </label>
-                                        </div>
+                                    <label>Discount Price</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend"><span class="input-group-text">₹</span></div>
+                                        <input type="number" min="0" step="0.01" class="form-control" id="package_discount_price" placeholder="0.00">
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-12 mt-3">
-                                <label>Essential Puja Samagri</label>
-                                <small class="form-text text-muted mb-2">Add required items for this package. Existing items can be edited.</small>
-                                <div id="samagriInputContainer">
-                                    <div class="input-group mb-2 samagri-input-row">
-                                        <input type="text" class="form-control samagri-name-input" placeholder="Enter item name (e.g. Nariyal, Phool, Haldi)">
-                                        <div class="input-group-append">
-                                            <button type="button" class="btn btn-outline-danger remove-samagri-item" title="Remove item"><i class="fas fa-times"></i></button>
-                                        </div>
+                                <label>Temple Products</label>
+                                <small class="form-text text-muted mb-2">Select products from the temple product list and enter quantities.</small>
+                                <div class="form-row align-items-end">
+                                    <div class="form-group col-md-8">
+                                        <label for="package_product_select">Product</label>
+                                        <select class="form-control" id="package_product_select">
+                                            <option value="">Select product</option>
+                                            @foreach(($templeProducts ?? collect()) as $product)
+                                                <option value="{{ $product->id }}" data-name="{{ $product->name }}" data-price="{{ $product->price }}" data-qty="{{ $product->qty ?? 0 }}" data-unit="{{ $product->unit ?? 'piece' }}" data-temple-id="{{ $product->temple_id ?? '' }}">{{ $product->name }} — ₹{{ number_format((float)$product->price, 2) }} / {{ $product->unit ?? 'piece' }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-md-2">
+                                        <label for="package_product_quantity">Quantity</label>
+                                        <input type="number" min="1" step="1" class="form-control" id="package_product_quantity" value="1">
+                                    </div>
+                                    <div class="form-group col-md-2">
+                                        <button type="button" class="btn btn-outline-primary btn-block" id="addPackageProduct"><i class="fas fa-plus"></i> Add</button>
                                     </div>
                                 </div>
-                                <button type="button" class="btn btn-sm btn-outline-primary" id="addSamagriItem"><i class="fas fa-plus"></i> Add Item</button>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-sm" id="packageProductsTable">
+                                        <thead>
+                                            <tr><th>Product</th><th>Unit Price</th><th>Quantity</th><th>Total</th><th width="70">Action</th></tr>
+                                        </thead>
+                                        <tbody id="packageProductsBody">
+                                            <tr class="no-products-row"><td colspan="5" class="text-center text-muted">No products selected.</td></tr>
+                                        </tbody>
+                                        <tfoot>
+                                            <tr><th colspan="3" class="text-right">Products Total</th><th colspan="2" id="package_products_total">₹0.00</th></tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
                             </div>
                             <div class="col-md-12 mt-4">
                                 <div class="custom-control custom-checkbox">
@@ -837,358 +684,181 @@
     @endsection
     @push('scripts')
         <script>
-            $(document).ready(function() {
-                var $description = $('#puja_description');
-                function initDescriptionEditor() {
-                    if (!$description.length) {
-                        console.error('Puja description textarea not found.');
-                        return;
-                    }
-                    if (typeof $.fn.summernote !== 'function') {
-                        console.error('Summernote is not loaded. Check summernote-bs4.js.');
-                        return;
-                    }
-                    if (!$description.next('.note-editor').length) {
-                        $description.summernote({
-                            height: 200,
-                            callbacks: {
-                                onInit: function() {
-
-                                    $description.val($(this).summernote('code'));
-                                },
-                                onChange: function(contents) {
-
-                                    $description.val(contents);
-                                }
-                            }
-                        });
-                    }
-                }
-                initDescriptionEditor();
-                function syncSummernote() {
-                    if (!$description.length || typeof $.fn.summernote !== 'function') {
-                        return;
-                    }
-                    if ($description.next('.note-editor').length) {
-                        var content = $description.summernote('code');
-                        $description.val(content);
-                    }
-                }
-                $('#pujaEditForm').on('submit', function() {
-                    syncSummernote();
-                });
-                $('#wizard_horizontal').on('click', '.actions a', function() {
-                    syncSummernote();
-                });
-                $(document).on('click', '#wizard_horizontal .actions a[href="#finish"]', function() {
-                    syncSummernote();
-                });
-                let packageIndex = $('#packageContainer .package-card').length;
-                let editingPackageIndex = null;
-                let faqIndex = @json(count($editFaqs));
-                $('#addFaq').on('click', function() {
-                    let faqHtml = `
-                        <div class="faq-item border rounded p-3 mb-3">
-                            <div class="row">
-                                <div class="form-group col-md-5">
-                                    <label>Question <span class="text-danger">*</span></label>
-                                    <input type="text" name="faq[${faqIndex}][question]" class="form-control" placeholder="Enter FAQ question">
-                                </div>
-                                <div class="form-group col-md-6">
-                                    <label>Answer <span class="text-danger">*</span></label>
-                                    <textarea name="faq[${faqIndex}][answer]" class="form-control" rows="3" placeholder="Enter FAQ answer"></textarea>
-                                </div>
-                                <div class="form-group col-md-1">
-                                    <label class="d-block">&nbsp;</label>
-                                    <button type="button" class="btn btn-danger btn-sm removeFaq" title="Remove FAQ">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>`;
-                    $('#faqContainer').append(faqHtml);
-                    faqIndex++;
-                });
-                $(document).on('click', '.removeFaq', function() {
-                    $(this).closest('.faq-item').remove();
-                });
-                $('#addSamagriItem').on('click', function() {
-                    $('#samagriInputContainer').append(`
-                        <div class="input-group mb-2 samagri-input-row">
-                            <input type="text" class="form-control samagri-name-input" placeholder="Enter item name">
-                            <div class="input-group-append">
-                                <button type="button" class="btn btn-outline-danger remove-samagri-item" title="Remove item"><i class="fas fa-times"></i></button>
-                            </div>
-                        </div>`);
-                });
-                $(document).on('click', '.remove-samagri-item', function() {
-                    if ($('#samagriInputContainer .samagri-input-row').length > 1) {
-                        $(this).closest('.samagri-input-row').remove();
-                    } else {
-                        $(this).closest('.samagri-input-row').find('.samagri-name-input').val('');
-                    }
-                });
-                function getSamagriValues() {
-                    return $('.samagri-name-input').map(function() {
-                        return $.trim($(this).val());
-                    }).get().filter(function(item) {
-                        return item !== '';
-                    }).filter(function(item, index, items) {
-                        return items.findIndex(function(value) {
-                            return value.toLowerCase() === item.toLowerCase();
-                        }) === index;
-                    });
-                }
-                function renderSamagriInputs(items) {
-                    let values = items && items.length ? items : [''];
-                    $('#samagriInputContainer').empty();
-                    values.forEach(function(item) {
-                        $('#samagriInputContainer').append(`
-                            <div class="input-group mb-2 samagri-input-row">
-                                <input type="text" class="form-control samagri-name-input" value="${escapeHtml(item)}" placeholder="Enter item name">
-                                <div class="input-group-append">
-                                    <button type="button" class="btn btn-outline-danger remove-samagri-item" title="Remove item"><i class="fas fa-times"></i></button>
-                                </div>
-                            </div>`);
-                    });
-                }
-                function resetPackageForm() {
-                    $('#packageModalError').addClass('d-none').html('');
-                    $('#package_name').val('');
-                    $('#package_person_count').val(1);
-                    $('#package_sort_order').val(0);
-                    $('#package_price').val('');
-                    $('#package_discount_price').val('');
-                    $('#package_short_description').val('');
-                    $('#package_description').val('');
-                    $('#package_sankalp, #package_prasad, #package_video, #package_certificate, #package_is_featured').prop(
-                        'checked', false);
-                    $('#package_image').val('');
-                    $('#samagriInputContainer').html(`
-                        <div class="input-group mb-2 samagri-input-row">
-                            <input type="text" class="form-control samagri-name-input" placeholder="Enter item name">
-                            <div class="input-group-append">
-                                <button type="button" class="btn btn-outline-danger remove-samagri-item" title="Remove item"><i class="fas fa-times"></i></button>
-                            </div>
-                        </div>`);
-                    editingPackageIndex = null;
-                    $('#packageModalLabel').text('Add Package');
-                    $('#savePackageBtn').html('<i class="fas fa-save"></i> Save Package');
-                }
-                function escapeHtml(value) {
-                    return $('<div>').text(value == null ? '' : value).html();
-                }
-                function getCardValue(card, field) {
-                    return $(card).find('input[name*="[' + field + ']"]').val() || '';
-                }
-                $(document).on('click', '#addPackageBtn, #addFirstPackageBtn', function(e) {
-                    e.preventDefault();
-                    resetPackageForm();
-                    $('#packageModal').modal('show');
-                });
-                $(document).on('click', '.edit-package', function(e) {
-                    e.preventDefault();
-                    let card = $(this).closest('.package-card');
-                    editingPackageIndex = card.attr('data-package-index');
-                    $('#packageModalLabel').text('Edit Package');
-                    $('#savePackageBtn').html('<i class="fas fa-save"></i> Update Package');
-                    $('#packageModalError').addClass('d-none').html('');
-                    $('#package_name').val(getCardValue(card, 'name'));
-                    $('#package_person_count').val(getCardValue(card, 'person_count') || 1);
-                    $('#package_price').val(getCardValue(card, 'price'));
-                    $('#package_discount_price').val(getCardValue(card, 'discount_price'));
-                    $('#package_sort_order').val(getCardValue(card, 'sort_order') || 0);
-                    $('#package_short_description').val(getCardValue(card, 'short_description'));
-                    $('#package_description').val(getCardValue(card, 'description'));
-                    $('#package_sankalp').prop('checked', getCardValue(card, 'includes_sankalp') == '1');
-                    $('#package_prasad').prop('checked', getCardValue(card, 'includes_prasad') == '1');
-                    $('#package_video').prop('checked', getCardValue(card, 'includes_video') == '1');
-                    $('#package_certificate').prop('checked', getCardValue(card, 'includes_certificate') == '1');
-                    $('#package_is_featured').prop('checked', getCardValue(card, 'is_featured') == '1');
-                    let existingSamagri = [];
-                    card.find('input[name*="[puja_samagri]"]').each(function() {
-                        existingSamagri.push($(this).val());
-                    });
-                    renderSamagriInputs(existingSamagri);
-                    $('#package_image').val('');
-                    $('#packageModal').modal('show');
-                });
-                $('#savePackageBtn').on('click', function() {
-                    let name = $.trim($('#package_name').val());
-                    let personCount = $('#package_person_count').val();
-                    let price = $('#package_price').val();
-                    let discountPrice = $('#package_discount_price').val();
-                    let sortOrder = $('#package_sort_order').val();
-                    let shortDescription = $('#package_short_description').val();
-                    let description = $('#package_description').val();
-                    let sankalp = $('#package_sankalp').is(':checked') ? 1 : 0;
-                    let prasad = $('#package_prasad').is(':checked') ? 1 : 0;
-                    let video = $('#package_video').is(':checked') ? 1 : 0;
-                    let certificate = $('#package_certificate').is(':checked') ? 1 : 0;
-                    let pujaSamagri = getSamagriValues();
-                    let featured = $('#package_is_featured').is(':checked') ? 1 : 0;
-                    let errors = [];
-                    if (!name) errors.push('Package name is required.');
-                    if (!personCount || parseInt(personCount) < 1) errors.push('Person count must be at least 1.');
-                    if (price === '' || parseFloat(price) < 0 || isNaN(parseFloat(price))) errors.push(
-                        'Package price is required.');
-                    if (discountPrice !== '' && parseFloat(discountPrice) > parseFloat(price)) errors.push(
-                        'Discount price cannot be greater than package price.');
-                    if (errors.length) {
-                        $('#packageModalError').html(errors.join('<br>')).removeClass('d-none');
-                        return;
-                    }
-                    $('#noPackageMessage').remove();
-                    if (editingPackageIndex !== null) {
-                        let card = $('.package-card[data-package-index="' + editingPackageIndex + '"]');
-                        card.find('input[name*="[name]"]').val(name);
-                        card.find('input[name*="[person_count]"]').val(personCount);
-                        card.find('input[name*="[price]"]').val(price);
-                        card.find('input[name*="[discount_price]"]').val(discountPrice);
-                        card.find('input[name*="[sort_order]"]').val(sortOrder);
-                        card.find('input[name*="[short_description]"]').val(shortDescription);
-                        card.find('input[name*="[description]"]').val(description);
-                        card.find('input[name*="[includes_sankalp]"]').val(sankalp);
-                        card.find('input[name*="[includes_prasad]"]').val(prasad);
-                        card.find('input[name*="[includes_video]"]').val(video);
-                        card.find('input[name*="[includes_certificate]"]').val(certificate);
-                        card.find('input[name*="[puja_samagri]"]').remove();
-                        pujaSamagri.forEach(function(item) {
-                            card.append(`<input type="hidden" name="packages[${editingPackageIndex}][puja_samagri][]" value="${escapeHtml(item)}">`);
-                        });
-                        card.find('input[name*="[is_featured]"]').val(featured);
-                        card.find('.package-title').text(name);
-                        card.find('.package-person-count').text(personCount + (personCount == 1 ? ' Person' :
-                            ' Persons'));
-                        card.find('.package-price').text('₹' + parseFloat(price).toFixed(2));
-                        card.find('.package-discount-price').text(discountPrice !== '' ? '₹' + parseFloat(
-                            discountPrice).toFixed(2) : '—');
-                        card.find('.package-sort-order').text(sortOrder);
-                        card.find('.package-short-description').html(shortDescription ?
-                            '<strong>Short Description:</strong> ' + escapeHtml(shortDescription) : '');
-                        card.find('.package-badges').html(
-                            (sankalp ? '<span class="badge badge-info mr-1">Sankalp</span>' : '') +
-                            (prasad ? '<span class="badge badge-success mr-1">Prasad</span>' : '') +
-                            (video ? '<span class="badge badge-primary mr-1">Video</span>' : '') +
-                            (certificate ? '<span class="badge badge-warning mr-1">Certificate</span>' : '') +
-                            (featured ? '<span class="badge badge-dark mr-1">Featured</span>' : '')
-                        );
-                        card.find('.package-samagri-summary').remove();
-                        if (pujaSamagri.length) {
-                            card.find('.package-card-body').append(
-                                '<div class="mt-3 package-samagri-summary"><strong>Essential Puja Samagri:</strong> ' +
-                                pujaSamagri.map(function(item) {
-                                    return '<span class="badge badge-light border mr-1">' + escapeHtml(item) + '</span>';
-                                }).join(' ') + '</div>'
-                            );
-                        }
-                        card.find('.package-card-header .badge-warning').remove();
-                        if (featured) {
-                            card.find('.package-card-header > div:first-child').append(
-                                '<span class="badge badge-warning ml-2">Featured</span>');
-                        }
-                        let selectedFile = $('#package_image')[0].files[0];
-                        if (selectedFile) {
-                            let input = card.find('.package-image-input')[0];
-                            if (!input) {
-                                input = $('<input type="file" class="package-image-input d-none" accept="image/*">').appendTo(card)[0];
-                            }
-                            let dt = new DataTransfer();
-                            dt.items.add(selectedFile);
-                            input.files = dt.files;
-                        }
-                    } else {
-                        let index = packageIndex++;
-                        let packageHtml = `
-                            <div class="package-card border rounded p-3 mb-3" data-package-index="${index}">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <div>
-                                        <h6 class="mb-1 package-title">${escapeHtml(name)}</h6>
-                                        <small class="text-muted package-person-count">${escapeHtml(personCount)} ${personCount == 1 ? 'Person' : 'Persons'}</small>
-                                    </div>
-                                    <div>
-                                        <button type="button" class="btn btn-outline-primary btn-sm edit-package mr-1"><i class="fas fa-edit"></i></button>
-                                        <button type="button" class="btn btn-danger btn-sm removePackage"><i class="fas fa-trash"></i></button>
-                                    </div>
-                                </div>
-                                <div class="row mt-3">
-                                    <div class="col-md-4"><strong>Price:</strong> <span class="package-price">₹${parseFloat(price).toFixed(2)}</span></div>
-                                    <div class="col-md-4"><strong>Discount Price:</strong> <span class="package-discount-price">${discountPrice ? '₹' + parseFloat(discountPrice).toFixed(2) : '—'}</span></div>
-                                    <div class="col-md-4"><strong>Sort Order:</strong> <span class="package-sort-order">${escapeHtml(sortOrder)}</span></div>
-                                </div>
-                                <div class="mt-2 package-short-description">${shortDescription ? '<strong>Short Description:</strong> ' + escapeHtml(shortDescription) : ''}</div>
-                                <div class="mt-2 package-badges">
-                                    ${sankalp ? '<span class="badge badge-info mr-1">Sankalp</span>' : ''}
-                                    ${prasad ? '<span class="badge badge-success mr-1">Prasad</span>' : ''}
-                                    ${video ? '<span class="badge badge-primary mr-1">Video</span>' : ''}
-                                    ${certificate ? '<span class="badge badge-warning mr-1">Certificate</span>' : ''}
-                                    ${featured ? '<span class="badge badge-dark mr-1">Featured</span>' : ''}
-                                </div>
-                                ${pujaSamagri.length ? '<div class="mt-3 package-samagri-summary"><strong>Essential Puja Samagri:</strong> ' + pujaSamagri.map(function(item) { return '<span class="badge badge-light border mr-1">' + escapeHtml(item) + '</span>'; }).join(' ') + '</div>' : ''}
-                                <input type="hidden" name="packages[${index}][name]" value="${escapeHtml(name)}">
-                                <input type="hidden" name="packages[${index}][person_count]" value="${escapeHtml(personCount)}">
-                                <input type="hidden" name="packages[${index}][price]" value="${escapeHtml(price)}">
-                                <input type="hidden" name="packages[${index}][discount_price]" value="${escapeHtml(discountPrice)}">
-                                <input type="hidden" name="packages[${index}][sort_order]" value="${escapeHtml(sortOrder)}">
-                                <input type="hidden" name="packages[${index}][short_description]" value="${escapeHtml(shortDescription)}">
-                                <input type="hidden" name="packages[${index}][description]" value="${escapeHtml(description)}">
-                                <input type="hidden" name="packages[${index}][includes_sankalp]" value="${sankalp}">
-                                <input type="hidden" name="packages[${index}][includes_prasad]" value="${prasad}">
-                                <input type="hidden" name="packages[${index}][includes_video]" value="${video}">
-                                <input type="hidden" name="packages[${index}][includes_certificate]" value="${certificate}">
-                                ${pujaSamagri.map(function(item) { return `<input type="hidden" name="packages[${index}][puja_samagri][]" value="${escapeHtml(item)}">`; }).join('')}
-                                <input type="hidden" name="packages[${index}][is_featured]" value="${featured}">
-                                <input type="file" name="packages[${index}][package_image]" class="package-image-input d-none" accept="image/*">
-                            </div>`;
-                        let $card = $(packageHtml);
-                        let selectedFile = $('#package_image')[0].files[0];
-                        if (selectedFile) {
-                            let dt = new DataTransfer();
-                            dt.items.add(selectedFile);
-                            $card.find('.package-image-input')[0].files = dt.files;
-                        }
-                        $('#packageContainer').append($card);
-                    }
-                    $('#packageModal').modal('hide');
-                    resetPackageForm();
-                });
-                $(document).on('click', '.removePackage', function() {
-                    $(this).closest('.package-card').remove();
-                    if ($('#packageContainer .package-card').length === 0) {
-                        $('#packageContainer').html(`
-                            <div id="noPackageMessage" class="text-center py-5">
-                                <i class="fas fa-box-open package-empty-icon"></i>
-                                <h5 class="mt-3">No packages added yet</h5>
-                                <p class="text-muted">Click "Add Package" to create a package for this Puja.</p>
-                                <button type="button" class="btn btn-outline-primary" id="addFirstPackageBtn" data-toggle="modal" data-target="#packageModal">
-                                    <i class="fas fa-plus"></i> Add First Package
-                                </button>
-                            </div>`);
-                    }
-                });
+        $(function () {
+            const templeProducts = @json($templeProducts->values());
+            let packageIndex = 0;
+            $('#packageContainer .package-card').each(function () {
+                let idx = parseInt($(this).attr('data-package-index') ?? $(this).attr('data-index') ?? '-1', 10);
+                if (Number.isFinite(idx) && idx >= packageIndex) packageIndex = idx + 1;
+                $(this).attr('data-package-index', Number.isFinite(idx) && idx >= 0 ? idx : packageIndex++);
             });
+            let editingPackageIndex = null;
+            let selectedProducts = [];
+            let faqIndex = @json(count($editFaqs));
+            const money = value => '₹' + (Number(value || 0)).toFixed(2);
+            function escapeHtml(value) {
+                return String(value == null ? '' : value).replace(/[&<>"']/g, function (c) {
+                    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c];
+                });
+            }
+            function currentTempleId() { return String($('[name="temple_id"]').val() || ''); }
+            function refreshProductOptions() {
+                const templeId = currentTempleId();
+                const $select = $('#package_product_select');
+                const previous = $select.val();
+                $select.html('<option value="">Select product</option>');
+                templeProducts.filter(p => String(p.temple_id) === templeId).forEach(p => {
+                    $select.append($('<option>').val(p.id).text(p.name + ' — ' + money(p.price) + ' / ' + (p.unit || 'piece'))
+                        .attr('data-name', p.name).attr('data-price', p.price).attr('data-unit', p.unit || 'piece'));
+                });
+                if (previous && $select.find('option[value="' + previous + '"]').length) $select.val(previous);
+            }
+            function productInfo(id, saved) {
+                const p = templeProducts.find(item => String(item.id) === String(id));
+                return {product_id: String(id), name: p ? p.name : ((saved && saved.name) || ('Product #' + id)), price: p ? Number(p.price) : Number((saved && saved.price) || 0), unit: p ? (p.unit || 'piece') : ((saved && saved.unit) || 'piece')};
+            }
+            function renderProducts() {
+                const $body = $('#packageProductsBody').empty();
+                let total = 0;
+                if (!selectedProducts.length) $body.append('<tr class="no-products-row"><td colspan="5" class="text-center text-muted">No products selected.</td></tr>');
+                selectedProducts.forEach((p, i) => {
+                    const line = Number(p.price || 0) * Number(p.quantity || 0); total += line;
+                    $body.append('<tr><td>' + escapeHtml(p.name) + ' / ' + escapeHtml(p.unit) + '</td><td>' + money(p.price) + '</td><td><input type="number" min="1" step="1" class="form-control form-control-sm selected-product-quantity" data-index="' + i + '" value="' + Number(p.quantity) + '"></td><td>' + money(line) + '</td><td><button type="button" class="btn btn-sm btn-outline-danger remove-selected-product" data-index="' + i + '">Remove</button></td></tr>');
+                });
+                $('#package_products_total').text(money(total));
+                $('#package_price').val((Number($('#package_pandit_price').val() || 0) + total).toFixed(2));
+                return total;
+            }
+            function addProduct(id, quantity, saved) {
+                if (!id || Number(quantity) < 1) return;
+                const found = selectedProducts.find(p => String(p.product_id) === String(id));
+                if (found) found.quantity = Number(found.quantity) + Number(quantity);
+                else selectedProducts.push(Object.assign(productInfo(id, saved), {quantity: Number(quantity)}));
+                renderProducts();
+            }
+            function resetPackageForm() {
+                $('#packageModalError').addClass('d-none').empty();
+                $('#package_name').val(''); $('#package_person_count').val(1); $('#package_pandit_price').val('0.00');
+                $('#package_price').val('0.00'); $('#package_discount_price').val(''); $('#package_sort_order').val(0);
+                $('#package_short_description').val(''); $('#package_description').val(''); if ($('#package_image').length) $('#package_image').val('');
+                $('#package_product_select').val(''); $('#package_product_quantity').val(1); $('#package_is_featured').prop('checked', false);
+                selectedProducts = []; renderProducts(); editingPackageIndex = null;
+                $('#packageModalLabel').text('Add Package'); $('#savePackageBtn').html('<i class="fas fa-save"></i> Save Package');
+            }
+            function cardValue($card, field) { const idx = $card.attr('data-package-index'); return $card.find('input[name="packages[' + idx + '][' + field + ']"]').val() || ''; }
+            function setHidden($card, idx, field, value) {
+                let $input = $card.find('input[name="packages[' + idx + '][' + field + ']"]');
+                if (!$input.length) $input = $('<input type="hidden">').attr('name', 'packages[' + idx + '][' + field + ']').appendTo($card);
+                $input.val(value == null ? '' : value);
+            }
+            function saveProductHidden($card, idx) {
+                $card.find('input[name^="packages[' + idx + '][products]"]').remove();
+                selectedProducts.forEach((p, i) => {
+                    const base = 'packages[' + idx + '][products][' + i + ']';
+                    [['product_id',p.product_id],['quantity',p.quantity]].forEach(pair => $card.append($('<input type="hidden">').attr('name', base + '[' + pair[0] + ']').val(pair[1])));
+                });
+            }
+            function packageCardHtml(idx, data) {
+                return $('<div class="package-card border rounded p-3 mb-3" data-package-index="' + idx + '">' +
+                    '<div class="d-flex justify-content-between align-items-start"><div><h6 class="package-title mb-1"></h6><small class="package-person-count text-muted"></small></div><div><button type="button" class="btn btn-sm btn-outline-primary edit-package mr-1"><i class="fas fa-edit"></i></button><button type="button" class="btn btn-sm btn-outline-danger removePackage"><i class="fas fa-trash"></i></button></div></div>' +
+                    '<div class="row mt-3"><div class="col-md-3"><strong>Pandit Price:</strong> <span class="package-pandit-price"></span></div><div class="col-md-3"><strong>Package Total:</strong> <span class="package-price"></span></div><div class="col-md-3"><strong>Discount Price:</strong> <span class="package-discount-price"></span></div><div class="col-md-3"><strong>Sort Order:</strong> <span class="package-sort-order"></span></div></div>' +
+                    '<div class="mt-2 package-short-description"></div><div class="mt-3 package-products-summary"></div></div>');
+            }
+            function renderCard($card, idx, data) {
+                ['name','person_count','pandit_price','price','discount_price','sort_order','short_description','description','is_featured'].forEach(field => setHidden($card, idx, field, data[field]));
+                $card.find('.package-title').text(data.name);
+                $card.find('.package-person-count').text(data.person_count + (Number(data.person_count) === 1 ? ' Person' : ' Persons'));
+                $card.find('.package-pandit-price').text(money(data.pandit_price));
+                $card.find('.package-price').text(money(data.price));
+                $card.find('.package-discount-price').text(data.discount_price !== '' && data.discount_price != null ? money(data.discount_price) : '—');
+                $card.find('.package-sort-order').text(data.sort_order || 0);
+                $card.find('.package-short-description').text(data.short_description || '');
+                const summary = selectedProducts.length ? selectedProducts.map(p => '<span class="badge badge-light border mr-1">' + escapeHtml(p.name) + ' × ' + p.quantity + ' (' + money(Number(p.price) * Number(p.quantity)) + ')</span>').join(' ') : '<span class="text-muted">No products selected</span>';
+                $card.find('.package-products-summary').html('<strong>Selected Products:</strong> ' + summary);
+                saveProductHidden($card, idx);
+                let $file = $card.find('input.package-image-input');
+                if (!$file.length) $file = $('<input type="file" class="package-image-input d-none" accept="image/*">').appendTo($card);
+                $file.attr('name', 'packages[' + idx + '][package_image]');
+                if (data.existing_package_image) {
+                    let $existing = $card.find('input[name="packages[' + idx + '][existing_package_image]"]');
+                    if (!$existing.length) $existing = $('<input type="hidden">').attr('name','packages[' + idx + '][existing_package_image]').appendTo($card);
+                    $existing.val(data.existing_package_image);
+                }
+                if (data.file) { const dt = new DataTransfer(); dt.items.add(data.file); $file[0].files = dt.files; }
+            }
+            refreshProductOptions(); renderProducts();
+            $('[name="temple_id"]').on('change', function() { refreshProductOptions(); });
+            $('#addPackageProduct').on('click', function() {
+                const id = $('#package_product_select').val(); const qty = parseInt($('#package_product_quantity').val(), 10);
+                if (!id) { $('#packageModalError').text('Please select a product.').removeClass('d-none'); return; }
+                if (!qty || qty < 1) { $('#packageModalError').text('Quantity must be at least 1.').removeClass('d-none'); return; }
+                addProduct(id, qty); $('#package_product_select').val(''); $('#package_product_quantity').val(1); $('#packageModalError').addClass('d-none').empty();
+            });
+            $(document).on('change', '.selected-product-quantity', function() { const i = Number($(this).data('index')); const q = parseInt($(this).val(),10); if (selectedProducts[i] && q > 0) { selectedProducts[i].quantity = q; renderProducts(); } });
+            $(document).on('click', '.remove-selected-product', function() { selectedProducts.splice(Number($(this).data('index')),1); renderProducts(); });
+            $('#package_pandit_price').on('input change', renderProducts);
+            $(document).on('click', '#addPackageBtn, #addFirstPackageBtn', function(e) { e.preventDefault(); resetPackageForm(); refreshProductOptions(); $('#packageModal').modal('show'); });
+            $(document).on('click', '.edit-package', function() {
+                const $card = $(this).closest('.package-card'); editingPackageIndex = String($card.attr('data-package-index'));
+                $('#packageModalLabel').text('Edit Package'); $('#savePackageBtn').html('<i class="fas fa-save"></i> Update Package');
+                $('#package_name').val(cardValue($card,'name')); $('#package_person_count').val(cardValue($card,'person_count') || 1);
+                $('#package_pandit_price').val(cardValue($card,'pandit_price') || 0); $('#package_discount_price').val(cardValue($card,'discount_price'));
+                $('#package_sort_order').val(cardValue($card,'sort_order') || 0); $('#package_short_description').val(cardValue($card,'short_description'));
+                $('#package_description').val(cardValue($card,'description')); $('#package_is_featured').prop('checked', cardValue($card,'is_featured') == '1');
+                $('#packageModalError').addClass('d-none').empty(); selectedProducts = [];
+                const grouped = {};
+                $card.find('input[name^="packages[' + editingPackageIndex + '][products]"]').each(function() {
+                    const m = $(this).attr('name').match(/\[products\]\[(\d+)\]\[(product_id|quantity|name|price|unit)\]/); if (!m) return;
+                    grouped[m[1]] = grouped[m[1]] || {}; grouped[m[1]][m[2]] = $(this).val();
+                });
+                Object.keys(grouped).sort((a,b)=>Number(a)-Number(b)).forEach(k => { const p = grouped[k]; addProduct(p.product_id, p.quantity || 1, p); });
+                if ($('#package_image').length) $('#package_image').val(''); renderProducts(); $('#packageModal').modal('show');
+            });
+            $('#savePackageBtn').on('click', function() {
+                const name = $.trim($('#package_name').val()); const person = parseInt($('#package_person_count').val(),10);
+                const pandit = Number($('#package_pandit_price').val()); const productTotal = renderProducts(); const price = Number($('#package_price').val());
+                const discount = $('#package_discount_price').val(); const sort = $('#package_sort_order').val() || 0;
+                const shortDesc = $('#package_short_description').val(); const description = $('#package_description').val(); const featured = $('#package_is_featured').is(':checked') ? 1 : 0;
+                const errors = []; if (!name) errors.push('Package name is required.'); if (!person || person < 1) errors.push('Person count must be at least 1.');
+                if (!Number.isFinite(pandit) || pandit < 0) errors.push('Pandit price must be zero or greater.');
+                if (discount !== '' && (!Number.isFinite(Number(discount)) || Number(discount) < 0 || Number(discount) > price)) errors.push('Discount price cannot exceed the calculated package total.');
+                if (errors.length) { $('#packageModalError').html(errors.map(escapeHtml).join('<br>')).removeClass('d-none'); return; }
+                $('#noPackageMessage').remove();
+                let idx = editingPackageIndex;
+                let $card;
+                let existingImage = '';
+                if (idx !== null) {
+                    $card = $('.package-card[data-package-index="' + idx + '"]');
+                    existingImage = $card.find('input[name="packages[' + idx + '][existing_package_image]"]').val() || '';
+                    const oldFile = $card.find('input.package-image-input')[0];
+                    const packageImageInput = $('#package_image')[0];
+                    if ((!packageImageInput || !packageImageInput.files.length) && oldFile && oldFile.files && oldFile.files.length) {
+                        const dt = new DataTransfer();
+                        dt.items.add(oldFile.files[0]);
+                        var preservedFile = dt.files[0];
+                    }
+                } else {
+                    idx = packageIndex++;
+                    $card = packageCardHtml(idx);
+                    $('#packageContainer').append($card);
+                }
+                const packageImageInput = $('#package_image')[0];
+                const file = (packageImageInput && packageImageInput.files.length ? packageImageInput.files[0] : null) || (typeof preservedFile !== 'undefined' ? preservedFile : null);
+                $card.find('input[name^="packages[' + idx + ']" ]').not('[type="file"]').remove();
+                $card.find('input.package-image-input').remove();
+                $card.find('input[name="packages[' + idx + '][existing_package_image]"]').remove();
+                renderCard($card, idx, {name:name,person_count:person,pandit_price:pandit.toFixed(2),price:price.toFixed(2),discount_price:discount,sort_order:sort,short_description:shortDesc,description:description,is_featured:featured,existing_package_image:existingImage,file:file});
+                $('#packageModal').modal('hide'); resetPackageForm();
+            });
+            $(document).on('click', '.removePackage, .remove-package', function() { $(this).closest('.package-card').remove(); if (!$('#packageContainer .package-card').length) $('#packageContainer').html('<div id="noPackageMessage" class="text-center py-5"><i class="fas fa-box-open package-empty-icon"></i><h5 class="mt-3">No packages added yet</h5><p class="text-muted">Click Add Package to create a package.</p><button type="button" class="btn btn-outline-primary" id="addFirstPackageBtn"><i class="fas fa-plus"></i> Add First Package</button></div>'); });
+            $('#addFaq').on('click', function() { const html = '<div class="faq-item border rounded p-3 mb-3"><div class="row"><div class="form-group col-md-5"><label>Question *</label><input type="text" name="faq['+faqIndex+'][question]" class="form-control" required placeholder="Enter FAQ question"></div><div class="form-group col-md-6"><label>Answer *</label><textarea name="faq['+faqIndex+'][answer]" class="form-control" rows="3" required placeholder="Enter FAQ answer"></textarea></div><div class="form-group col-md-1"><label>&nbsp;</label><button type="button" class="btn btn-danger btn-sm removeFaq"><i class="fas fa-trash"></i></button></div></div></div>'; $('#faqContainer').append(html); faqIndex++; });
+            $(document).on('click', '.removeFaq', function() { $(this).closest('.faq-item').remove(); });
+            const $description = $('#puja_description');
+            if ($description.length && typeof $.fn.summernote === 'function' && !$description.next('.note-editor').length) $description.summernote({height:200,callbacks:{onChange:function(contents){$description.val(contents);}}});
+            $('#pujaEditForm').on('submit', function() { if ($description.length && typeof $.fn.summernote === 'function' && $description.next('.note-editor').length) $description.val($description.summernote('code')); });
+        });
         </script>
-        <style>
-            .package-card {
-                background: #fff;
-                transition: 0.2s ease;
-            }
-            .package-card:hover {
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-            }
-            .package-card h6 {
-                font-weight: 600;
-            }
-            #packageContainer {
-                min-height: 100px;
-            }
-            #packageModal .modal-header {
-                background: #f8f9fa;
-            }
-            #packageModal .form-group {
-                margin-bottom: 15px;
-            }
-        </style>
+        <style>.package-card{background:#fff;transition:.2s ease}.package-card:hover{box-shadow:0 2px 8px rgba(0,0,0,.08)}#packageContainer{min-height:100px}#packageModal .modal-header{background:#f8f9fa}#packageModal .form-group{margin-bottom:15px}</style>
     @endpush
     @else
         @php

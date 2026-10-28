@@ -16,7 +16,6 @@ class Puja extends Model
         'description',
         'benefits',
         'ritual_details',
-        'samagri_details',
         'duration',
         'image',
         'banner_image',
@@ -55,14 +54,12 @@ class Puja extends Model
 
     public function faqs()
     {
-        return $this->hasMany(PujaFaq::class, 'puja_id')
-            ->orderBy('sort_order');
+        return $this->hasMany(PujaFaq::class, 'puja_id')->orderBy('sort_order');
     }
 
     public function packages()
     {
-        return $this->hasMany(PujaPackage::class, 'puja_id')
-            ->orderBy('sort_order');
+        return $this->hasMany(PujaPackage::class, 'puja_id')->orderBy('sort_order');
     }
 
     public function creator()
@@ -74,6 +71,7 @@ class Puja extends Model
     {
         return $this->belongsTo(User::class, 'updated_by');
     }
+
     public function bookings()
     {
         return $this->hasMany(PujaBooking::class, 'puja_id');
