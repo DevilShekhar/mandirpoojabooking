@@ -12,17 +12,23 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
+        // Rename existing role instead of creating a new one
+        Role::where('name', 'Puja Manager')
+            ->where('guard_name', 'web')
+            ->update(['name' => 'Store Manager']);
+
+        // Create other roles only if they don't already exist
         $roles = [
             'Super Admin',
             'Admin',
             'Temple Manager',
-            'Puja Manager',
             'Pandit',
             'Finance Manager',
             'Delivery Manager',
             'Support Executive',
             'Customer',
         ];
+
         foreach ($roles as $role) {
             Role::firstOrCreate([
                 'name' => $role,

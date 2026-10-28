@@ -210,6 +210,13 @@ class PermissionSeeder extends Seeder
             'all-tickit-booking.index',
             'my-tickit-booking.details',
             'all-tickit-booking.details',
+            
+            'store-managers.view',
+            'store-managers.index',
+            'store-managers.create',
+            'store-managers.show',
+            'store-managers.edit',
+            'store-managers.delete',
 
         ];
         foreach ($permissions as $permission) {
