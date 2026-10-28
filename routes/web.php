@@ -50,6 +50,7 @@ use App\Http\Controllers\Frontend\RazorpayTicketController;
 use App\Http\Controllers\Admin\TempleDailyTicketLimitController;
 use App\Http\Controllers\Admin\TicketBookingHistoryController;
 use App\Http\Controllers\Admin\StoreManagerController;
+use App\Http\Controllers\Admin\TempleProductController;
 
 Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
 Route::get('our-temples', [OurTemplesContoller::class, 'index'])->name('frontend.our-temples');
@@ -195,6 +196,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/tickit-booking-history',[TicketBookingHistoryController::class, 'managerHistory'])->name('admin.tickit-booking-history');
     Route::get('/tickit-booking-history/{bookingReference}',[TicketBookingHistoryController::class, 'managerBookingDetails'])->name('admin.tickit-booking-history.show');
     Route::resource('store-managers', StoreManagerController::class)->names('admin.store-managers');
+    Route::resource('temple-products', TempleProductController::class)->names('admin.temple-products')->parameters(['temple-products' => 'id']);
+
 });
 Route::middleware('auth')->prefix('payment/razorpay')->name('razorpay.')->group(function () {
     Route::post('/create-order', [RazorpayPaymentController::class, 'createOrder'])->name('create-order');

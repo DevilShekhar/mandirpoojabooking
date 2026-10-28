@@ -217,7 +217,14 @@ class PermissionSeeder extends Seeder
             'store-managers.show',
             'store-managers.edit',
             'store-managers.delete',
-
+            
+            // Temple Products
+            'product-temple.view',
+            'product-temple.create',
+            'product-temple.edit',
+            'product-temple.index',
+            'product-temple.show',
+            'product-temple.delete',
         ];
         foreach ($permissions as $permission) {
             Permission::firstOrCreate([

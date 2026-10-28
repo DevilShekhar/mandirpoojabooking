@@ -287,8 +287,7 @@
                                 <span>Sanatan Events</span>
                             </a>
                         </li>
-                        @endcan
-                        
+                        @endcan                        
                         @can('all-templae-register.list')
                         <li class="{{ request()->routeIs('all-templae-register*') ? 'active' : '' }}">
                             <a href="{{ route('all-templae-register') }}" class="nav-link">
@@ -297,8 +296,6 @@
                             </a>
                         </li>
                         @endcan
-
-                        {{-- Users --}}
                         @can('users.view')
                             <li class="dropdown {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
                                 <a href="#" class="menu-toggle nav-link has-dropdown">
@@ -327,9 +324,6 @@
                                 </ul>
                             </li>
                         @endcan
-
-
-                        {{-- Pandits --}}
                         @can('pandits.view')
                             <li class="dropdown {{ request()->routeIs('pandits.*') ? 'active' : '' }}">
                                 <a href="#" class="menu-toggle nav-link has-dropdown">
@@ -350,9 +344,36 @@
                                 </ul>
                             </li>
                         @endcan
-
-
-                        {{-- Roles --}}
+                        @canany(['store-managers.view', 'store-managers.index', 'store-managers.create'])
+                            <li class="dropdown {{ request()->routeIs('admin.store-managers.*') ? 'active' : '' }}">
+                                <a href="#" class="menu-toggle nav-link has-dropdown">
+                                    <i data-feather="user-check"></i>
+                                    <span>Store Manager</span>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    @canany(['store-managers.view', 'store-managers.index'])
+                                        <li class="{{ request()->routeIs('admin.store-managers.index') ? 'active' : '' }}">
+                                            <a class="nav-link" href="{{ route('admin.store-managers.index') }}">
+                                                Store Manager Listing
+                                            </a>
+                                        </li>
+                                    @endcanany
+                                    @can('store-managers.create')
+                                        <li class="{{ request()->routeIs('admin.store-managers.create') ? 'active' : '' }}">
+                                            <a class="nav-link" href="{{ route('admin.store-managers.create') }}">
+                                                Add Store Manager
+                                            </a>
+                                        </li>
+                                    @endcan
+                                </ul>
+                            </li>
+                        @endcanany
+                         <li class="{{ request()->routeIs('admin.temple-products.*') ? 'active' : '' }}">
+                            <a href="{{ route('admin.temple-products.index') }}" class="nav-link">
+                                <i data-feather="package"></i>
+                                <span>Temple Products</span>
+                            </a>
+                        </li>
                         @can('roles.view')
                             <li class="dropdown {{ request()->routeIs('roles.*') ? 'active' : '' }}">
                                 <a href="#" class="menu-toggle nav-link has-dropdown">
