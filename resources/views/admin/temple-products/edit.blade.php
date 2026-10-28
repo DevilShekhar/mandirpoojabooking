@@ -31,22 +31,7 @@
                                             @error('name')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
-                                        </div>
-
-                                        <div class="form-group col-lg-6">
-                                            <label for="sku">SKU</label>
-                                            <input
-                                                type="text"
-                                                name="sku"
-                                                id="sku"
-                                                class="form-control @error('sku') is-invalid @enderror"
-                                                value="{{ old('sku', $product->sku) }}"
-                                                placeholder="Enter product SKU"
-                                            >
-                                            @error('sku')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                        </div>
+                                        </div>                                      
 
                                         <div class="form-group col-lg-6">
                                             <label for="description">Description</label>
@@ -78,6 +63,34 @@
                                             >
                                             @error('price')
                                                 <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                        <div class="form-group col-lg-6">
+                                            <label for="qty" class="form-label">Quantity</label>
+                                            <input type="number" name="qty" id="qty" class="form-control" min="0" step="1"
+                                                value="{{ old('qty', $product->qty ?? 0) }}" required >
+                                            @error('qty')
+                                                <div class="text-danger">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                        <div class="form-group col-lg-6">
+                                            <label for="unit" class="form-label">Product Unit</label>
+
+                                            <select name="unit" id="unit"  class="form-control" required>
+                                                <option value="piece" {{ old('unit', $product->unit ?? 'piece') == 'piece' ? 'selected' : '' }}>Piece</option>
+                                                <option value="packet" {{ old('unit', $product->unit ?? '') == 'packet' ? 'selected' : '' }}>Packet</option>
+                                                <option value="box" {{ old('unit', $product->unit ?? '') == 'box' ? 'selected' : '' }}>Box</option>
+                                                <option value="ml" {{ old('unit', $product->unit ?? '') == 'ml' ? 'selected' : '' }}>Millilitre (ml)</option>
+                                                <option value="litre" {{ old('unit', $product->unit ?? '') == 'litre' ? 'selected' : '' }}>Litre</option>
+                                                <option value="gram" {{ old('unit', $product->unit ?? '') == 'gram' ? 'selected' : '' }}>Gram (g)</option>
+                                                <option value="kg" {{ old('unit', $product->unit ?? '') == 'kg' ? 'selected' : '' }}>Kilogram (kg)</option>
+                                                <option value="roll" {{ old('unit', $product->unit ?? '') == 'roll' ? 'selected' : '' }}>Roll</option>
+                                                <option value="kit" {{ old('unit', $product->unit ?? '') == 'kit' ? 'selected' : '' }}>Kit</option>
+                                                <option value="dozen" {{ old('unit', $product->unit ?? '') == 'dozen' ? 'selected' : '' }}>Dozen</option>
+                                            </select>
+
+                                            @error('unit')
+                                                <div class="text-danger">{{ $message }}</div>
                                             @enderror
                                         </div>
 

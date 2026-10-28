@@ -13,6 +13,8 @@ class TempleProduct extends Model
         'sku',
         'description',
         'price',
+        'qty',
+        'unit',
         'status',
         'created_by',
         'updated_by',
@@ -20,6 +22,7 @@ class TempleProduct extends Model
 
     protected $casts = [
         'price' => 'decimal:2',
+        'qty' => 'integer',
         'status' => 'boolean',
     ];
 
