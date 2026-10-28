@@ -8,9 +8,11 @@
                         <div class="card">
                             <div class="card-header">
                                 <h4>Temple Product Listing</h4>
+
                                 <div class="card-header-action">
                                     @can('product-temple.create')
-                                        <a href="{{ route('admin.temple-products.create') }}" class="btn btn-primary">
+                                        <a href="{{ route('admin.temple-products.create') }}"
+                                           class="btn btn-primary">
                                             <i class="fas fa-plus"></i> Add Product
                                         </a>
                                     @endcan
@@ -25,72 +27,81 @@
                                                 <th class="text-center">#</th>
                                                 <th>Product Name</th>
                                                 <th>SKU</th>
-                                                <th>Price</th>
+                                                <th>Price (₹)</th>
+                                                <th>Qty</th>
+                                                <th>Unit</th>
                                                 <th>Status</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
+
                                         <tbody>
                                             @forelse($products as $product)
                                                 <tr>
                                                     <td class="text-center">
                                                         {{ $products->firstItem() + $loop->index }}
                                                     </td>
+
                                                     <td>
                                                         <strong>{{ $product->name }}</strong>
                                                     </td>
+
                                                     <td>
                                                         {{ $product->sku ?: '-' }}
                                                     </td>
+
                                                     <td>
-                                                        {{ number_format((float) $product->price, 2) }}
+                                                        ₹{{ number_format((float) $product->price, 2) }}
                                                     </td>
+
+                                                    <td>
+                                                        {{ $product->qty ?? 0 }}
+                                                    </td>
+
+                                                    <td>
+                                                        {{ ucfirst($product->unit ?? 'piece') }}
+                                                    </td>
+
                                                     <td>
                                                         @if($product->status)
-                                                            <div class="badge badge-success badge-shadow">
+                                                            <span class="badge badge-success badge-shadow">
                                                                 Active
-                                                            </div>
+                                                            </span>
                                                         @else
-                                                            <div class="badge badge-danger badge-shadow">
+                                                            <span class="badge badge-danger badge-shadow">
                                                                 Inactive
-                                                            </div>
+                                                            </span>
                                                         @endif
                                                     </td>
+
                                                     <td>
                                                         <div class="d-flex align-items-center">
                                                             @can('product-temple.show')
-                                                                <a
-                                                                    href="{{ route('admin.temple-products.show', $product->id) }}"
-                                                                    class="btn btn-info btn-sm mr-1"
-                                                                    title="View"
-                                                                >
+                                                                <a href="{{ route('admin.temple-products.show', $product->id) }}"
+                                                                   class="btn btn-info btn-sm mr-1"
+                                                                   title="View">
                                                                     <i class="fas fa-eye"></i>
                                                                 </a>
                                                             @endcan
 
                                                             @can('product-temple.edit')
-                                                                <a
-                                                                    href="{{ route('admin.temple-products.edit', $product->id) }}"
-                                                                    class="btn btn-primary btn-sm mr-1"
-                                                                    title="Edit"
-                                                                >
+                                                                <a href="{{ route('admin.temple-products.edit', $product->id) }}"
+                                                                   class="btn btn-primary btn-sm mr-1"
+                                                                   title="Edit">
                                                                     <i class="fas fa-edit"></i>
                                                                 </a>
                                                             @endcan
 
                                                             @can('product-temple.delete')
-                                                                <form
-                                                                    action="{{ route('admin.temple-products.destroy', $product->id) }}"
-                                                                    method="POST"
-                                                                    class="delete-product-form"
-                                                                >
+                                                                <form action="{{ route('admin.temple-products.destroy', $product->id) }}"
+                                                                      method="POST"
+                                                                      class="delete-product-form">
                                                                     @csrf
                                                                     @method('DELETE')
-                                                                    <button
-                                                                        type="submit"
-                                                                        class="btn btn-danger btn-sm"
-                                                                        title="Delete"
-                                                                    >
+
+                                                                    <button type="submit"
+                                                                            class="btn btn-danger btn-sm"
+                                                                            title="Delete">
                                                                         <i class="fas fa-trash"></i>
                                                                     </button>
                                                                 </form>
@@ -100,7 +111,7 @@
                                                 </tr>
                                             @empty
                                                 <tr>
-                                                    <td colspan="6" class="text-center">
+                                                    <td colspan="8" class="text-center">
                                                         No temple products found.
                                                     </td>
                                                 </tr>
@@ -119,9 +130,7 @@
             </div>
         </section>
     @else
-        @php
-            abort(403);
-        @endphp
+        @php abort(403); @endphp
     @endcan
 @endsection
 
@@ -132,11 +141,11 @@
                 ordering: true,
                 searching: true,
                 paging: false,
-                info: true,
+                info: false,
                 columnDefs: [
                     {
                         orderable: false,
-                        targets: [0, 5]
+                        targets: [0, 7]
                     }
                 ]
             });
