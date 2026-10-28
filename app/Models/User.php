@@ -24,6 +24,7 @@ class User extends Authenticatable
         'status',
         'password',
         'role_id',
+        'temple_id',
         'google_id',
         'created_by',
         'updated_by',

@@ -368,12 +368,14 @@
                                 </ul>
                             </li>
                         @endcanany
+                         @can('product-temple.view')
                          <li class="{{ request()->routeIs('admin.temple-products.*') ? 'active' : '' }}">
                             <a href="{{ route('admin.temple-products.index') }}" class="nav-link">
                                 <i data-feather="package"></i>
                                 <span>Temple Products</span>
                             </a>
                         </li>
+                        @endcan
                         @can('roles.view')
                             <li class="dropdown {{ request()->routeIs('roles.*') ? 'active' : '' }}">
                                 <a href="#" class="menu-toggle nav-link has-dropdown">

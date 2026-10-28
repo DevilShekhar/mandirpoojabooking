@@ -10,20 +10,15 @@
         <div class="row">
             <div class="col-12">
                 <div class="card">
-
-
                 <div class="card-header">
                     <h4>Edit Temple</h4>
-
                     <div class="card-header-action">
                         <a href="{{ route('temples.index') }}" class="btn btn-secondary">
                             <i class="fas fa-arrow-left"></i> Back
                         </a>
                     </div>
                 </div>
-
-                <form method="POST"
-                    action="{{ route('temples.update', $temple->id) }}"
+                <form method="POST"  action="{{ route('temples.update', $temple->id) }}"
                     enctype="multipart/form-data">
 
                     @csrf
