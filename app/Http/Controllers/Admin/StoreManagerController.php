@@ -12,48 +12,45 @@ use Spatie\Permission\Models\Role;
 
 class StoreManagerController extends Controller
 {
+    private function templeId(): int
+    {
+        $user = auth()->user();
+        abort_unless($user && $user->hasRole('Temple Manager'), 403);
+        $templeId = DB::table('temple_user')->where('user_id', $user->id)->value('temple_id');
+        abort_unless($templeId, 403, 'No temple is assigned to this Temple Manager.');
+        return (int) $templeId;
+    }
     private function storeManagerRole(): Role
     {
-        return Role::where('name', 'Store Manager')
-            ->where('guard_name', 'web')
-            ->firstOrFail();
+        return Role::where('name', 'Store Manager')->where('guard_name', 'web')->firstOrFail();
     }
 
     private function authorizeStoreManager(User $storeManager): void
     {
-        abort_unless(
-            $storeManager->hasRole('Store Manager')
-            && (int) $storeManager->created_by === (int) auth()->id(),
-            404
-        );
+        abort_unless($storeManager->hasRole('Store Manager') && (int) $storeManager->created_by === (int) auth()->id() && (int) $storeManager->temple_id === $this->templeId(), 404);
     }
 
     public function index()
     {
-        $storeManagers = User::where('created_by', auth()->id())
-            ->whereHas('roles', function ($query) {
-                $query->where('name', 'Store Manager')
-                    ->where('guard_name', 'web');
-            })
-            ->latest()
-            ->paginate(10);
+        $templeId = $this->templeId();
+
+        $storeManagers = User::where('created_by', auth()->id())->where('temple_id', $templeId)->whereHas('roles', function ($query) {
+            $query->where('name', 'Store Manager')->where('guard_name', 'web');
+        })->latest()->paginate(10);
 
         return view('admin.store-managers.index', compact('storeManagers'));
     }
 
     public function create()
     {
-        $storeManagerExists = User::where('created_by', auth()->id())
-            ->whereHas('roles', function ($query) {
-                $query->where('name', 'Store Manager')
-                    ->where('guard_name', 'web');
-            })
-            ->exists();
+        $templeId = $this->templeId();
+
+        $storeManagerExists = User::where('created_by', auth()->id())->where('temple_id', $templeId)->whereHas('roles', function ($query) {
+            $query->where('name', 'Store Manager')->where('guard_name', 'web');
+        })->exists();
 
         if ($storeManagerExists) {
-            return redirect()
-                ->route('admin.store-managers.index')
-                ->with('error', 'You can create only one Store Manager.');
+            return redirect()->route('admin.store-managers.index')->with('error', 'You can create only one Store Manager for your temple.');
         }
 
         return view('admin.store-managers.create');
@@ -61,6 +58,7 @@ class StoreManagerController extends Controller
 
     public function store(Request $request)
     {
+        $templeId = $this->templeId();
         $role = $this->storeManagerRole();
 
         $validated = $request->validate([
@@ -74,25 +72,16 @@ class StoreManagerController extends Controller
             'status' => ['sometimes', 'boolean'],
         ]);
 
-        $storeManager = DB::transaction(function () use ($request, $validated, $role) {
-            $exists = User::where('created_by', $request->user()->id)
-                ->whereHas('roles', function ($query) {
-                    $query->where('name', 'Store Manager')
-                        ->where('guard_name', 'web');
-                })
-                ->lockForUpdate()
-                ->exists();
+        $storeManager = DB::transaction(function () use ($request, $validated, $role, $templeId) {
+            $exists = User::where('created_by', $request->user()->id)->where('temple_id', $templeId)->whereHas('roles', function ($query) {
+                $query->where('name', 'Store Manager')->where('guard_name', 'web');
+            })->exists();
 
             if ($exists) {
                 return null;
             }
 
-            $profilePath = null;
-
-            if ($request->hasFile('profile')) {
-                $profilePath = $request->file('profile')
-                    ->store('profiles', 'public');
-            }
+            $profilePath = $request->hasFile('profile') ? $request->file('profile')->store('profiles', 'public') : null;
 
             $user = User::create([
                 'name' => $validated['name'],
@@ -104,6 +93,7 @@ class StoreManagerController extends Controller
                 'password' => $validated['password'],
                 'status' => $request->boolean('status', true),
                 'role_id' => $role->id,
+                'temple_id' => $templeId,
                 'created_by' => $request->user()->id,
                 'updated_by' => $request->user()->id,
             ]);
@@ -114,14 +104,10 @@ class StoreManagerController extends Controller
         });
 
         if (!$storeManager) {
-            return redirect()
-                ->route('admin.store-managers.index')
-                ->with('error', 'You can create only one Store Manager.');
+            return redirect()->route('admin.store-managers.index')->with('error', 'You can create only one Store Manager for your temple.');
         }
 
-        return redirect()
-            ->route('admin.store-managers.index')
-            ->with('success', 'Store Manager created successfully.');
+        return redirect()->route('admin.store-managers.index')->with('success', 'Store Manager created successfully.');
     }
 
     public function show(User $storeManager)
@@ -144,12 +130,7 @@ class StoreManagerController extends Controller
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => [
-                'required',
-                'email',
-                'max:255',
-                Rule::unique('users', 'email')->ignore($storeManager->id),
-            ],
+            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($storeManager->id)],
             'phone' => ['nullable', 'string', 'max:20'],
             'gender' => ['nullable', Rule::in(['male', 'female', 'other'])],
             'birth_date' => ['nullable', 'date', 'before_or_equal:today'],
@@ -158,8 +139,7 @@ class StoreManagerController extends Controller
         ]);
 
         if ($request->hasFile('profile')) {
-            $newProfilePath = $request->file('profile')
-                ->store('profiles', 'public');
+            $newProfilePath = $request->file('profile')->store('profiles', 'public');
 
             if ($storeManager->profile) {
                 Storage::disk('public')->delete($storeManager->profile);
@@ -172,22 +152,15 @@ class StoreManagerController extends Controller
 
         $storeManager->update($validated);
 
-        return redirect()
-            ->route('admin.store-managers.index')
-            ->with('success', 'Store Manager updated successfully.');
+        return redirect()->route('admin.store-managers.index')->with('success', 'Store Manager updated successfully.');
     }
 
     public function destroy(User $storeManager)
     {
         $this->authorizeStoreManager($storeManager);
 
-        $storeManager->update([
-            'status' => false,
-            'updated_by' => auth()->id(),
-        ]);
+        $storeManager->update(['status' => false, 'updated_by' => auth()->id()]);
 
-        return redirect()
-            ->route('admin.store-managers.index')
-            ->with('success', 'Store Manager deactivated successfully.');
+        return redirect()->route('admin.store-managers.index')->with('success', 'Store Manager deactivated successfully.');
     }
 }
