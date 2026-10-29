@@ -1,0 +1,24 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::table('puja_bookings', function (Blueprint $table) {
+            $table->string('samgri_otp', 6)
+                ->nullable()
+                ->after('selected_products');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('puja_bookings', function (Blueprint $table) {
+            $table->dropColumn('samgri_otp');
+        });
+    }
+};

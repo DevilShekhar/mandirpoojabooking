@@ -156,6 +156,7 @@ class RazorpayPaymentController extends Controller
                 'user_id' => $request->user()->id,
                 'puja_id' => $puja->id,
                 'puja_package_id' => $package->id,
+                'temple_id'        => $puja->temple_id ?? $puja->temple?->id,
                 'amount_paise' => $amountPaise,
                 'currency' => 'INR',
                 'razorpay_order_id' => $order['id'],
@@ -282,6 +283,10 @@ class RazorpayPaymentController extends Controller
                     ->lockForUpdate()
                     ->firstOrFail();
                 if ($lockedPayment->puja_booking_id) {
+                    DB::table('puja_bookings')
+                        ->where('id', $lockedPayment->puja_booking_id)
+                        ->whereNull('samgri_otp')
+                        ->update(['samgri_otp' => (string) random_int(100000, 999999)]);
                     $lockedPayment->update([
                         'razorpay_payment_id' =>
                             $validated['razorpay_payment_id'],
@@ -326,6 +331,12 @@ class RazorpayPaymentController extends Controller
                     }
                     if ($matchingBookings->count() === 1) {
                         $existingBooking = $matchingBookings->first();
+                        if (empty($existingBooking->samgri_otp)) {
+                            DB::table('puja_bookings')
+                                ->where('id', $existingBooking->id)
+                                ->whereNull('samgri_otp')
+                                ->update(['samgri_otp' => (string) random_int(100000, 999999)]);
+                        }
                         $lockedPayment->update([
                             'puja_booking_id' => $existingBooking->id,
                             'razorpay_payment_id' =>
@@ -398,6 +409,7 @@ class RazorpayPaymentController extends Controller
                     0,
                     round($baseAmount - $finalPackageAmount, 2)
                 );
+                $samgriOtp = (string) random_int(100000, 999999);
                 $bookingNumber = 'PB' .
                     now()->format('YmdHis') .
                     Str::upper(Str::random(5));
@@ -436,6 +448,7 @@ class RazorpayPaymentController extends Controller
                             $selectedProducts,
                             JSON_THROW_ON_ERROR
                         ),
+                        'samgri_otp' => $samgriOtp,
                         'base_amount' => $baseAmount,
                         'discount_amount' => $discountAmount,
                         'coupon_discount' => 0,
@@ -521,6 +534,28 @@ class RazorpayPaymentController extends Controller
                         })->values()->toArray()
                         : [];
 
+                    $selectedProducts = $booking->selected_products ?? [];
+                    if (is_string($selectedProducts)) {
+                        $selectedProducts = json_decode($selectedProducts, true);
+                    }
+                    $selectedProducts = collect(
+                        is_array($selectedProducts) ? $selectedProducts : []
+                    )->map(function ($product) {
+                        $product = is_array($product) ? $product : [];
+                        $quantity = max(1, (int) ($product['quantity'] ?? 1));
+                        $price = max(0, (float) ($product['price'] ?? 0));
+                        return [
+                            'product_id' => $product['product_id'] ?? null,
+                            'name' => (string) ($product['name'] ?? 'Puja Samagri'),
+                            'unit' => (string) ($product['unit'] ?? 'Item'),
+                            'quantity' => $quantity,
+                            'price' => $price,
+                            'line_total' => max(
+                                0,
+                                (float) ($product['line_total'] ?? round($price * $quantity, 2))
+                            ),
+                        ];
+                    })->values()->all();
                     $details = [
                         // Booking and customer details
                         'booking_number' => $booking->booking_number,
@@ -531,6 +566,8 @@ class RazorpayPaymentController extends Controller
                         'booking_time' => $booking->schedule_time,
                         'amount' => (float) $booking->total_amount,
                         'payment_id' => $validated['razorpay_payment_id'],
+                        'samgri_otp' => $booking->samgri_otp ?? null,
+                        'selected_products' => $selectedProducts,
 
                         // Puja details
                         'puja_name' => $puja?->name ?? 'Puja',
