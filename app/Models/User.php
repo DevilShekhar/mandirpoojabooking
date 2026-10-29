@@ -60,6 +60,10 @@ class User extends Authenticatable
     {
         return $this->belongsTo(self::class, 'updated_by');
     }
+    public function temple(): BelongsTo
+    {
+        return $this->belongsTo(Temple::class,'temple_id','id');
+    }
 
     public function temples(): BelongsToMany
     {
@@ -70,7 +74,7 @@ class User extends Authenticatable
             ->withPivot('approval_status')
             ->withTimestamps();
     }
-
+    
     public function createdPujas(): HasMany
     {
         return $this->hasMany(Puja::class, 'created_by');
