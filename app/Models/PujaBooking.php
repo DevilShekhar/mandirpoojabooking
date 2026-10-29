@@ -35,12 +35,14 @@ class PujaBooking extends Model
         'puja_status',
         'video_status',
         'prasad_status',
+        'selected_products',
         'created_by',
         'updated_by',
     ];
 
     protected $casts = [
         'schedule_date' => 'date',
+        'schedule_time' => 'string',
         'base_amount' => 'decimal:2',
         'discount_amount' => 'decimal:2',
         'coupon_discount' => 'decimal:2',
@@ -48,8 +50,9 @@ class PujaBooking extends Model
         'shipping_amount' => 'decimal:2',
         'tax_amount' => 'decimal:2',
         'total_amount' => 'decimal:2',
+        'selected_products' => 'array',
     ];
-
+    
     public function user()
     {
         return $this->belongsTo(User::class);

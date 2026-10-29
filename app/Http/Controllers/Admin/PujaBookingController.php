@@ -29,9 +29,10 @@ class PujaBookingController extends Controller
         ]);
 
         if ($user->hasRole('Temple Manager')) {
-            $templeIds = $this->getManagedTempleIds($user);
-
-            $query->whereIn('temple_id', $templeIds);
+            $query->whereIn(
+                'temple_id',
+                $this->getManagedTempleIds($user)
+            );
         } elseif ($user->hasRole('Pandit')) {
             $query->where('pandit_id', $user->id);
         } elseif (!$user->hasAnyRole(['Admin', 'Super Admin'])) {
@@ -69,17 +70,32 @@ class PujaBookingController extends Controller
             'updatedBy',
         ]);
 
-        $bookingPayments = collect();
+        $selectedProducts = $this->normalizeSelectedProducts(
+            $pujaBooking->selected_products
+        );
         $paymentTable = (new PujaBookingPayment())->getTable();
+        $bookingPayments = collect();
 
         if (Schema::hasTable($paymentTable)) {
             $paymentForeignKey = $this->getBookingForeignKey($paymentTable);
 
             if ($paymentForeignKey) {
-                $bookingPayments = PujaBookingPayment::where(
+                $paymentQuery = PujaBookingPayment::where(
                     $paymentForeignKey,
                     $pujaBooking->id
-                )->latest()->get();
+                );
+                $bookingPayments = (clone $paymentQuery)
+                    ->latest()
+                    ->get();
+                if ($selectedProducts->isEmpty()) {
+                    $paymentProducts = (clone $paymentQuery)
+                        ->whereNotNull('selected_products')
+                        ->latest()
+                        ->value('selected_products');
+                    $selectedProducts = $this->normalizeSelectedProducts(
+                        $paymentProducts
+                    );
+                }
             }
         }
 
@@ -87,7 +103,9 @@ class PujaBookingController extends Controller
         $assignmentTable = (new PujaAssignment())->getTable();
 
         if (Schema::hasTable($assignmentTable)) {
-            $assignmentForeignKey = $this->getBookingForeignKey($assignmentTable);
+            $assignmentForeignKey = $this->getBookingForeignKey(
+                $assignmentTable
+            );
 
             if ($assignmentForeignKey) {
                 $assignments = PujaAssignment::where(
@@ -100,7 +118,8 @@ class PujaBookingController extends Controller
         return view('admin.booking-puja-order.show', compact(
             'pujaBooking',
             'bookingPayments',
-            'assignments'
+            'assignments',
+            'selectedProducts'
         ));
     }
 
@@ -121,7 +140,10 @@ class PujaBookingController extends Controller
         ])->where('payment_status', 'paid');
 
         if ($user->hasRole('Temple Manager')) {
-            $query->whereIn('temple_id', $this->getManagedTempleIds($user));
+            $query->whereIn(
+                'temple_id',
+                $this->getManagedTempleIds($user)
+            );
         } elseif ($user->hasRole('Pandit')) {
             $query->where('pandit_id', $user->id);
         } elseif (!$user->hasAnyRole(['Admin', 'Super Admin'])) {
@@ -130,7 +152,10 @@ class PujaBookingController extends Controller
 
         $bookings = $query->latest()->paginate(10);
 
-        return view('admin.booking-puja-order.successful', compact('bookings'));
+        return view(
+            'admin.booking-puja-order.successful',
+            compact('bookings')
+        );
     }
 
     public function failed()
@@ -150,7 +175,10 @@ class PujaBookingController extends Controller
 
         $payments = $query->latest()->paginate(10);
 
-        return view('admin.booking-puja-order.failed', compact('payments'));
+        return view(
+            'admin.booking-puja-order.failed',
+            compact('payments')
+        );
     }
 
     public function cancelled()
@@ -169,7 +197,10 @@ class PujaBookingController extends Controller
         ])->where('booking_status', 'cancelled');
 
         if ($user->hasRole('Temple Manager')) {
-            $query->whereIn('temple_id', $this->getManagedTempleIds($user));
+            $query->whereIn(
+                'temple_id',
+                $this->getManagedTempleIds($user)
+            );
         } elseif ($user->hasRole('Pandit')) {
             $query->where('pandit_id', $user->id);
         } elseif (!$user->hasAnyRole(['Admin', 'Super Admin'])) {
@@ -178,7 +209,10 @@ class PujaBookingController extends Controller
 
         $bookings = $query->latest()->paginate(10);
 
-        return view('admin.booking-puja-order.cancelled', compact('bookings'));
+        return view(
+            'admin.booking-puja-order.cancelled',
+            compact('bookings')
+        );
     }
 
     public function destroy(PujaBooking $pujaBooking)
@@ -205,8 +239,59 @@ class PujaBookingController extends Controller
             ->with('success', 'Puja booking cancelled successfully.');
     }
 
-    private function canViewBooking(User $user, PujaBooking $pujaBooking): bool
+    private function normalizeSelectedProducts($products)
     {
+        if (is_string($products)) {
+            $decoded = json_decode($products, true);
+
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                return collect();
+            }
+
+            $products = $decoded;
+        }
+
+        if (is_object($products)) {
+            $products = (array) $products;
+        }
+
+        if (!is_array($products) || empty($products)) {
+            return collect();
+        }
+
+        // Support {"products": [...]} and {"items": [...]}.
+        if (isset($products['products']) && is_array($products['products'])) {
+            $products = $products['products'];
+        } elseif (isset($products['items']) && is_array($products['items'])) {
+            $products = $products['items'];
+        }
+
+        // Support a single product object stored instead of a list.
+        if (
+            isset($products['name']) ||
+            isset($products['product_name']) ||
+            isset($products['product_id'])
+        ) {
+            $products = [$products];
+        }
+
+        return collect($products)
+            ->map(function ($product) {
+                if (is_object($product)) {
+                    return (array) $product;
+                }
+
+                return $product;
+            })
+            ->filter(function ($product) {
+                return is_array($product) || is_object($product);
+            })
+            ->values();
+    }
+    private function canViewBooking(
+        User $user,
+        PujaBooking $pujaBooking
+    ): bool {
         if ($user->hasAnyRole(['Admin', 'Super Admin'])) {
             return true;
         }
@@ -251,7 +336,9 @@ class PujaBookingController extends Controller
             $query->where('approval_status', 'approved');
         }
 
-        return $query->pluck('temple_id')->unique()->values();
+        return $query->pluck('temple_id')
+            ->unique()
+            ->values();
     }
 
     private function getBookingForeignKey(string $table): ?string
