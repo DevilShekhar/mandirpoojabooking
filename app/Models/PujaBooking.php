@@ -36,6 +36,7 @@ class PujaBooking extends Model
         'video_status',
         'prasad_status',
         'selected_products',
+        'samgri_otp',
         'created_by',
         'updated_by',
     ];
@@ -51,8 +52,9 @@ class PujaBooking extends Model
         'tax_amount' => 'decimal:2',
         'total_amount' => 'decimal:2',
         'selected_products' => 'array',
+        'samgri_otp' => 'string',
     ];
-    
+
     public function user()
     {
         return $this->belongsTo(User::class);

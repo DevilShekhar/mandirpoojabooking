@@ -20,6 +20,7 @@ class PujaBookingPayment extends Model
         'puja_id',
         'puja_package_id',
         'puja_booking_id',
+        'temple_id', // Added temple ID
 
         // Payment amount
         'amount_paise',
@@ -39,6 +40,9 @@ class PujaBookingPayment extends Model
         'error_source',
         'error_step',
         'error_reason',
+        // Other existing fields
+        'emails_sent_at',
+        'selected_products',
     ];
 
     /**
@@ -51,7 +55,10 @@ class PujaBookingPayment extends Model
             'puja_id' => 'integer',
             'puja_package_id' => 'integer',
             'puja_booking_id' => 'integer',
+            'temple_id' => 'integer',
             'amount_paise' => 'integer',
+            'emails_sent_at' => 'datetime',
+            'selected_products' => 'array',
         ];
     }
 
@@ -91,5 +98,13 @@ class PujaBookingPayment extends Model
             PujaBooking::class,
             'puja_booking_id'
         );
+    }
+
+    /**
+     * Payment belongs to a temple.
+     */
+    public function temple(): BelongsTo
+    {
+        return $this->belongsTo(Temple::class, 'temple_id');
     }
 }
