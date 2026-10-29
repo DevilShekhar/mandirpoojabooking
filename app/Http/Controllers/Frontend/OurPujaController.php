@@ -11,6 +11,8 @@ use App\Models\Temple;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+
 
 class OurPujaController extends Controller
 {
@@ -157,32 +159,83 @@ class OurPujaController extends Controller
             'temple.city',
             'deity',
             'pujaCategory',
-            'faqs',
-            'packages',
-        ])
-            ->where('status', 1)
-            ->where('slug', $slug)
-            ->firstOrFail();
-
+            'faqs' => function ($query) {
+                $query->where('status', 1)
+                    ->orderBy('sort_order');
+            },
+            'packages' => function ($query) {
+                $query->where('status', 1)
+                    ->orderBy('sort_order')
+                    ->orderBy('id');
+            },
+        ])->where('status', 1)->where('slug', $slug)->firstOrFail();       
+        $packages = $puja->packages;
+        $productIds = $packages->flatMap(function ($package) {
+            $products = $package->products;
+            if (is_string($products)) {
+                $products = json_decode($products, true);
+            }
+            if (!is_array($products)) {
+                return [];
+            }
+            return collect($products)->pluck('product_id')->filter()->map(fn ($id) => (int) $id);
+        })->unique()->values();        
+        $currentProducts = $productIds->isNotEmpty()
+            ? DB::table('temple_products')
+                ->where('temple_id', $puja->temple_id)
+                ->where('status', 1)
+                ->whereIn('id', $productIds)
+                ->get([
+                    'id',
+                    'name',
+                    'price',
+                    'qty',
+                    'unit',
+                ])
+                ->keyBy('id')
+            : collect();
+        foreach ($packages as $package) {
+            $products = $package->products;
+            if (is_string($products)) {
+                $products = json_decode($products, true);
+            }
+            $products = is_array($products) ? $products : [];
+            $packageProducts = collect($products)
+                ->map(function ($item) use ($currentProducts) {
+                    $productId = (int) ($item['product_id'] ?? 0);
+                    $currentProduct = $currentProducts->get($productId);
+                    $price = (float) ($item['price'] ?? $currentProduct?->price ?? 0 );
+                    $quantity = max(1,(int) ($item['quantity'] ?? 1));
+                    $name = $item['name'] ?? $currentProduct?->name ?? 'Puja Samagri';
+                    $unit = $item['unit'] ?? $currentProduct?->unit ?? null;
+                    return [
+                        'product_id' => $productId ?: null,
+                        'name' => $name,
+                        'price' => $price,
+                        'quantity' => $quantity,
+                        'unit' => $unit,
+                        'line_total' => round($price * $quantity,2),
+                    ];
+                })->values();
+            $originalPrice = (float) $package->price;
+            $discountPrice = $package->discount_price;
+            $hasDiscount = $discountPrice !== null && $discountPrice !== ''  && (float) $discountPrice < $originalPrice;
+            $package->setAttribute('frontend_products',$packageProducts);
+            $package->setAttribute('frontend_price',$hasDiscount ? (float) $discountPrice : $originalPrice);
+            $package->setAttribute('frontend_has_discount',$hasDiscount);
+        }
         $reviews = PujaReview::with('user')
             ->where('puja_id', $puja->id)
             ->where(function ($query) {
                 $query->where('status', 1);
-
                 if (auth()->check()) {
                     $query->orWhere(function ($q) {
                         $q->where('created_by', auth()->id())
                             ->where('status', 0);
                     });
                 }
-            })
-            ->latest()
-            ->get();
-
-        return view(
-            'frontend.pujas.show',
-            compact('puja', 'reviews')
-        );
+            })->latest()->get();
+        return view('frontend.pujas.show',compact('puja', 'reviews'));
     }
 
     public function storeReview(Request $request, $pujaId)
