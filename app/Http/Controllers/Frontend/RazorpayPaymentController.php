@@ -35,6 +35,8 @@ class RazorpayPaymentController extends Controller
     {
         $validated = $request->validate([
             'package_id' => ['required', 'integer', 'min:1'],
+            'product_ids' => ['sometimes', 'array'],
+            'product_ids.*' => ['integer', 'distinct', 'min:1'],
             'booking_date' => ['required', 'date', 'after_or_equal:today'],
             'booking_time' => ['required', 'date_format:H:i'],
         ]);
@@ -48,7 +50,7 @@ class RazorpayPaymentController extends Controller
                 ], 422);
             }
 
-            $package = PujaPackage::with('puja')->findOrFail($validated['package_id']);
+            $package = PujaPackage::query()->where('status', 1)->with('puja')->findOrFail($validated['package_id']);
             $puja = $package->puja;
             if (!$puja || (int) $puja->status !== 1) {
                 return response()->json([
@@ -56,17 +58,87 @@ class RazorpayPaymentController extends Controller
                     'message' => 'The selected puja is not available.',
                 ], 422);
             }
-            $baseAmount = (float) $package->price;
-            $finalAmount = ($package->discount_price !== null && $package->discount_price !== '' && (float) $package->discount_price < $baseAmount)
-                ? (float) $package->discount_price
-                : $baseAmount;
-            $amountPaise = (int) round($finalAmount * 100);
+            $snapshot = $package->products;
+            if (is_string($snapshot)) {
+                $snapshot = json_decode($snapshot, true);
+            }
+            $snapshot = is_array($snapshot) ? $snapshot : [];
+            $packageProducts = collect($snapshot)->map(function ($item) {
+                $item = is_array($item) ? $item : [];
+                $price = max(0, (float) ($item['price'] ?? 0));
+                $quantity = max(1, (int) ($item['quantity'] ?? 1));
+                $productId = (int) ($item['product_id'] ?? 0);
+                return [
+                    'product_id' => $productId > 0 ? $productId : null,
+                    'name' => (string) ($item['name'] ?? 'Puja Samagri'),
+                    'unit' => (string) ($item['unit'] ?? 'Item'),
+                    'price' => $price,
+                    'quantity' => $quantity,
+                    'line_total' => round($price * $quantity, 2),
+                ];
+            })->values();
+            $selectedIds = collect($validated['product_ids'] ?? [])
+                ->map(fn ($id) => (int) $id)
+                ->unique()
+                ->values();
+            $availableIds = $packageProducts
+                ->pluck('product_id')
+                ->filter()
+                ->unique()
+                ->values();
+            if ($selectedIds->diff($availableIds)->isNotEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'A selected product does not belong to this package.',
+                ], 422);
+            }
+            $selectedProducts = $packageProducts
+                ->filter(fn ($product) =>
+                    $product['product_id'] !== null
+                    && $selectedIds->contains($product['product_id'])
+                )
+                ->values();
+            $originalPrice = max(0, (float) $package->price);
+            $allProductTotal = round(
+                (float) $packageProducts->sum('line_total'),
+                2
+            );
+            $basePackagePrice = max(0, round($originalPrice - $allProductTotal, 2));
+
+            $discountPrice = $package->discount_price;
+            $hasDiscount = $discountPrice !== null
+                && $discountPrice !== ''
+                && (float) $discountPrice >= 0
+                && (float) $discountPrice < $originalPrice;
+
+            $discountFactor = $hasDiscount && $originalPrice > 0
+                ? (float) $discountPrice / $originalPrice
+                : 1;
+
+            $finalPackagePrice = round($basePackagePrice * $discountFactor, 2);
+            $selectedProductsTotal = round(
+                (float) $selectedProducts->sum('line_total'),
+                2
+            );
+            $total = round($finalPackagePrice + $selectedProductsTotal, 2);
+            $amountPaise = (int) round($total * 100);
+
             if ($amountPaise < 100) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'The package amount must be at least ₹1.00.',
+                    'message' => 'The total amount must be at least ₹1.00.',
                 ], 422);
             }
+
+            $selectedProductsSnapshot = $selectedProducts->map(fn ($product) => [
+                'product_id' => $product['product_id'],
+                'name' => $product['name'],
+                'unit' => $product['unit'],
+                'price' => $product['price'],
+                'quantity' => $product['quantity'],
+                'line_total' => $product['line_total'],
+            ])->values()->all();
+
             $api = $this->razorpay();
             $order = $api->order->create([
                 'receipt' => 'puja_' . Str::lower(Str::random(20)),
@@ -80,7 +152,7 @@ class RazorpayPaymentController extends Controller
                     'booking_time' => $validated['booking_time'],
                 ],
             ]);
-            PujaBookingPayment::create([
+            $paymentRecord = PujaBookingPayment::create([
                 'user_id' => $request->user()->id,
                 'puja_id' => $puja->id,
                 'puja_package_id' => $package->id,
@@ -89,6 +161,16 @@ class RazorpayPaymentController extends Controller
                 'razorpay_order_id' => $order['id'],
                 'status' => 'pending',
             ]);
+
+            // Persist the selected product details against this exact Razorpay order.
+            DB::table('puja_booking_payments')
+                ->where('id', $paymentRecord->id)
+                ->update([
+                    'selected_products' => json_encode(
+                        $selectedProductsSnapshot,
+                        JSON_THROW_ON_ERROR
+                    ),
+                ]);
             return response()->json([
                 'success' => true,
                 'key' => config('services.razorpay.key'),
@@ -266,15 +348,55 @@ class RazorpayPaymentController extends Controller
                         'The puja associated with this payment could not be found.'
                     );
                 }
-                $paidAmount = $lockedPayment->amount_paise / 100;
-                $currentBaseAmount = (float) $package->price;
-                $baseAmount = max(
-                    $currentBaseAmount,
-                    $paidAmount
+                $paidAmount = round($lockedPayment->amount_paise / 100, 2);
+
+                // Use the snapshot saved at createOrder; never trust product_ids
+                // submitted again by the browser during payment verification.
+                $selectedProducts = $lockedPayment->selected_products ?? [];
+                if (is_string($selectedProducts)) {
+                    $selectedProducts = json_decode($selectedProducts, true);
+                }
+                $selectedProducts = is_array($selectedProducts)
+                    ? array_values($selectedProducts)
+                    : [];
+
+                $selectedProductsTotal = round(
+                    (float) collect($selectedProducts)->sum('line_total'),
+                    2
                 );
+
+                $packageSnapshot = $package->products;
+                if (is_string($packageSnapshot)) {
+                    $packageSnapshot = json_decode($packageSnapshot, true);
+                }
+                $packageSnapshot = is_array($packageSnapshot)
+                    ? $packageSnapshot
+                    : [];
+
+                $allProductTotal = collect($packageSnapshot)->sum(
+                    fn ($item) => max(0, (float) ($item['price'] ?? 0))
+                        * max(1, (int) ($item['quantity'] ?? 1))
+                );
+
+                // The base amount is the pandit/service component, excluding
+                // all products bundled into the original package price.
+                $baseAmount = max(
+                    0,
+                    round((float) $package->price - $allProductTotal, 2)
+                );
+
+                $discountPrice = $package->discount_price;
+                $hasDiscount = $discountPrice !== null
+                    && $discountPrice !== ''
+                    && (float) $discountPrice >= 0
+                    && (float) $discountPrice < (float) $package->price;
+                $discountFactor = $hasDiscount && (float) $package->price > 0
+                    ? (float) $discountPrice / (float) $package->price
+                    : 1;
+                $finalPackageAmount = round($baseAmount * $discountFactor, 2);
                 $discountAmount = max(
                     0,
-                    $baseAmount - $paidAmount
+                    round($baseAmount - $finalPackageAmount, 2)
                 );
                 $bookingNumber = 'PB' .
                     now()->format('YmdHis') .
@@ -310,10 +432,14 @@ class RazorpayPaymentController extends Controller
                         'person_count' => (int) (
                             $package->person_count ?? 1
                         ),
+                        'selected_products' => json_encode(
+                            $selectedProducts,
+                            JSON_THROW_ON_ERROR
+                        ),
                         'base_amount' => $baseAmount,
                         'discount_amount' => $discountAmount,
                         'coupon_discount' => 0,
-                        'addon_amount' => 0,
+                        'addon_amount' => $selectedProductsTotal,
                         'shipping_amount' => 0,
                         'tax_amount' => 0,
                         'total_amount' => $paidAmount,

@@ -1,8 +1,5 @@
-
 @extends('frontend.layouts.app')
-
 @section('title', 'Puja Checkout')
-
 @section('content')
     @php
         $temple = $puja->temple;
@@ -27,12 +24,6 @@
             }
         }
 
-        $hasDiscount =
-            $package->discount_price !== null &&
-            $package->discount_price !== '' &&
-            $package->discount_price < $package->price;
-
-        $finalPrice = $hasDiscount ? $package->discount_price : $package->price;
         $personCount = (int) ($package->person_count ?? 1);
     @endphp
 
@@ -157,6 +148,59 @@
 
                                 <div class="description-content">
                                     {!! nl2br(e($puja->samagri_details)) !!}
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+
+                    <div class="checkout-card">
+                        <div class="checkout-card-heading">
+                            <div class="heading-icon">
+                                <i class="fa fa-shopping-basket"></i>
+                            </div>
+                            <div>
+                                <h3>Selected Puja Samagri</h3>
+                                <p>Products selected with your package</p>
+                            </div>
+                        </div>
+
+                        @if($selectedProducts->isNotEmpty())
+                            <div class="table-responsive">
+                                <table class="table checkout-products-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Product</th>
+                                            <th>Unit</th>
+                                            <th>Unit Price</th>
+                                            <th>Qty</th>
+                                            <th class="text-right">Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($selectedProducts as $product)
+                                            <tr>
+                                                <td>{{ $product['name'] }}</td>
+                                                <td>{{ $product['unit'] ?: '—' }}</td>
+                                                <td>₹{{ number_format($product['price'], 2) }}</td>
+                                                <td>{{ $product['quantity'] }}</td>
+                                                <td class="text-right">₹{{ number_format($product['line_total'], 2) }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th colspan="4" class="text-right">Samagri Subtotal</th>
+                                            <th class="text-right">₹{{ number_format($selectedProductsTotal, 2) }}</th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        @else
+                            <div class="checkout-empty-samagri">
+                                <i class="fa fa-check-circle"></i>
+                                <div>
+                                    <strong>Package only</strong>
+                                    <p>You have not selected any additional samagri.</p>
                                 </div>
                             </div>
                         @endif
@@ -298,37 +342,23 @@
 
                             <div class="summary-divider"></div>
 
-                            @if($hasDiscount)
-                                <div class="summary-detail">
-                                    <span>Original Price</span>
+                            <div class="summary-detail">
+                                <span>Puja Package</span>
+                                <strong>₹{{ number_format($finalPackagePrice, 2) }}</strong>
+                            </div>
 
-                                    <span class="original-price">
-                                        ₹{{ number_format($package->price, 2) }}
-                                    </span>
-                                </div>
-
-                                <div class="summary-detail">
-                                    <span>Discount</span>
-
-                                    <strong class="discount-text">
-                                        -₹{{ number_format(
-                                            $package->price - $finalPrice,
-                                            2
-                                        ) }}
-                                    </strong>
-                                </div>
-                            @endif
+                            <div class="summary-detail">
+                                <span>Selected Samagri</span>
+                                <strong>₹{{ number_format($selectedProductsTotal, 2) }}</strong>
+                            </div>
 
                             <div class="summary-total">
                                 <span>Total Amount</span>
-
-                                <strong>
-                                    ₹{{ number_format($finalPrice, 2) }}
-                                </strong>
+                                <strong>₹{{ number_format($total, 2) }}</strong>
                             </div>
 
                             <p class="price-note">
-                                Final package price before any additional charges.
+                                Total for the selected package and samagri.
                             </p>
 
                             <button
@@ -415,7 +445,6 @@
         box-shadow: 0 4px 18px rgba(0, 0, 0, .04);
     }
 
-    /* Keep only the right-side Booking Summary sticky on desktop. */
     .package-summary-card {
         position: sticky;
         top: 100px;
@@ -770,6 +799,53 @@
         margin-right: 5px;
     }
 
+    .checkout-products-table {
+        margin-bottom: 0;
+        font-size: 13px;
+    }
+
+    .checkout-products-table thead th {
+        background: #fff6eb;
+        color: #59412d;
+        border-top: 0;
+        white-space: nowrap;
+    }
+
+    .checkout-products-table td,
+    .checkout-products-table th {
+        padding: 12px 9px;
+        vertical-align: middle;
+    }
+
+    .checkout-products-table tfoot th {
+        border-top: 1px solid #eadfd5;
+    }
+
+    .checkout-empty-samagri {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 16px;
+        border: 1px solid #d9ecdf;
+        border-radius: 9px;
+        background: #f0f8f2;
+    }
+
+    .checkout-empty-samagri i {
+        color: #198754;
+        font-size: 23px;
+    }
+
+    .checkout-empty-samagri strong {
+        color: #24573a;
+    }
+
+    .checkout-empty-samagri p {
+        margin: 4px 0 0;
+        color: #777;
+        font-size: 13px;
+    }
+
     .empty-message {
         color: #777;
         font-size: 14px;
@@ -852,7 +928,6 @@
 @push('scripts')
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
-
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const paymentButton = document.getElementById('checkoutPaymentButton');
@@ -869,14 +944,12 @@
         const verifyPaymentUrl = @json(route('razorpay.verify'));
         const failedUrl = @json(route('razorpay.failed'));
         const packageId = @json($package->id);
+        const selectedProductIds = @json($selectedIds->values()->all());
         const bookingDateInput = document.getElementById('booking_date');
         const bookingTimeInput = document.getElementById('booking_time');
 
         let paymentInProgress = false;
 
-        /**
-         * Update payment button and message.
-         */
         function setLoading(isLoading, message = '') {
             paymentButton.disabled = isLoading;
 
@@ -889,9 +962,6 @@
             }
         }
 
-        /**
-         * Send JSON request to Laravel.
-         */
         async function postJson(url, payload) {
             const response = await fetch(url, {
                 method: 'POST',
@@ -922,9 +992,6 @@
             return data;
         }
 
-        /**
-         * Handle failed payment.
-         */
         async function handlePaymentFailure(response, order) {
             const error = response.error || {};
             const metadata = error.metadata || {};
@@ -961,9 +1028,6 @@
             }
         }
 
-        /**
-         * Start checkout.
-         */
         paymentButton.addEventListener('click', async function () {
             if (paymentInProgress) {
                 return;
@@ -988,9 +1052,9 @@
             setLoading(true, 'Creating payment order...');
 
             try {
-                // 1. Create Razorpay order on the Laravel backend.
                 const order = await postJson(createOrderUrl, {
                     package_id: packageId,
+                    product_ids: selectedProductIds,
                     booking_date: bookingDate,
                     booking_time: bookingTime,
                     schedule: selectedSchedule
@@ -999,8 +1063,6 @@
                 if (!order.order_id || !order.key) {
                     throw new Error('Unable to create payment order.');
                 }
-
-                // 2. Configure Razorpay checkout.
                 const options = {
                     key: order.key,
                     amount: order.amount,
@@ -1013,8 +1075,6 @@
                     theme: {
                         color: '#d71968'
                     },
-
-                    // 3. Successful payment: verify on the backend.
                     handler: async function (response) {
                         setLoading(true, 'Verifying payment...');
 
@@ -1025,7 +1085,9 @@
                                 razorpay_signature: response.razorpay_signature,
                                 booking_date: bookingDate,
                                 booking_time: bookingTime,
-                                schedule: selectedSchedule
+                                schedule: selectedSchedule,
+                                package_id: packageId,
+                                product_ids: selectedProductIds
                             });
 
                             if (result.redirect_url) {
@@ -1045,8 +1107,6 @@
                             setLoading(false, error.message);
                         }
                     },
-
-                    // 4. Customer closes the Razorpay popup.
                     modal: {
                         ondismiss: function () {
                             paymentInProgress = false;
@@ -1058,16 +1118,10 @@
                         }
                     }
                 };
-
-                // 5. Create Razorpay instance.
                 const razorpay = new Razorpay(options);
-
-                // 6. Register failure event BEFORE opening checkout.
                 razorpay.on('payment.failed', function (response) {
                     handlePaymentFailure(response, order);
                 });
-
-                // 7. Open Razorpay popup.
                 razorpay.open();
 
             } catch (error) {
