@@ -368,6 +368,32 @@
                                 </ul>
                             </li>
                         @endcanany
+                        @canany(['news.view', 'news.index', 'news.create'])
+                            <li class="dropdown {{ request()->routeIs('my-news.*') ? 'active' : '' }}">
+                                <a href="#" class="menu-toggle nav-link has-dropdown">
+                                    <i data-feather="file-text"></i>
+                                    <span>My News</span>
+                                </a>
+
+                                <ul class="dropdown-menu">
+                                    @canany(['news.view', 'news.index'])
+                                        <li class="{{ request()->routeIs('my-news.index', 'my-news.show') ? 'active' : '' }}">
+                                            <a class="nav-link" href="{{ route('my-news.index') }}">
+                                                News Listing
+                                            </a>
+                                        </li>
+                                    @endcanany
+
+                                    @can('news.create')
+                                        <li class="{{ request()->routeIs('my-news.create') ? 'active' : '' }}">
+                                            <a class="nav-link" href="{{ route('my-news.create') }}">
+                                                Add News
+                                            </a>
+                                        </li>
+                                    @endcan
+                                </ul>
+                            </li>
+                        @endcanany
                         @can('product-temple.view')
                          <li class="{{ request()->routeIs('admin.temple-products.*') ? 'active' : '' }}">
                             <a href="{{ route('admin.temple-products.index') }}" class="nav-link">
