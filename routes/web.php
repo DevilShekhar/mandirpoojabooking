@@ -47,6 +47,7 @@ use App\Http\Controllers\Frontend\EventCreatorRegistrationController;
 use App\Http\Controllers\Admin\TicketPriceController;
 use App\Http\Controllers\Frontend\TicketCartController;
 use App\Http\Controllers\Frontend\RazorpayTicketController;
+use App\Http\Controllers\Frontend\TickitBookingfillterController;
 use App\Http\Controllers\Admin\TempleDailyTicketLimitController;
 use App\Http\Controllers\Admin\TicketBookingHistoryController;
 use App\Http\Controllers\Admin\StoreManagerController;
@@ -85,7 +86,9 @@ Route::get('/temple-register/get-cities/{district}', [TempleRegistrationControll
 Route::get('/event-creator/register', [EventCreatorRegistrationController::class, 'create'])->name('event-creator.register');
 Route::post('/event-creator/register', [EventCreatorRegistrationController::class, 'store'])->name('event-creator.register.store');
 Route::post('/temples/{temple}/ticket-cart',[TicketCartController::class, 'store'])->name('frontend.ticket-cart.store');
-
+Route::get('/tickit-booking', [TickitBookingfillterController::class,'tickitbooking'])->name('tickit-booking.tickitfillter');
+Route::get('/tickit-booking/search', [TickitBookingfillterController::class,'search'])->name('tickit-booking.search');
+Route::get('/tickit-booking/view-puja/{puja}', [TickitBookingfillterController::class,'viewPuja'])->whereNumber('puja')->name('tickit-booking.view-puja');
 Route::middleware('auth')
     ->prefix('ticket-cart')
     ->name('frontend.ticket-cart.')
