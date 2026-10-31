@@ -54,6 +54,7 @@ use App\Http\Controllers\Admin\StoreManagerController;
 use App\Http\Controllers\Admin\TempleProductController;
 use App\Http\Controllers\Admin\SamgriBookingController;
 use App\Http\Controllers\Admin\NewsController;
+use App\Http\Controllers\Frontend\NewsFrontendController;
 
 Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
 Route::get('our-temples', [OurTemplesContoller::class, 'index'])->name('frontend.our-temples');
@@ -90,6 +91,8 @@ Route::post('/temples/{temple}/ticket-cart',[TicketCartController::class, 'store
 Route::get('/tickit-booking', [TickitBookingfillterController::class,'tickitbooking'])->name('tickit-booking.tickitfillter');
 Route::get('/tickit-booking/search', [TickitBookingfillterController::class,'search'])->name('tickit-booking.search');
 Route::get('/tickit-booking/view-puja/{puja}', [TickitBookingfillterController::class,'viewPuja'])->whereNumber('puja')->name('tickit-booking.view-puja');
+Route::get('/news', [NewsFrontendController::class, 'index'])->name('frontend.news');
+Route::get('/news/{slug}', [NewsFrontendController::class, 'show'])->name('frontend.news.show');
 Route::middleware('auth')
     ->prefix('ticket-cart')
     ->name('frontend.ticket-cart.')

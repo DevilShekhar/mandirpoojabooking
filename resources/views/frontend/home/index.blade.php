@@ -386,88 +386,84 @@
         </div>
     </div>
 </section>
+@if(isset($news) && $news->isNotEmpty())
 <section class="special-puja-area pt-60 pb-60">
     <div class="container">
         <div class="row">
             <div class="col-12">
                 <div class="special-puja-heading text-center mb-30">
-                    <h2>Sri Mandir in News</h2>
+                    <h2>
+                        <span>Sri Mandir</span> in News
+                    </h2>
+                    <p>
+                        Read the latest news, updates and announcements from Sri Mandir.
+                    </p>
                 </div>
             </div>
         </div>
         <div class="row">
             <div class="col-12">
                 <div class="special-puja-slider owl-carousel">
-                    <div class="col-lg-4">
-                        <div class="special-puja-card">
-                            <div class="puja-content text-center">
-                                <div class="puja-category">द्रिक पंचांग</div>
-                                <h3>अयोध्या का विग्रहण: श्री मंदिर एवं बालाजी धाम से जुड़ी विशेष खबर</h3>
-                                <p class="puja-description">श्री मंदिर से जुड़ी महत्वपूर्ण धार्मिक खबरें और विशेष समाचार पढ़ें।</p>
-                            </div>
-                            <div class="puja-image">
-                                <img src="{{ asset('assets/frontend/assets/images/news/news-1.jpg') }}" alt="Sri Mandir News">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="special-puja-card">
-                            <div class="puja-content text-center">
-                                <div class="puja-category">प्रभात खबर</div>
-                                <h3>पितृपक्ष में अनुष्ठान का बना बदलाव, श्री मंदिर ऐप से दुनिया भर के श्रद्धालु जुड़ रहे</h3>
-                                <p class="puja-description">देश और विदेश के भक्तों के लिए विशेष पूजा और धार्मिक अनुष्ठानों की जानकारी।</p>
-                            </div>
-                            <div class="puja-image">
-                                <img src="{{ asset('assets/frontend/assets/images/news/news-2.jpg') }}" alt="Sri Mandir News">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="special-puja-card">
-                            <div class="puja-content text-center">
-                                <div class="puja-category">नवभारत टाइम्स</div>
-                                <h3>उदय के अतिथि देवों भवः की सेवा और भक्ति लोकपयोगी भी मंदिर सेवा पर</h3>
-                                <p class="puja-description">भारत के प्रसिद्ध मंदिरों और धार्मिक आयोजनों से जुड़ी नवीनतम खबरें।</p>
-                            </div>
-                            <div class="puja-image">
-                                <img src="{{ asset('assets/frontend/assets/images/news/news-3.jpg') }}" alt="Sri Mandir News">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="special-puja-card">
-                            <div class="puja-content text-center">
-                                <div class="puja-category">आज तक</div>
-                                <h3>धार्मिक स्थलों और मंदिरों से जुड़ी महत्वपूर्ण खबरें और अपडेट</h3>
-                                <p class="puja-description">मंदिरों, पूजा और धार्मिक आयोजनों की नवीनतम जानकारी।</p>
-                            </div>
-                            <div class="puja-image">
-                                <img src="{{ asset('assets/frontend/assets/images/news/news-4.jpg') }}" alt="Sri Mandir News">
+                    @foreach($news as $item)
+                        <div class="col-lg-4">
+                            <div class="special-puja-card">
+                                <div class="puja-image">
+                                    @if($item->image)
+                                        <img
+                                            src="{{ asset('storage/' . $item->image) }}"
+                                            alt="{{ $item->title }}"
+                                        >
+                                    @else
+                                        <img
+                                            src="{{ asset('assets/frontend/assets/images/news/news-1.jpg') }}"
+                                            alt="{{ $item->title }}"
+                                        >
+                                    @endif
+                                </div>
+
+                                <div class="puja-content text-center">
+                                    <h3>
+                                        {{ $item->title }}
+                                    </h3>
+                                    @if($item->short_description)
+                                        <p class="puja-description">
+                                            {{ \Illuminate\Support\Str::limit(
+                                                strip_tags($item->short_description),
+                                                120
+                                            ) }}
+                                        </p>
+                                    @elseif($item->description)
+                                        <p class="puja-description">
+                                            {{ \Illuminate\Support\Str::limit(
+                                                strip_tags($item->description),
+                                                120
+                                            ) }}
+                                        </p>
+                                    @endif
+                                    <a href="{{ route('frontend.news.show', ['slug' => $item->slug]) }}"
+                                       class="puja-btn">
+                                        READ MORE
+                                        <i class="fa fa-arrow-right"></i>
+                                    </a>
+
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="special-puja-card">
-                            <div class="puja-content text-center">
-                                <div class="puja-category">दैनिक जागरण</div>
-                                <h3>भारत के प्रसिद्ध मंदिरों में विशेष पूजा और धार्मिक कार्यक्रमों की जानकारी</h3>
-                                <p class="puja-description">श्रद्धालुओं के लिए पूजा और धार्मिक कार्यक्रमों से जुड़ी विशेष जानकारी।</p>
-                            </div>
-                            <div class="puja-image">
-                                <img src="{{ asset('assets/frontend/assets/images/news/news-5.jpg') }}" alt="Sri Mandir News">
-                            </div>
-                        </div>
-                    </div>
+                    @endforeach
                 </div>
             </div>
         </div>
         <div class="row">
             <div class="col-12 text-center mt-25">
-                <a href="#" class="view-all-pujas">View All News <i class="fa fa-arrow-right"></i></a>
+                <a href="{{ route('frontend.news') }}" class="view-all-pujas">
+                    View All News
+                    <i class="fa fa-arrow-right"></i>
+                </a>
             </div>
         </div>
     </div>
 </section>
+@endif
 <section class="why-choose-section">
 
     <div class="container">

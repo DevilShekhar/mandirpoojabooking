@@ -251,10 +251,8 @@
                     </div>
 
                     @if($sanatan->is_online || $sanatan->is_offline)
-                        <a href="{{ route('frontend.sanatanevents') }}" class="sanatan-primary-btn">
-                            <i class="fa fa-calendar-check-o"></i>
-                            Explore Events
-                            <i class="fa fa-arrow-right"></i>
+                        <a href="{{ route('frontend.sanatanevents.buy', $sanatan->slug) }}" class="sanatan-view-btn flex-fill">
+                            <i class="fa fa-shopping-cart me-1"></i> Add to Cart
                         </a>
                     @else
                         <button type="button" class="sanatan-primary-btn disabled" disabled>
@@ -321,6 +319,8 @@
 
 @push('styles')
 <style>
+    .sanatan-view-btn{display:block;text-align:center;background:#e85d04;color:#fff;text-decoration:none;padding:11px 15px;border-radius:7px;font-size:14px;font-weight:600;transition:.3s}
+    .sanatan-view-btn:hover{background:#c94d00;color:#fff}
 .sanatan-event-page{background:#fffaf4;padding:35px 0 70px}
 .sanatan-breadcrumb{margin-bottom:20px}
 .sanatan-breadcrumb a{display:inline-flex;align-items:center;gap:8px;color:#a9430b;font-size:14px;font-weight:600;text-decoration:none}

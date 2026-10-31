@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\HomeBanner;
 use App\Models\Puja;
 use App\Models\Temple;
+use App\Models\News;
 
 class HomeController extends Controller
 {
@@ -30,11 +31,16 @@ class HomeController extends Controller
             ->latest()
             ->take(6)
             ->get();
-
+        $news = News::with('temple')
+                    ->where('status', 1)
+                    ->latest()
+                    ->take(6)
+                    ->get();
         return view('frontend.home.index', compact(
             'homeBanners',
             'temples',
-            'pujas'
+            'pujas',
+            'news'
         ));
     }
 }
