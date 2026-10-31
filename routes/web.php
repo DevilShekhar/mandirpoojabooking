@@ -51,6 +51,7 @@ use App\Http\Controllers\Admin\TempleDailyTicketLimitController;
 use App\Http\Controllers\Admin\TicketBookingHistoryController;
 use App\Http\Controllers\Admin\StoreManagerController;
 use App\Http\Controllers\Admin\TempleProductController;
+use App\Http\Controllers\Admin\SamgriBookingController;
 
 Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
 Route::get('our-temples', [OurTemplesContoller::class, 'index'])->name('frontend.our-temples');
@@ -197,7 +198,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/tickit-booking-history/{bookingReference}',[TicketBookingHistoryController::class, 'managerBookingDetails'])->name('admin.tickit-booking-history.show');
     Route::resource('store-managers', StoreManagerController::class)->names('admin.store-managers');
     Route::resource('temple-products', TempleProductController::class)->names('admin.temple-products')->parameters(['temple-products' => 'id']);
-
+    Route::get('/samgri-booking', [SamgriBookingController::class, 'index'])->name('samgri-booking.index');
+    Route::get('/samgri-booking/{booking}/view', [SamgriBookingController::class, 'show'])->name('samgri-booking.show');
+    Route::get('/completed-samgri-booking', [SamgriBookingController::class, 'completed'])->name('completed-samgri-booking.index');
+    Route::get('/completed-samgri-booking/{booking}/view', [SamgriBookingController::class, 'completedShow'])->name('completed-samgri-booking.show');
+    Route::post('/samgri-booking/{id}/verify-otp',[SamgriBookingController::class, 'verifyOtp'])->name('samgri-booking.verify-otp');
 });
 Route::middleware('auth')->prefix('payment/razorpay')->name('razorpay.')->group(function () {
     Route::post('/create-order', [RazorpayPaymentController::class, 'createOrder'])->name('create-order');

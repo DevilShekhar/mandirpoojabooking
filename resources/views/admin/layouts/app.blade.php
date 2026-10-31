@@ -368,13 +368,30 @@
                                 </ul>
                             </li>
                         @endcanany
-                         @can('product-temple.view')
+                        @can('product-temple.view')
                          <li class="{{ request()->routeIs('admin.temple-products.*') ? 'active' : '' }}">
                             <a href="{{ route('admin.temple-products.index') }}" class="nav-link">
                                 <i data-feather="package"></i>
                                 <span>Temple Products</span>
                             </a>
                         </li>
+                        @endcan
+                        @can('samgri-booking.view')
+                            <li class="{{ request()->routeIs('samgri-booking.*') ? 'active' : '' }}">
+                                <a href="{{ route('samgri-booking.index') }}" class="nav-link">
+                                    <i data-feather="package"></i>
+                                    <span>Samagri Bookings</span>
+                                </a>
+                            </li>
+                        @endcan
+
+                        @can('samgri-booking-completed.view')
+                            <li class="{{ request()->routeIs('completed-samgri-booking.*') ? 'active' : '' }}">
+                                <a href="{{ route('completed-samgri-booking.index') }}" class="nav-link">
+                                    <i data-feather="check-circle"></i>
+                                    <span>Completed Samagri</span>
+                                </a>
+                            </li>
                         @endcan
                         @can('roles.view')
                             <li class="dropdown {{ request()->routeIs('roles.*') ? 'active' : '' }}">
