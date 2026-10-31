@@ -232,6 +232,13 @@ class PermissionSeeder extends Seeder
             'samgri-booking-completed.view',             
             'samgri-booking-completed.index',
             'samgri-booking-completed.show',
+
+            'news.view',
+            'news.index',
+            'news.show',
+            'news.edit',
+            'news.delete',
+            'news.create',
         ];
         foreach ($permissions as $permission) {
             Permission::firstOrCreate([

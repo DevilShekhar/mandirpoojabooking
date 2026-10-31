@@ -53,6 +53,7 @@ use App\Http\Controllers\Admin\TicketBookingHistoryController;
 use App\Http\Controllers\Admin\StoreManagerController;
 use App\Http\Controllers\Admin\TempleProductController;
 use App\Http\Controllers\Admin\SamgriBookingController;
+use App\Http\Controllers\Admin\NewsController;
 
 Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
 Route::get('our-temples', [OurTemplesContoller::class, 'index'])->name('frontend.our-temples');
@@ -206,6 +207,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/completed-samgri-booking', [SamgriBookingController::class, 'completed'])->name('completed-samgri-booking.index');
     Route::get('/completed-samgri-booking/{booking}/view', [SamgriBookingController::class, 'completedShow'])->name('completed-samgri-booking.show');
     Route::post('/samgri-booking/{id}/verify-otp',[SamgriBookingController::class, 'verifyOtp'])->name('samgri-booking.verify-otp');
+    Route::resource('my-news', NewsController::class)->names('my-news');
 });
 Route::middleware('auth')->prefix('payment/razorpay')->name('razorpay.')->group(function () {
     Route::post('/create-order', [RazorpayPaymentController::class, 'createOrder'])->name('create-order');
