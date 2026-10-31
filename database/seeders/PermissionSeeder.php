@@ -225,6 +225,13 @@ class PermissionSeeder extends Seeder
             'product-temple.index',
             'product-temple.show',
             'product-temple.delete',
+            //samgri booking store manger permission
+            'samgri-booking.view',
+            'samgri-booking.index',
+            'samgri-booking.show',
+            'samgri-booking-completed.view',             
+            'samgri-booking-completed.index',
+            'samgri-booking-completed.show',
         ];
         foreach ($permissions as $permission) {
             Permission::firstOrCreate([

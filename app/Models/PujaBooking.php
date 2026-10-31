@@ -114,4 +114,10 @@ class PujaBooking extends Model
     {
         return $this->belongsTo(User::class, 'updated_by');
     }
+    public function samgriVerification()
+    {
+        return $this->hasOne( 
+            SamgriBookingVerification::class,'puja_booking_id','id'
+        );
+    }
 }
