@@ -353,6 +353,9 @@
                                         <li>
                                             <a href="{{ route('tickit-booking.tickitfillter') }}">Ticket Booking</a>
                                         </li>
+                                         <li>
+                                            <a href="{{ route('frontend.news') }}">News</a>
+                                        </li>
                                         <li class="dropdown-holder">
                                             <a href="{{ route('frontend.sanatanevents') }}">Sanatan Events</a>
                                             <ul class="hb-dropdown">

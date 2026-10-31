@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use App\Models\User;
+use Illuminate\Support\Str;
 class NewsController extends Controller
 {
     private function isAdmin(): bool
@@ -104,6 +105,7 @@ class NewsController extends Controller
     public function store(Request $request)
     {
         $this->checkAccess();
+
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'short_description' => ['nullable', 'string'],
@@ -112,6 +114,8 @@ class NewsController extends Controller
             'artical_img' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
             'status' => ['required', 'in:0,1'],
         ]);
+
+        $validated['slug'] = Str::slug($validated['title']);
         $validated['temple_id'] = $this->validateTemple($request);
         $validated['image'] = $this->uploadImage($request, 'image', 'news');
         $validated['artical_img'] = $this->uploadImage($request, 'artical_img', 'news/articles');
@@ -120,7 +124,6 @@ class NewsController extends Controller
         News::create($validated);
         return redirect()->route('my-news.index')->with('success', 'News created successfully.');
     }
-
     public function edit(News $my_news)
     {
         $this->checkAccess();
@@ -136,7 +139,7 @@ class NewsController extends Controller
     {
         $this->checkAccess();
         if (!$this->isAdmin()) {
-            abort_unless($this->assignedTempleIds()->contains((int) $my_news->temple_id),403,'You cannot update this news.');
+            abort_unless($this->assignedTempleIds()->contains((int) $my_news->temple_id), 403, 'You cannot update this news.');
         }
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
@@ -146,6 +149,7 @@ class NewsController extends Controller
             'artical_img' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
             'status' => ['required', 'in:0,1'],
         ]);
+        $validated['slug'] = Str::slug($validated['title']);
         $validated['temple_id'] = $this->validateTemple($request);
         if ($request->hasFile('image')) {
             if ($my_news->image) {
