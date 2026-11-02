@@ -14,11 +14,11 @@ use Spatie\Permission\Models\Role;
 
 class PanditController extends Controller
 {
+    
     public function index()
     {
         $user = auth()->user();
         $panditRole = $this->getPanditRole();
-
         $query = User::query()
             ->where(function ($q) use ($panditRole) {
                 $q->where('role_id', $panditRole->id)
@@ -30,14 +30,11 @@ class PanditController extends Controller
             ->with(['temples' => function ($query) {
                 $query->wherePivot('approval_status', 'approved');
             }]);
-
         if (!$user->hasAnyRole(['Admin', 'Super Admin'])) {
             $templeIds = $this->availableTemples()->pluck('temples.id');
-
             $query->where(function ($q) use ($user, $templeIds) {
                 $q->where('created_by', $user->id)
                     ->orWhere('updated_by', $user->id);
-
                 if ($templeIds->isNotEmpty()) {
                     $q->orWhereHas('temples', function ($templeQuery) use ($templeIds) {
                         $templeQuery->whereIn('temples.id', $templeIds)
@@ -46,9 +43,10 @@ class PanditController extends Controller
                 }
             });
         }
-        $pandits = $query->latest()->paginate(10);
+        $pandits = $query->latest()->get();
         return view('admin.pandits.index', compact('pandits'));
     }
+
     public function create()
     {
          $temples = $this->availableTemples()

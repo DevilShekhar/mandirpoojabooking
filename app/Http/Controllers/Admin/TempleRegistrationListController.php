@@ -14,6 +14,7 @@ use Throwable;
 
 class TempleRegistrationListController extends Controller
 {
+    
     public function index(Request $request)
     {
         $query = DB::table('temple_user as tu')
@@ -68,8 +69,7 @@ class TempleRegistrationListController extends Controller
 
         $registrations = $query
             ->orderByDesc('tu.created_at')
-            ->paginate(15)
-            ->withQueryString();
+            ->get();
 
         $totalCount = DB::table('temple_user')->count();
 
@@ -93,6 +93,7 @@ class TempleRegistrationListController extends Controller
             'rejectedCount'
         ));
     }
+
 
     public function approve($registrationId)
     {

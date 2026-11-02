@@ -94,8 +94,7 @@ class StoreManagerController extends Controller
         $user = auth()->user();
         $templeId = $this->templeId();
         abort_unless((int) $storeManager->created_by === (int) $user->id  && (int) $storeManager->temple_id === $templeId,404,'You cannot manage this Store Manager.');
-    }
-
+    }    
     public function index()
     {
         $this->authorizeManagerAccess([
@@ -104,24 +103,22 @@ class StoreManagerController extends Controller
         ]);
         $query = User::with(['temple', 'roles'])
             ->whereHas('roles', function ($roleQuery) {
-                $roleQuery
-                    ->where('name', 'Store Manager')
+                $roleQuery->where('name', 'Store Manager')
                     ->where('guard_name', 'web');
             });
         if (!$this->isAdmin()) {
             $templeId = $this->templeId();
             $query->where('temple_id', $templeId);
         }
-        $storeManagers = $query->latest()->paginate(10)->withQueryString();
+        $storeManagers = $query->latest()->get();
         if ($this->isAdmin()) {
             $canAddStoreManager = $this->availableTemplesQuery()->exists();
         } else {
-            $canAddStoreManager = !$this->templeHasStoreManager(
-                $this->templeId()
-            );
+            $canAddStoreManager = !$this->templeHasStoreManager($this->templeId());
         }
-        return view('admin.store-managers.index',compact('storeManagers', 'canAddStoreManager'));
+        return view('admin.store-managers.index', compact('storeManagers', 'canAddStoreManager'));
     }
+
 
     public function create()
     {
