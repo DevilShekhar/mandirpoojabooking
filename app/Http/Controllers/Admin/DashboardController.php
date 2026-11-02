@@ -11,6 +11,9 @@ use Spatie\Permission\Models\Role;
 use App\Models\User;
 use App\Models\News;
 use App\Models\Puja;
+use App\Models\HomeBanner;
+use App\Models\Deity;
+use App\Models\PujaCategory;
 use App\Models\PujaBookingPayment;
 use Illuminate\Support\Facades\DB;
 
@@ -55,6 +58,14 @@ class DashboardController extends Controller
         $customerCancellations = collect();
         $managerTicketBookingCount = 0;
         $managerTicketBookings = collect();
+        $homeBannerCount = 0;
+        $templeRegistrationCount = 0;
+        $pendingTempleRegistrationCount = 0;
+        $approvedTempleRegistrationCount = 0;
+        $rejectedTempleRegistrationCount = 0;
+        $totalUsersCount = 0;
+        $deityCount = 0;
+        $pujaCategoryCount = 0;
         if ($user->hasRole('Customer')) {
             $bookingQuery = PujaBooking::where('user_id', $user->id);
             $bookingCount = (clone $bookingQuery)->count();
@@ -327,6 +338,72 @@ class DashboardController extends Controller
                     $managerTicketBookings = (clone $managerTicketBookingQuery)->orderByDesc('latest_id')->take(5)->get();
                 }
         }
+        if ($user->hasAnyRole(['Super Admin', 'Admin'])) {
+            $homeBannerCount = HomeBanner::count();
+            $sanatanEventQuery = Sanatan::query();
+            $sanatanEventCount = (clone $sanatanEventQuery)->count();
+            $activeSanatanEventCount = (clone $sanatanEventQuery)->where('status', 1)->count();
+            $inactiveSanatanEventCount = (clone $sanatanEventQuery)->where('status', 0)->count();
+            $sanatanEvents = (clone $sanatanEventQuery)->latest()->take(5)->get();
+            $templeRegistrationCount = DB::table('temple_user')->count();
+            $pendingTempleRegistrationCount = DB::table('temple_user')->where('approval_status', 'pending')->count();
+            $approvedTempleRegistrationCount = DB::table('temple_user')->where('approval_status', 'approved')->count();
+            $rejectedTempleRegistrationCount = DB::table('temple_user')->where('approval_status', 'rejected')->count();
+            $totalUsersCount = User::whereDoesntHave('roles', function ($query) {
+                $query->whereIn('name', ['Admin', 'Super Admin']);
+            })->count();
+            $newsCount = News::count();
+            $samgriBookingQuery = PujaBooking::whereNotNull('selected_products')
+                ->whereJsonLength('selected_products', '>', 0)
+                ->where('samgri_otp_verified', 0)
+                ->whereDate('schedule_date', '>=', today());
+
+            $samgriBookingCount = $samgriBookingQuery->count();
+
+            $completedSamgriBookingQuery = PujaBooking::whereNotNull('selected_products')
+                ->whereJsonLength('selected_products', '>', 0)
+                ->where('samgri_otp_verified', 1);
+
+            $completedSamgriBookingCount = $completedSamgriBookingQuery->count();
+            $deityCount = Deity::count();
+            $pujaCategoryCount = PujaCategory::count();
+            $pujaCount = Puja::count();
+            $sanatanEventBookingCount = DB::table('sanatan_event_orders')->count();
+            $successfulPujaBookingCount = PujaBooking::where('payment_status', 'paid')->count();
+            $failedPujaPaymentCount = PujaBookingPayment::where('status', 'failed')->count();
+            $cancelledPujaBookingCount = PujaBooking::where('booking_status', 'cancelled')->count();
+            $ticketPaidQuery = DB::table('ticket_bookings')->where('payment_status', 'paid')->where('booking_status', 'confirmed');
+$ticketPaidCount = (clone $ticketPaidQuery)->distinct('razorpay_order_id')->count('razorpay_order_id');
+$ticketPaidAmount = (clone $ticketPaidQuery)->sum('price');
+
+$ticketCancelledQuery = DB::table('ticket_bookings')->where('booking_status', 'cancelled');
+$ticketCancelledCount = (clone $ticketCancelledQuery)->distinct('razorpay_order_id')->count('razorpay_order_id');
+$ticketCancelledAmount = (clone $ticketCancelledQuery)->sum('price');
+
+$eventPaidQuery = DB::table('sanatan_event_orders')->where('payment_status', 'paid');
+$eventPaidCount = (clone $eventPaidQuery)->count();
+$eventPaidAmount = (clone $eventPaidQuery)->sum('amount');
+
+$eventCancelledQuery = DB::table('sanatan_event_orders')->where('booking_status', 'cancelled');
+$eventCancelledCount = (clone $eventCancelledQuery)->count();
+$eventCancelledAmount = (clone $eventCancelledQuery)->sum('amount');
+
+$eventRefundQuery = DB::table('sanatan_event_orders')->where('refund_status', 'processed');
+$eventRefundCount = (clone $eventRefundQuery)->count();
+$eventRefundAmount = (clone $eventRefundQuery)->sum('refund_amount');
+
+$pujaPaidQuery = PujaBooking::where('payment_status', 'paid');
+$pujaPaidCount = (clone $pujaPaidQuery)->count();
+$pujaPaidAmount = (clone $pujaPaidQuery)->sum('total_amount');
+
+$pujaCancelledQuery = PujaBooking::where('booking_status', 'cancelled');
+$pujaCancelledCount = (clone $pujaCancelledQuery)->count();
+$pujaCancelledAmount = (clone $pujaCancelledQuery)->sum('total_amount');
+
+$pujaRefundQuery = CustomerBookingCancellation::where('refund_status', 'processed');
+$pujaRefundCount = (clone $pujaRefundQuery)->count();
+$pujaRefundAmount = (clone $pujaRefundQuery)->sum('refund_amount');
+        }
 
         return view('dashboard', compact(
             'bookingCount',
@@ -361,6 +438,30 @@ class DashboardController extends Controller
             'customerCancellations',
             'managerTicketBookingCount',
             'managerTicketBookings',
+            'homeBannerCount',
+            'templeRegistrationCount',
+            'pendingTempleRegistrationCount',
+            'approvedTempleRegistrationCount',
+            'rejectedTempleRegistrationCount',
+            'totalUsersCount',
+            'deityCount',
+            'pujaCategoryCount',
+            'ticketPaidCount',
+'ticketPaidAmount',
+'ticketCancelledCount',
+'ticketCancelledAmount',
+'eventPaidCount',
+'eventPaidAmount',
+'eventCancelledCount',
+'eventCancelledAmount',
+'eventRefundCount',
+'eventRefundAmount',
+'pujaPaidCount',
+'pujaPaidAmount',
+'pujaCancelledCount',
+'pujaCancelledAmount',
+'pujaRefundCount',
+'pujaRefundAmount',
         ));
     }
 }
