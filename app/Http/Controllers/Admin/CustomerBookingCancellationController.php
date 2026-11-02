@@ -212,12 +212,42 @@ class CustomerBookingCancellationController extends Controller
 
     public function customerIndex()
     {
-        $cancellations = CustomerBookingCancellation::with('booking')
-            ->where('customer_id', Auth::id())
-            ->latest()
-            ->paginate(10);
+        $user = auth()->user();
 
-        return view('admin.cancel-booking.index', compact('cancellations'));
+        $query = CustomerBookingCancellation::with([
+            'booking.user',
+            'booking.temple',
+            'booking.puja',
+            'booking.pujaPackage',
+            'customer',
+        ]);
+
+        if ($user->hasRole('Temple Manager')) {
+            $templeIds = $user->temples()
+                ->wherePivot('approval_status', 'approved')
+                ->pluck('temples.id');
+
+            $query->whereHas('booking', function ($bookingQuery) use ($templeIds) {
+                $bookingQuery->whereIn('temple_id', $templeIds);
+            });
+        } else {
+            $query->where('customer_id', $user->id);
+        }
+
+        $cancellationCount = (clone $query)->count();
+        $pendingCancellationCount = (clone $query)->where('status', 'pending')->count();
+        $approvedCancellationCount = (clone $query)->where('status', 'approved')->count();
+        $rejectedCancellationCount = (clone $query)->where('status', 'rejected')->count();
+
+        $cancellations = (clone $query)->latest()->paginate(10)->withQueryString();
+
+        return view('admin.cancel-booking.index', compact(
+            'cancellations',
+            'cancellationCount',
+            'pendingCancellationCount',
+            'approvedCancellationCount',
+            'rejectedCancellationCount'
+        ));
     }
 
     /**

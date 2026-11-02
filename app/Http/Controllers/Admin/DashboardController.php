@@ -6,8 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Models\PujaBooking;
 use App\Models\TempleProduct;
 use App\Models\Sanatan;
-use App\Models\PujaBookingPayment;
 use App\Models\CustomerBookingCancellation;
+use Spatie\Permission\Models\Role;
+use App\Models\User;
+use App\Models\News;
+use App\Models\Puja;
+use App\Models\PujaBookingPayment;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -41,6 +45,16 @@ class DashboardController extends Controller
         $failedPujaPayments = collect();
         $cancelledPujaBookingCount = 0;
         $cancelledPujaBookings = collect();
+        $panditCount = 0;
+        $pandits = collect();
+        $newsCount = 0;
+        $newsList = collect();
+        $pujaCount = 0;
+        $pujas = collect();
+        $customerCancellationCount = 0;
+        $customerCancellations = collect();
+        $managerTicketBookingCount = 0;
+        $managerTicketBookings = collect();
         if ($user->hasRole('Customer')) {
             $bookingQuery = PujaBooking::where('user_id', $user->id);
             $bookingCount = (clone $bookingQuery)->count();
@@ -179,7 +193,141 @@ class DashboardController extends Controller
                 ->latest()
                 ->take(5)
                 ->get();
+        }     
+        if ($user->hasRole('Temple Manager')) {
+            $templeIds = $user->temples()
+                ->wherePivot('approval_status', 'approved')
+                ->pluck('temples.id');
+            $panditRole = Role::where('name', 'Pandit')->where('guard_name', 'web')->first();
+            if ($panditRole && $templeIds->isNotEmpty()) {
+                $panditQuery = User::query()
+                    ->where(function ($query) use ($panditRole) {
+                        $query->where('role_id', $panditRole->id)
+                            ->orWhereHas('roles', function ($roleQuery) {
+                                $roleQuery->where('name', 'Pandit')
+                                    ->where('guard_name', 'web');
+                            });
+                    })
+                    ->whereHas('temples', function ($templeQuery) use ($templeIds) {
+                        $templeQuery->whereIn('temples.id', $templeIds)
+                            ->where('temple_user.approval_status', 'approved');
+                    })
+                    ->with(['temples' => function ($query) use ($templeIds) {
+                        $query->whereIn('temples.id', $templeIds)
+                            ->wherePivot('approval_status', 'approved');
+                    }]);
+                $panditCount = (clone $panditQuery)->count();
+                $pandits = (clone $panditQuery)->latest()->take(5)->get();
+            }
+            if ($templeIds->isNotEmpty()) {
+                $newsQuery = News::with('temple')->whereIn('temple_id', $templeIds);
+                $newsCount = (clone $newsQuery)->count();
+                $newsList = (clone $newsQuery)->latest()->take(5)->get();
+            }
+            $pujaQuery = Puja::with(['temple', 'deity', 'pujaCategory']);
+                if (!$user->hasAnyRole(['Super Admin', 'Admin'])) {
+                    $pujaQuery->where('created_by', $user->id);
+                }
+            $pujaCount = (clone $pujaQuery)->count();
+            $pujas = (clone $pujaQuery)->latest()->take(5)->get();
+            $successfulPujaQuery = PujaBooking::with([
+                    'user',
+                    'temple',
+                    'deity',
+                    'puja',
+                    'pujaPackage',
+                    'pandit',
+                ])
+                    ->where('payment_status', 'paid')
+                    ->whereIn('temple_id', $templeIds);
+            $successfulPujaBookingCount = (clone $successfulPujaQuery)->count();
+            $successfulPujaBookings = (clone $successfulPujaQuery)
+                    ->latest()
+                    ->take(5)
+                    ->get();
+            $failedPujaPaymentQuery = PujaBookingPayment::with([
+                    'user',
+                    'puja',
+                    'package',
+                    'booking',
+                ])
+                    ->where('status', 'failed')
+                    ->whereHas('booking', function ($query) use ($templeIds) {
+                        $query->whereIn('temple_id', $templeIds);
+                    });
+            $failedPujaPaymentCount = (clone $failedPujaPaymentQuery)->count();
+            $failedPujaPayments = (clone $failedPujaPaymentQuery)
+                    ->latest()
+                    ->take(5)
+                    ->get();
+            $cancelledPujaQuery = PujaBooking::with([
+                    'user',
+                    'temple',
+                    'deity',
+                    'puja',
+                    'pujaPackage',
+                    'pandit',
+                ])
+                    ->where('booking_status', 'cancelled')
+                    ->whereIn('temple_id', $templeIds);
+            $cancelledPujaBookingCount = (clone $cancelledPujaQuery)->count();
+            $cancelledPujaBookings = (clone $cancelledPujaQuery)
+                ->latest()
+                ->take(5)
+                ->get();
+                if ($templeIds->isNotEmpty()) {
+                    $customerCancellationQuery = CustomerBookingCancellation::with([
+                        'booking.user',
+                        'booking.temple',
+                        'booking.puja',
+                        'booking.pujaPackage',
+                        'customer',
+                    ])->whereHas('booking', function ($query) use ($templeIds) {
+                        $query->whereIn('temple_id', $templeIds);
+                    });
+
+                    $customerCancellationCount = (clone $customerCancellationQuery)->count();
+                    $customerCancellations = (clone $customerCancellationQuery)->latest()->take(5)->get();
+                }
+                if ($templeIds->isNotEmpty()) {
+                    $managerTicketBookingQuery = DB::table('ticket_bookings')
+                        ->join('users', 'users.id', '=', 'ticket_bookings.user_id')
+                        ->join('temples', 'temples.id', '=', 'ticket_bookings.temple_id')
+                        ->whereIn('ticket_bookings.temple_id', $templeIds)
+                        ->where('ticket_bookings.payment_status', 'paid')
+                        ->where('ticket_bookings.booking_status', 'confirmed')
+                        ->select(
+                            'ticket_bookings.razorpay_order_id',
+                            'ticket_bookings.user_id',
+                            'ticket_bookings.temple_id',
+                            'ticket_bookings.booking_date',
+                            'ticket_bookings.payment_status',
+                            'ticket_bookings.booking_status',
+                            'users.name as customer_name',
+                            'users.email as customer_email',
+                            'temples.name as temple_name',
+                            DB::raw('MIN(ticket_bookings.booking_reference) AS booking_reference'),
+                            DB::raw('COUNT(ticket_bookings.id) AS total_members'),
+                            DB::raw('SUM(ticket_bookings.price) AS total_amount'),
+                            DB::raw('MAX(ticket_bookings.id) AS latest_id')
+                        )
+                        ->groupBy(
+                            'ticket_bookings.razorpay_order_id',
+                            'ticket_bookings.user_id',
+                            'ticket_bookings.temple_id',
+                            'ticket_bookings.booking_date',
+                            'ticket_bookings.payment_status',
+                            'ticket_bookings.booking_status',
+                            'users.name',
+                            'users.email',
+                            'temples.name'
+                        );
+
+                    $managerTicketBookingCount = DB::query()->fromSub(clone $managerTicketBookingQuery, 'ticket_orders')->count();
+                    $managerTicketBookings = (clone $managerTicketBookingQuery)->orderByDesc('latest_id')->take(5)->get();
+                }
         }
+
         return view('dashboard', compact(
             'bookingCount',
             'bookings',
@@ -203,6 +351,16 @@ class DashboardController extends Controller
             'failedPujaPayments',
             'cancelledPujaBookingCount',
             'cancelledPujaBookings',
+            'panditCount',
+            'pandits',
+            'newsCount',
+            'newsList',
+            'pujaCount',
+            'pujas',
+            'customerCancellationCount',
+            'customerCancellations',
+            'managerTicketBookingCount',
+            'managerTicketBookings',
         ));
     }
 }
