@@ -126,93 +126,50 @@ class PujaBookingController extends Controller
     public function successful()
     {
         $user = auth()->user();
-
-        $query = PujaBooking::with([
-            'user',
-            'temple',
-            'deity',
-            'puja',
-            'pujaPackage',
-            'pandit',
-            'createdBy',
-            'updatedBy',
-            'payments',
-        ])->where('payment_status', 'paid');
-
+        $query = PujaBooking::with(['user', 'temple', 'deity', 'puja', 'pujaPackage', 'pandit', 'createdBy', 'updatedBy', 'payments'])
+            ->where('payment_status', 'paid');
         if ($user->hasRole('Temple Manager')) {
-            $query->whereIn(
-                'temple_id',
-                $this->getManagedTempleIds($user)
-            );
+            $query->whereIn('temple_id', $this->getManagedTempleIds($user));
         } elseif ($user->hasRole('Pandit')) {
             $query->where('pandit_id', $user->id);
         } elseif (!$user->hasAnyRole(['Admin', 'Super Admin'])) {
             $query->where('user_id', $user->id);
         }
-
-        $bookings = $query->latest()->paginate(10);
-
-        return view(
-            'admin.booking-puja-order.successful',
-            compact('bookings')
-        );
+        $bookings = $query->latest()->get();
+        return view('admin.booking-puja-order.successful', compact('bookings'));
     }
 
     public function failed()
     {
         $user = auth()->user();
-
-        $query = PujaBookingPayment::with([
-            'user',
-            'puja',
-            'package',
-            'booking',
-        ])->where('status', 'failed');
+        $query = PujaBookingPayment::with(['user', 'puja', 'package', 'booking'])
+            ->where('status', 'failed');
 
         if (!$user->hasAnyRole(['Admin', 'Super Admin'])) {
             $query->where('user_id', $user->id);
         }
 
-        $payments = $query->latest()->paginate(10);
+        $payments = $query->latest()->get();
 
-        return view(
-            'admin.booking-puja-order.failed',
-            compact('payments')
-        );
+        return view('admin.booking-puja-order.failed', compact('payments'));
     }
-
     public function cancelled()
     {
         $user = auth()->user();
-
-        $query = PujaBooking::with([
-            'user',
-            'temple',
-            'deity',
-            'puja',
-            'pujaPackage',
-            'pandit',
-            'createdBy',
-            'updatedBy',
-        ])->where('booking_status', 'cancelled');
+        $query = PujaBooking::with(['user', 'temple', 'deity', 'puja', 'pujaPackage', 'pandit', 'createdBy', 'updatedBy'])
+            ->where('booking_status', 'cancelled');
 
         if ($user->hasRole('Temple Manager')) {
-            $query->whereIn(
-                'temple_id',
-                $this->getManagedTempleIds($user)
-            );
+            $query->whereIn('temple_id', $this->getManagedTempleIds($user));
         } elseif ($user->hasRole('Pandit')) {
             $query->where('pandit_id', $user->id);
         } elseif (!$user->hasAnyRole(['Admin', 'Super Admin'])) {
             $query->where('user_id', $user->id);
         }
 
-        $bookings = $query->latest()->paginate(10);
+        $bookings = $query->latest()->get();
 
-        return view(
-            'admin.booking-puja-order.cancelled',
-            compact('bookings')
-        );
+        return view('admin.booking-puja-order.cancelled', compact('bookings'));
     }
 
     public function destroy(PujaBooking $pujaBooking)

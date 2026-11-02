@@ -2138,6 +2138,219 @@
                 </div>
             </div>
         </section>
+   @elseif(auth()->user()->hasAnyRole(['Super Admin', 'Admin']))
+        <section class="section dashboard-overview">
+            <style>
+                .dashboard-overview{--dash-primary:#5546a5;--dash-text:#263248;--dash-muted:#7b8495;--dash-border:#edf0f5}
+                .dashboard-hero{position:relative;overflow:hidden;border-radius:16px;padding:28px 30px;margin-bottom:25px;background:linear-gradient(120deg,#302568,#6653b5);color:#fff;box-shadow:0 8px 25px rgba(65,49,135,.18)}
+                .dashboard-hero:after{content:"ॐ";position:absolute;right:35px;top:-30px;font-size:150px;opacity:.09;font-weight:700}
+                .dashboard-hero h3{color:#fff;font-size:25px;font-weight:700;margin-bottom:7px}
+                .dashboard-hero p{color:rgba(255,255,255,.78);margin-bottom:0}
+                .dashboard-hero-icon{width:52px;height:52px;border-radius:14px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:24px;margin-right:16px}
+                .dashboard-section-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:28px 0 16px}
+                .dashboard-section-heading h4{font-size:17px;font-weight:700;color:var(--dash-text);margin:0}
+                .dashboard-section-heading p{font-size:12px;color:var(--dash-muted);margin:4px 0 0}
+                .dashboard-section-icon{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:16px;margin-right:12px}
+                .dashboard-stat-card{height:100%;min-height:112px;background:#fff;border:1px solid var(--dash-border);border-radius:13px;padding:17px 18px;display:flex;align-items:center;gap:15px;transition:all .2s ease;box-shadow:0 3px 12px rgba(35,45,65,.035)}
+                .dashboard-stat-card:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(35,45,65,.09)}
+                .dashboard-stat-icon{width:46px;height:46px;min-width:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:19px}
+                .dashboard-stat-info{min-width:0}
+                .dashboard-stat-info h3{font-size:23px;font-weight:700;color:var(--dash-text);margin:0 0 4px;line-height:1.2}
+                .dashboard-stat-info span{font-size:12px;color:var(--dash-muted);font-weight:600}
+                .dashboard-stat-info a{color:inherit;text-decoration:none}
+                .dashboard-stat-info a:hover{color:var(--dash-primary)}
+                .dashboard-payment-section{border:1px solid var(--dash-border);border-radius:16px;background:#fff;margin-bottom:22px;overflow:hidden;box-shadow:0 4px 16px rgba(35,45,65,.045)}
+                .dashboard-payment-header{padding:19px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+                .dashboard-payment-header h4{font-size:17px;font-weight:700;margin:0;color:#fff}
+                .dashboard-payment-header p{font-size:12px;margin:4px 0 0;color:rgba(255,255,255,.8)}
+                .dashboard-payment-title{display:flex;align-items:center}
+                .dashboard-payment-title-icon{width:42px;height:42px;border-radius:12px;background:rgba(255,255,255,.17);display:flex;align-items:center;justify-content:center;font-size:19px;margin-right:13px;color:#fff}
+                .dashboard-payment-total{font-size:12px;color:#fff;background:rgba(255,255,255,.15);padding:8px 12px;border-radius:20px;white-space:nowrap}
+                .dashboard-payment-body{padding:20px}
+                .dashboard-payment-card{height:100%;border:1px solid var(--dash-border);border-radius:13px;padding:17px;background:#fff;position:relative;overflow:hidden}
+                .dashboard-payment-card:after{content:"";position:absolute;right:-23px;top:-28px;width:85px;height:85px;border-radius:50%;background:var(--payment-soft);opacity:.65}
+                .dashboard-payment-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:15px;position:relative;z-index:1}
+                .dashboard-payment-card-icon{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:var(--payment-soft);color:var(--payment-color);font-size:16px}
+                .dashboard-payment-label{font-size:12px;color:var(--dash-muted);font-weight:600}
+                .dashboard-payment-count{font-size:25px;font-weight:700;color:var(--dash-text);line-height:1.2;margin-bottom:8px}
+                .dashboard-payment-amount{font-size:19px;font-weight:700;color:var(--payment-color);margin-bottom:3px}
+                .dashboard-payment-caption{font-size:11px;color:var(--dash-muted)}
+                .dashboard-payment-card.paid{--payment-color:#15966a;--payment-soft:#e6f7ef}
+                .dashboard-payment-card.cancelled{--payment-color:#dc4c55;--payment-soft:#fff0f0}
+                .dashboard-payment-card.refunded{--payment-color:#d58a25;--payment-soft:#fff5e5}
+                .dashboard-payment-note{font-size:12px;color:#8a6b32;background:#fff8e9;border:1px solid #f5e8c9;border-radius:9px;padding:10px 13px;margin-top:15px}
+                @media(max-width:767px){.dashboard-hero{padding:22px 18px}.dashboard-hero h3{font-size:21px}.dashboard-hero:after{right:5px;font-size:100px}.dashboard-payment-header{padding:16px}.dashboard-payment-body{padding:14px}.dashboard-payment-total{display:none}.dashboard-stat-card{min-height:95px}}
+            </style>
+
+            @php
+                $dashboardStats = [
+                    ['title' => 'Home Banners', 'value' => $homeBannerCount ?? 0, 'icon' => 'fa-images', 'color' => 'purple', 'url' => route('home-banners.index')],
+                    ['title' => 'Sanatan Events', 'value' => $sanatanEventCount ?? 0, 'icon' => 'fa-calendar-alt', 'color' => 'blue', 'url' => route('admin.sanatan-events.index')],
+                    ['title' => 'Temple Registrations', 'value' => $templeRegistrationCount ?? 0, 'icon' => 'fa-place-of-worship', 'color' => 'orange', 'url' => route('all-templae-register')],
+                    ['title' => 'Approved Temples', 'value' => $approvedTempleRegistrationCount ?? 0, 'icon' => 'fa-check-circle', 'color' => 'green', 'url' => route('all-templae-register')],
+                    ['title' => 'Rejected Registrations', 'value' => $rejectedTempleRegistrationCount ?? 0, 'icon' => 'fa-times-circle', 'color' => 'red', 'url' => route('all-templae-register')],
+                    ['title' => 'Total Users', 'value' => $totalUsersCount ?? 0, 'icon' => 'fa-users', 'color' => 'purple', 'url' => route('admin.users.index')],
+                    ['title' => 'Total News', 'value' => $newsCount ?? 0, 'icon' => 'fa-newspaper', 'color' => 'blue', 'url' => route('my-news.index')],
+                    ['title' => 'Samgri Bookings', 'value' => $samgriBookingCount ?? 0, 'icon' => 'fa-box-open', 'color' => 'orange', 'url' => route('samgri-booking.index')],
+                    ['title' => 'Completed Samgri', 'value' => $completedSamgriBookingCount ?? 0, 'icon' => 'fa-check-circle', 'color' => 'green', 'url' => route('completed-samgri-booking.index')],
+                    ['title' => 'Total Deities', 'value' => $deityCount ?? 0, 'icon' => 'fa-praying-hands', 'color' => 'purple', 'url' => route('deities.index')],
+                    ['title' => 'Puja Categories', 'value' => $pujaCategoryCount ?? 0, 'icon' => 'fa-list-alt', 'color' => 'blue', 'url' => route('puja-categories.index')],
+                    ['title' => 'Total Pujas', 'value' => $pujaCount ?? 0, 'icon' => 'fa-om', 'color' => 'orange', 'url' => route('pujas.index')],
+                    ['title' => 'Sanatan Event Bookings', 'value' => $sanatanEventBookingCount ?? 0, 'icon' => 'fa-calendar-check', 'color' => 'purple', 'url' => route('customer.sanatan-event-bookings.index')],
+                    ['title' => 'Successful Puja Bookings', 'value' => $successfulPujaBookingCount ?? 0, 'icon' => 'fa-check-circle', 'color' => 'green', 'url' => route('booking-puja-order.successful')],
+                    ['title' => 'Failed Puja Payments', 'value' => $failedPujaPaymentCount ?? 0, 'icon' => 'fa-times-circle', 'color' => 'red', 'url' => route('booking-puja-order.failed')],
+                    ['title' => 'Cancelled Puja Bookings', 'value' => $cancelledPujaBookingCount ?? 0, 'icon' => 'fa-ban', 'color' => 'orange', 'url' => route('booking-puja-order.cancelled')]
+                ];
+            @endphp
+
+            <div class="dashboard-hero">
+                <div class="d-flex align-items-center position-relative" style="z-index:1;">
+                    <div class="dashboard-hero-icon"><i class="fas fa-chart-pie"></i></div>
+                    <div>
+                        <h3>Admin Dashboard</h3>
+                        <p>Welcome back, {{ auth()->user()->name }}. Monitor bookings, payments and temple activities.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-section-heading">
+                <div class="d-flex align-items-center">
+                    <div class="dashboard-section-icon" style="background:#eeeaff;color:#6653b5;"><i class="fas fa-th-large"></i></div>
+                    <div>
+                        <h4>Application Overview</h4>
+                        <p>Quick summary of your application activities</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                @foreach($dashboardStats as $stat)
+                    <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 mb-3">
+                        <div class="dashboard-stat-card">
+                            <div class="dashboard-stat-icon" style="background:{{ ['purple' => '#eeeaff', 'blue' => '#eaf2ff', 'green' => '#e6f7ef', 'red' => '#fff0f0', 'orange' => '#fff4e5'][$stat['color']] }};color:{{ ['purple' => '#6653b5', 'blue' => '#3975c6', 'green' => '#15966a', 'red' => '#dc4c55', 'orange' => '#d58a25'][$stat['color']] }};">
+                                <i class="fas {{ $stat['icon'] }}"></i>
+                            </div>
+                            <div class="dashboard-stat-info">
+                                <h3><a href="{{ $stat['url'] }}">{{ number_format($stat['value']) }}</a></h3>
+                                <span><a href="{{ $stat['url'] }}">{{ $stat['title'] }}</a></span>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+
+            <div class="dashboard-section-heading">
+                <div class="d-flex align-items-center">
+                    <div class="dashboard-section-icon" style="background:#e7f5ee;color:#15966a;"><i class="fas fa-wallet"></i></div>
+                    <div>
+                        <h4>Booking & Payment Overview</h4>
+                        <p>Paid collections, cancelled booking values and processed refunds</p>
+                    </div>
+                </div>
+            </div>
+
+            @php
+                $paymentSections = [
+                    [
+                        'title' => 'Ticket Booking Payments',
+                        'subtitle' => 'Ticket booking collection and cancellation summary',
+                        'icon' => 'fa-ticket-alt',
+                        'header' => 'linear-gradient(110deg,#315b9b,#4387c7)',
+                        'paidCount' => $ticketPaidCount ?? 0,
+                        'paidAmount' => $ticketPaidAmount ?? 0,
+                        'cancelledCount' => $ticketCancelledCount ?? 0,
+                        'cancelledAmount' => $ticketCancelledAmount ?? 0,
+                        'refundCount' => null,
+                        'refundAmount' => null
+                    ],
+                    [
+                        'title' => 'Sanatan Event Booking Payments',
+                        'subtitle' => 'Event booking collection, cancellations and refunds',
+                        'icon' => 'fa-calendar-alt',
+                        'header' => 'linear-gradient(110deg,#6945a5,#9568c9)',
+                        'paidCount' => $eventPaidCount ?? 0,
+                        'paidAmount' => $eventPaidAmount ?? 0,
+                        'cancelledCount' => $eventCancelledCount ?? 0,
+                        'cancelledAmount' => $eventCancelledAmount ?? 0,
+                        'refundCount' => $eventRefundCount ?? 0,
+                        'refundAmount' => $eventRefundAmount ?? 0
+                    ],
+                    [
+                        'title' => 'Puja Booking Payments',
+                        'subtitle' => 'Puja booking collection, cancellations and refunds',
+                        'icon' => 'fa-praying-hands',
+                        'header' => 'linear-gradient(110deg,#a85b26,#d58a3b)',
+                        'paidCount' => $pujaPaidCount ?? 0,
+                        'paidAmount' => $pujaPaidAmount ?? 0,
+                        'cancelledCount' => $pujaCancelledCount ?? 0,
+                        'cancelledAmount' => $pujaCancelledAmount ?? 0,
+                        'refundCount' => $pujaRefundCount ?? 0,
+                        'refundAmount' => $pujaRefundAmount ?? 0
+                    ]
+                ];
+            @endphp
+
+            @foreach($paymentSections as $payment)
+                <div class="dashboard-payment-section">
+                    <div class="dashboard-payment-header" style="background:{{ $payment['header'] }};">
+                        <div class="dashboard-payment-title">
+                            <div class="dashboard-payment-title-icon"><i class="fas {{ $payment['icon'] }}"></i></div>
+                            <div>
+                                <h4>{{ $payment['title'] }}</h4>
+                                <p>{{ $payment['subtitle'] }}</p>
+                            </div>
+                        </div>
+                        <div class="dashboard-payment-total"><i class="fas fa-chart-line mr-1"></i> Payment Summary</div>
+                    </div>
+                    <div class="dashboard-payment-body">
+                        <div class="row">
+                            <div class="col-lg-4 col-md-6 col-12 mb-3 mb-lg-0">
+                                <div class="dashboard-payment-card paid">
+                                    <div class="dashboard-payment-card-top">
+                                        <span class="dashboard-payment-label">SUCCESSFUL PAYMENTS</span>
+                                        <div class="dashboard-payment-card-icon"><i class="fas fa-check-circle"></i></div>
+                                    </div>
+                                    <div class="dashboard-payment-count">{{ number_format($payment['paidCount']) }}</div>
+                                    <div class="dashboard-payment-amount">₹{{ number_format($payment['paidAmount'], 2) }}</div>
+                                    <div class="dashboard-payment-caption">Total Paid Amount</div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6 col-12 mb-3 mb-lg-0">
+                                <div class="dashboard-payment-card cancelled">
+                                    <div class="dashboard-payment-card-top">
+                                        <span class="dashboard-payment-label">CANCELLED BOOKINGS</span>
+                                        <div class="dashboard-payment-card-icon"><i class="fas fa-times-circle"></i></div>
+                                    </div>
+                                    <div class="dashboard-payment-count">{{ number_format($payment['cancelledCount']) }}</div>
+                                    <div class="dashboard-payment-amount">₹{{ number_format($payment['cancelledAmount'], 2) }}</div>
+                                    <div class="dashboard-payment-caption">Total Cancelled Booking Amount</div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6 col-12">
+                                <div class="dashboard-payment-card refunded">
+                                    <div class="dashboard-payment-card-top">
+                                        <span class="dashboard-payment-label">PROCESSED REFUNDS</span>
+                                        <div class="dashboard-payment-card-icon"><i class="fas fa-undo-alt"></i></div>
+                                    </div>
+                                    @if($payment['refundCount'] !== null)
+                                        <div class="dashboard-payment-count">{{ number_format($payment['refundCount']) }}</div>
+                                        <div class="dashboard-payment-amount">₹{{ number_format($payment['refundAmount'], 2) }}</div>
+                                        <div class="dashboard-payment-caption">Total Refunded Amount</div>
+                                    @else
+                                        <div class="dashboard-payment-count">Not Available</div>
+                                        <div class="dashboard-payment-amount">—</div>
+                                        <div class="dashboard-payment-caption">Ticket refund tracking is not configured</div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                        @if($payment['refundCount'] === null)
+                            <div class="dashboard-payment-note"><i class="fas fa-info-circle mr-1"></i> Ticket refund totals will appear here after refund amount and refund status are stored in the ticket booking records.</div>
+                        @endif
+                    </div>
+                </div>
+            @endforeach
+        </section>
     @else
         <section class="section">
             <div class="row mb-4">
