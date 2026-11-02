@@ -16,16 +16,13 @@ class SanatanEventBookingController extends Controller
     public function index()
     {
         $user = Auth::user();
-
         if (!$user) {
             abort(403, 'You are not authorized to view these bookings.');
         }
-
         $isAdmin = $user->hasRole('Admin');
         $isSuperAdmin = $user->hasRole('Super Admin');
         $isCustomer = $user->hasRole('Customer');
         $isEventCreator = $user->hasRole('Event Creator');
-
         $query = DB::table('sanatan_event_orders as bookings')
             ->join('sanatans as events', 'events.id', '=', 'bookings.sanatan_id')
             ->leftJoin('users as customers', 'customers.id', '=', 'bookings.user_id')
@@ -42,21 +39,21 @@ class SanatanEventBookingController extends Controller
                 'event_creators.name as event_creator_name',
                 'cancelled_users.name as cancelled_by_name'
             );
-            if (!$isAdmin && !$isSuperAdmin) {
-                if ($isCustomer && $isEventCreator) {
-                    $query->where(function ($q) use ($user) {
-                        $q->where('bookings.user_id', $user->id)
-                            ->orWhere('events.created_by', $user->id);
-                    });
-                } elseif ($isCustomer) {
-                    $query->where('bookings.user_id', $user->id);
-                } elseif ($isEventCreator) {
-                    $query->where('events.created_by', $user->id);
-                } else {
-                    abort(403, 'You are not authorized to view these bookings.');
-                }
+        if (!$isAdmin && !$isSuperAdmin) {
+            if ($isCustomer && $isEventCreator) {
+                $query->where(function ($q) use ($user) {
+                    $q->where('bookings.user_id', $user->id)
+                        ->orWhere('events.created_by', $user->id);
+                });
+            } elseif ($isCustomer) {
+                $query->where('bookings.user_id', $user->id);
+            } elseif ($isEventCreator) {
+                $query->where('events.created_by', $user->id);
+            } else {
+                abort(403, 'You are not authorized to view these bookings.');
             }
-        $bookings = $query->orderByDesc('bookings.created_at')->paginate(10);
+        }
+        $bookings = $query->orderByDesc('bookings.created_at')->get();
         return view('admin.sanatanevents.bookings.index', compact('bookings'));
     }
 

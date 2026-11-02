@@ -14,35 +14,43 @@ use Illuminate\Support\Facades\Schema;
 class PujaBookingController extends Controller
 {
     public function index()
-    {
-        $user = auth()->user();
+{
+    $user = auth()->user();
 
-        $query = PujaBooking::with([
-            'user',
-            'temple',
-            'deity',
-            'puja',
-            'pujaPackage',
-            'pandit',
-            'createdBy',
-            'updatedBy',
-        ]);
+    $query = PujaBooking::with([
+        'user',
+        'temple',
+        'deity',
+        'puja',
+        'pujaPackage',
+        'pandit',
+        'createdBy',
+        'updatedBy',
+    ]);
 
-        if ($user->hasRole('Temple Manager')) {
-            $query->whereIn(
-                'temple_id',
-                $this->getManagedTempleIds($user)
-            );
-        } elseif ($user->hasRole('Pandit')) {
-            $query->where('pandit_id', $user->id);
-        } elseif (!$user->hasAnyRole(['Admin', 'Super Admin'])) {
-            $query->where('user_id', $user->id);
-        }
+    if ($user->hasRole('Temple Manager')) {
 
-        $bookings = $query->latest()->paginate(10);
+        $query->whereIn(
+            'temple_id',
+            $this->getManagedTempleIds($user)
+        );
 
-        return view('admin.puja-bookings.index', compact('bookings'));
+    } elseif ($user->hasRole('Pandit')) {
+
+        $query->where('pandit_id', $user->id);
+
+    } elseif (!$user->hasAnyRole(['Admin', 'Super Admin'])) {
+
+        $query->where('user_id', $user->id);
     }
+
+        $bookings = $query->latest()->get();
+
+    return view(
+        'admin.puja-bookings.index',
+        compact('bookings')
+    );
+}
 
     public function show($id)
     {
