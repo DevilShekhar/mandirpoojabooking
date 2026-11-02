@@ -66,6 +66,24 @@ class DashboardController extends Controller
         $totalUsersCount = 0;
         $deityCount = 0;
         $pujaCategoryCount = 0;
+        $ticketPaidCount = 0;
+        $ticketPaidAmount = 0;
+        $ticketCancelledCount = 0;
+        $ticketCancelledAmount = 0;
+
+        $eventPaidCount = 0;
+        $eventPaidAmount = 0;
+        $eventCancelledCount = 0;
+        $eventCancelledAmount = 0;
+        $eventRefundCount = 0;
+        $eventRefundAmount = 0;
+
+        $pujaPaidCount = 0;
+        $pujaPaidAmount = 0;
+        $pujaCancelledCount = 0;
+        $pujaCancelledAmount = 0;
+        $pujaRefundCount = 0;
+        $pujaRefundAmount = 0;
         if ($user->hasRole('Customer')) {
             $bookingQuery = PujaBooking::where('user_id', $user->id);
             $bookingCount = (clone $bookingQuery)->count();
@@ -373,36 +391,36 @@ class DashboardController extends Controller
             $failedPujaPaymentCount = PujaBookingPayment::where('status', 'failed')->count();
             $cancelledPujaBookingCount = PujaBooking::where('booking_status', 'cancelled')->count();
             $ticketPaidQuery = DB::table('ticket_bookings')->where('payment_status', 'paid')->where('booking_status', 'confirmed');
-$ticketPaidCount = (clone $ticketPaidQuery)->distinct('razorpay_order_id')->count('razorpay_order_id');
-$ticketPaidAmount = (clone $ticketPaidQuery)->sum('price');
+            $ticketPaidCount = (clone $ticketPaidQuery)->distinct('razorpay_order_id')->count('razorpay_order_id');
+            $ticketPaidAmount = (clone $ticketPaidQuery)->sum('price');
 
-$ticketCancelledQuery = DB::table('ticket_bookings')->where('booking_status', 'cancelled');
-$ticketCancelledCount = (clone $ticketCancelledQuery)->distinct('razorpay_order_id')->count('razorpay_order_id');
-$ticketCancelledAmount = (clone $ticketCancelledQuery)->sum('price');
+            $ticketCancelledQuery = DB::table('ticket_bookings')->where('booking_status', 'cancelled');
+            $ticketCancelledCount = (clone $ticketCancelledQuery)->distinct('razorpay_order_id')->count('razorpay_order_id');
+            $ticketCancelledAmount = (clone $ticketCancelledQuery)->sum('price');
 
-$eventPaidQuery = DB::table('sanatan_event_orders')->where('payment_status', 'paid');
-$eventPaidCount = (clone $eventPaidQuery)->count();
-$eventPaidAmount = (clone $eventPaidQuery)->sum('amount');
+            $eventPaidQuery = DB::table('sanatan_event_orders')->where('payment_status', 'paid');
+            $eventPaidCount = (clone $eventPaidQuery)->count();
+            $eventPaidAmount = (clone $eventPaidQuery)->sum('amount');
 
-$eventCancelledQuery = DB::table('sanatan_event_orders')->where('booking_status', 'cancelled');
-$eventCancelledCount = (clone $eventCancelledQuery)->count();
-$eventCancelledAmount = (clone $eventCancelledQuery)->sum('amount');
+            $eventCancelledQuery = DB::table('sanatan_event_orders')->where('booking_status', 'cancelled');
+            $eventCancelledCount = (clone $eventCancelledQuery)->count();
+            $eventCancelledAmount = (clone $eventCancelledQuery)->sum('amount');
 
-$eventRefundQuery = DB::table('sanatan_event_orders')->where('refund_status', 'processed');
-$eventRefundCount = (clone $eventRefundQuery)->count();
-$eventRefundAmount = (clone $eventRefundQuery)->sum('refund_amount');
+            $eventRefundQuery = DB::table('sanatan_event_orders')->where('refund_status', 'processed');
+            $eventRefundCount = (clone $eventRefundQuery)->count();
+            $eventRefundAmount = (clone $eventRefundQuery)->sum('refund_amount');
 
-$pujaPaidQuery = PujaBooking::where('payment_status', 'paid');
-$pujaPaidCount = (clone $pujaPaidQuery)->count();
-$pujaPaidAmount = (clone $pujaPaidQuery)->sum('total_amount');
+            $pujaPaidQuery = PujaBooking::where('payment_status', 'paid');
+            $pujaPaidCount = (clone $pujaPaidQuery)->count();
+            $pujaPaidAmount = (clone $pujaPaidQuery)->sum('total_amount');
 
-$pujaCancelledQuery = PujaBooking::where('booking_status', 'cancelled');
-$pujaCancelledCount = (clone $pujaCancelledQuery)->count();
-$pujaCancelledAmount = (clone $pujaCancelledQuery)->sum('total_amount');
+            $pujaCancelledQuery = PujaBooking::where('booking_status', 'cancelled');
+            $pujaCancelledCount = (clone $pujaCancelledQuery)->count();
+            $pujaCancelledAmount = (clone $pujaCancelledQuery)->sum('total_amount');
 
-$pujaRefundQuery = CustomerBookingCancellation::where('refund_status', 'processed');
-$pujaRefundCount = (clone $pujaRefundQuery)->count();
-$pujaRefundAmount = (clone $pujaRefundQuery)->sum('refund_amount');
+            $pujaRefundQuery = CustomerBookingCancellation::where('refund_status', 'processed');
+            $pujaRefundCount = (clone $pujaRefundQuery)->count();
+            $pujaRefundAmount = (clone $pujaRefundQuery)->sum('refund_amount');
         }
 
         return view('dashboard', compact(
@@ -447,21 +465,21 @@ $pujaRefundAmount = (clone $pujaRefundQuery)->sum('refund_amount');
             'deityCount',
             'pujaCategoryCount',
             'ticketPaidCount',
-'ticketPaidAmount',
-'ticketCancelledCount',
-'ticketCancelledAmount',
-'eventPaidCount',
-'eventPaidAmount',
-'eventCancelledCount',
-'eventCancelledAmount',
-'eventRefundCount',
-'eventRefundAmount',
-'pujaPaidCount',
-'pujaPaidAmount',
-'pujaCancelledCount',
-'pujaCancelledAmount',
-'pujaRefundCount',
-'pujaRefundAmount',
+            'ticketPaidAmount',
+            'ticketCancelledCount',
+            'ticketCancelledAmount',
+            'eventPaidCount',
+            'eventPaidAmount',
+            'eventCancelledCount',
+            'eventCancelledAmount',
+            'eventRefundCount',
+            'eventRefundAmount',
+            'pujaPaidCount',
+            'pujaPaidAmount',
+            'pujaCancelledCount',
+            'pujaCancelledAmount',
+            'pujaRefundCount',
+            'pujaRefundAmount',
         ));
     }
 }
