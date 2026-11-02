@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\PujaBooking;
 use App\Models\TempleProduct;
 use App\Models\Sanatan;
+use App\Models\PujaBookingPayment;
 use App\Models\CustomerBookingCancellation;
 use Illuminate\Support\Facades\DB;
 
@@ -34,6 +35,12 @@ class DashboardController extends Controller
         $sanatanEvents = collect();
         $sanatanEventBookingCount = 0;
         $sanatanEventBookings = collect();
+        $successfulPujaBookingCount = 0;
+        $successfulPujaBookings = collect();
+        $failedPujaPaymentCount = 0;
+        $failedPujaPayments = collect();
+        $cancelledPujaBookingCount = 0;
+        $cancelledPujaBookings = collect();
         if ($user->hasRole('Customer')) {
             $bookingQuery = PujaBooking::where('user_id', $user->id);
             $bookingCount = (clone $bookingQuery)->count();
@@ -132,6 +139,47 @@ class DashboardController extends Controller
                 ->take(5)
                 ->get();
         }
+        if ($user->hasRole('Pandit')) {
+            $successfulPujaQuery = PujaBooking::with([
+                'user',
+                'temple',
+                'puja',
+                'pujaPackage',
+            ])->where('pandit_id', $user->id)->where('payment_status', 'paid');
+            $successfulPujaBookingCount = (clone $successfulPujaQuery)->count();
+            $successfulPujaBookings = (clone $successfulPujaQuery)
+                ->latest()
+                ->take(5)
+                ->get();
+            $failedPujaPaymentQuery = PujaBookingPayment::with([
+                'user',
+                'puja',
+                'package',
+                'booking',
+            ])
+            ->where('status', 'failed')
+            ->whereHas('booking', function ($query) use ($user) {
+                $query->where('pandit_id', $user->id);
+            });
+            $failedPujaPaymentCount = (clone $failedPujaPaymentQuery)->count();
+            $failedPujaPayments = (clone $failedPujaPaymentQuery)
+                ->latest()
+                ->take(5)
+                ->get();
+            $cancelledPujaQuery = PujaBooking::with([
+                'user',
+                'temple',
+                'puja',
+                'pujaPackage',
+            ])
+            ->where('pandit_id', $user->id)
+            ->where('booking_status', 'cancelled');
+            $cancelledPujaBookingCount = (clone $cancelledPujaQuery)->count();
+            $cancelledPujaBookings = (clone $cancelledPujaQuery)
+                ->latest()
+                ->take(5)
+                ->get();
+        }
         return view('dashboard', compact(
             'bookingCount',
             'bookings',
@@ -149,6 +197,12 @@ class DashboardController extends Controller
             'completedSamgriBookings',
             'sanatanEventCount',
             'sanatanEvents',
+            'successfulPujaBookingCount',
+            'successfulPujaBookings',
+            'failedPujaPaymentCount',
+            'failedPujaPayments',
+            'cancelledPujaBookingCount',
+            'cancelledPujaBookings',
         ));
     }
 }

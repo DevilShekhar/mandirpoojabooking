@@ -1179,7 +1179,350 @@
                     </div>
                 </div>
             </div>
-        </section>    
+        </section>  
+    @elseif(auth()->user()->hasRole('Pandit'))
+        <section class="section">
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h4 class="font-weight-bold">Pandit Dashboard</h4>
+                    <p class="text-muted">
+                        Welcome back, {{ auth()->user()->name }}.
+                        Manage your assigned Puja bookings here.
+                    </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12">
+                    <div class="card card-statistic-1">
+                        <div class="card-icon l-bg-green">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="card-wrap">
+                            <div class="padding-20">
+                                <div class="text-right">
+                                    <h3 class="font-light mb-0">
+                                        {{ $successfulPujaBookingCount ?? 0 }}
+                                    </h3>
+                                    <span class="text-muted">
+                                        <a href="{{ url('booking-puja-order-successful') }}">
+                                            Successful Puja Bookings
+                                        </a>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12">
+                    <div class="card card-statistic-1">
+                        <div class="card-icon l-bg-red">
+                            <i class="fas fa-times-circle"></i>
+                        </div>
+                        <div class="card-wrap">
+                            <div class="padding-20">
+                                <div class="text-right">
+                                    <h3 class="font-light mb-0">
+                                        {{ $failedPujaPaymentCount ?? 0 }}
+                                    </h3>
+                                    <span class="text-muted">
+                                        <a href="{{ url('booking-puja-order-failed') }}">
+                                            Failed Puja Payments
+                                        </a>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12">
+                    <div class="card card-statistic-1">
+                        <div class="card-icon l-bg-orange">
+                            <i class="fas fa-ban"></i>
+                        </div>
+                        <div class="card-wrap">
+                            <div class="padding-20">
+                                <div class="text-right">
+                                    <h3 class="font-light mb-0">
+                                        {{ $cancelledPujaBookingCount ?? 0 }}
+                                    </h3>
+                                    <span class="text-muted">
+                                        <a href="{{ url('booking-puja-order-cancelled') }}">
+                                            Cancelled Puja Bookings
+                                        </a>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">
+                        <i class="fas fa-check-circle text-success mr-2"></i>
+                        Recent Successful Puja Bookings
+                    </h4>
+                    <a href="{{ url('booking-puja-order-successful') }}" class="btn btn-primary btn-sm">
+                        View All
+                        <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Booking Number</th>
+                                    <th>Customer</th>
+                                    <th>Puja</th>
+                                    <th>Package</th>
+                                    <th>Temple</th>
+                                    <th>Schedule Date</th>
+                                    <th>Payment Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($successfulPujaBookings ?? [] as $booking)
+                                    <tr>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td>
+                                            <strong>
+                                                {{ $booking->booking_number ?? $booking->id }}
+                                            </strong>
+                                        </td>
+                                        <td>
+                                            <i class="fas fa-user text-primary mr-1"></i>
+                                            {{ $booking->customer_name ?? $booking->user?->name ?? '-' }}
+                                        </td>
+                                        <td>
+                                            <i class="fas fa-praying-hands text-primary mr-1"></i>
+                                            {{ $booking->puja?->name ?? '-' }}
+                                        </td>
+                                        <td>
+                                            {{ $booking->pujaPackage?->name ?? $booking->package_name ?? '-' }}
+                                        </td>
+                                        <td>
+                                            {{ $booking->temple?->name ?? '-' }}
+                                        </td>
+                                        <td>
+                                            {{ $booking->schedule_date
+                                                ? \Carbon\Carbon::parse($booking->schedule_date)->format('d M Y')
+                                                : '-' }}
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-success">
+                                                <i class="fas fa-check-circle mr-1"></i>
+                                                Paid
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a href="{{ route('booking-puja-order.show', $booking->id) }}"
+                                            class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-eye"></i>
+                                                View
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="9" class="text-center py-5">
+                                            <i class="fas fa-calendar-check fa-3x text-muted mb-3"></i>
+                                            <h6 class="font-weight-bold">
+                                                No Successful Puja Bookings Found
+                                            </h6>
+                                            <p class="text-muted mb-0">
+                                                No paid bookings are currently assigned to you.
+                                            </p>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">
+                        <i class="fas fa-times-circle text-danger mr-2"></i>
+                        Recent Failed Puja Payments
+                    </h4>
+                    <a href="{{ url('booking-puja-order-failed') }}"
+                    class="btn btn-primary btn-sm">
+                        View All
+                        <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Payment ID</th>
+                                    <th>Booking Number</th>
+                                    <th>Customer</th>
+                                    <th>Puja</th>
+                                    <th>Amount</th>
+                                    <th>Payment Status</th>
+                                    <th>Date</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($failedPujaPayments ?? [] as $payment)
+                                    <tr>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td>
+                                            <strong>{{ $payment->id }}</strong>
+                                        </td>
+                                        <td>
+                                            {{ $payment->booking?->booking_number ?? $payment->booking?->id ?? '-' }}
+                                        </td>
+                                        <td>
+                                            <i class="fas fa-user text-primary mr-1"></i>
+                                            {{ $payment->user?->name ?? $payment->booking?->customer_name ?? '-' }}
+                                        </td>
+                                        <td>
+                                            <i class="fas fa-praying-hands text-primary mr-1"></i>
+                                            {{ $payment->puja?->name ?? $payment->booking?->puja?->name ?? '-' }}
+                                        </td>
+                                        <td>
+                                            <strong>
+                                                ₹{{ number_format((float) ($payment->amount ?? 0), 2) }}
+                                            </strong>
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-danger">
+                                                <i class="fas fa-times-circle mr-1"></i>
+                                                Failed
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {{ $payment->created_at
+                                                ? \Carbon\Carbon::parse($payment->created_at)->format('d M Y')
+                                                : '-' }}
+                                        </td>
+                                        <td>
+                                            @if($payment->booking)
+                                                <a href="{{ route('booking-puja-order.show', $payment->booking->id) }}"
+                                                class="btn btn-outline-primary btn-sm">
+                                                    <i class="fas fa-eye"></i>
+                                                    View
+                                                </a>
+                                            @else
+                                                -
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="9" class="text-center py-5">
+                                            <i class="fas fa-check-circle fa-3x text-muted mb-3"></i>
+                                            <h6 class="font-weight-bold">
+                                                No Failed Puja Payments Found
+                                            </h6>
+                                            <p class="text-muted mb-0">
+                                                There are no failed payments for your assigned bookings.
+                                            </p>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">
+                        <i class="fas fa-ban text-warning mr-2"></i>
+                        Recent Cancelled Puja Bookings
+                    </h4>
+                    <a href="{{ url('booking-puja-order-cancelled') }}" class="btn btn-primary btn-sm">
+                        View All
+                        <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Booking Number</th>
+                                    <th>Customer</th>
+                                    <th>Puja</th>
+                                    <th>Package</th>
+                                    <th>Temple</th>
+                                    <th>Schedule Date</th>
+                                    <th>Booking Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($cancelledPujaBookings ?? [] as $booking)
+                                    <tr>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td>
+                                            <strong>
+                                                {{ $booking->booking_number ?? $booking->id }}
+                                            </strong>
+                                        </td>
+                                        <td>
+                                            <i class="fas fa-user text-primary mr-1"></i>
+                                            {{ $booking->customer_name ?? $booking->user?->name ?? '-' }}
+                                        </td>
+                                        <td>
+                                            <i class="fas fa-praying-hands text-primary mr-1"></i>
+                                            {{ $booking->puja?->name ?? '-' }}
+                                        </td>
+                                        <td>
+                                            {{ $booking->pujaPackage?->name ?? $booking->package_name ?? '-' }}
+                                        </td>
+                                        <td>
+                                            {{ $booking->temple?->name ?? '-' }}
+                                        </td>
+                                        <td>
+                                            {{ $booking->schedule_date
+                                                ? \Carbon\Carbon::parse($booking->schedule_date)->format('d M Y')
+                                                : '-' }}
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-danger">
+                                                <i class="fas fa-ban mr-1"></i>
+                                                Cancelled
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a href="{{ route('booking-puja-order.show', $booking->id) }}"
+                                            class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-eye"></i>
+                                                View
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="9" class="text-center py-5">
+                                            <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                                            <h6 class="font-weight-bold">
+                                                No Cancelled Puja Bookings Found
+                                            </h6>
+                                            <p class="text-muted mb-0">
+                                                There are no cancelled bookings assigned to you.
+                                            </p>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
     @else
         <section class="section">
             <div class="row mb-4">

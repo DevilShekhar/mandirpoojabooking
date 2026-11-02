@@ -629,8 +629,8 @@
                         @endcan
                         
                         @can('customer-cancellled-bookings-order.view')
-                            <li class="{{ request()->routeIs('admin.customer-cancel-booking.*') ? 'active' : '' }}">
-                                <a class="nav-link" href="{{ route('admin.customer-cancel-booking.index') }}">
+                            <li class="{{ request()->routeIs('customer-cancel-booking.*') ? 'active' : '' }}">
+                                <a class="nav-link" href="{{ route('customer-cancel-booking.index') }}">
                                     <i data-feather="rotate-ccw"></i>
                                     <span>Customer Cancellation </span>
                                 </a>
