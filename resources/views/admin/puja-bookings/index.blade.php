@@ -11,21 +11,14 @@
                 <div class="card">
                     <div class="card-header">
                         <h4>Booking Puja Order</h4>
-                        <div class="card-header-action">
-                            <a href="{{ route('booking-puja-order.create') }}" class="btn btn-primary">
-                                <i class="fas fa-plus"></i> Add Booking
-                            </a>
-                        </div>
                     </div>
                     <div class="card-body">
                         @if(session('success'))
                             <div class="alert alert-success">{{ session('success') }}</div>
                         @endif
-
                         @if(session('error'))
                             <div class="alert alert-danger">{{ session('error') }}</div>
                         @endif
-
                         <div class="table-responsive">
                             <table class="table table-striped" id="table-1">
                                 <thead>
