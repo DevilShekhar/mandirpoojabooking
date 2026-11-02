@@ -1,5 +1,5 @@
 <?php
-
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\BookingDevoteeController;
 use App\Http\Controllers\Admin\BookingSankalpController;
 use App\Http\Controllers\Admin\CityController;
@@ -119,10 +119,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/ticket-booking/success',[RazorpayTicketController::class, 'success'])->name('frontend.ticket-booking.success');
 });
 
-    Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
+Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 Route::middleware('auth')->group(function () {
     // Home Banners
     Route::resource('home-banners', HomeBannerController::class);

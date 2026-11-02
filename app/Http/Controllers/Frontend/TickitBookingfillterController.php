@@ -72,7 +72,10 @@ class TickitBookingfillterController extends Controller
                     'temple_name' => $temple->name,
                     'temple_slug' => $temple->slug,
                     'temple_image' => $temple->main_image,
-
+                    'temple_url' => !empty($temple->slug)
+                        ? url('/our-temples/' . $temple->slug)
+                        : null,
+                    
                     'pujas' => $templePujas->map(function ($puja) {
                         return [
                             'id' => $puja->id,
