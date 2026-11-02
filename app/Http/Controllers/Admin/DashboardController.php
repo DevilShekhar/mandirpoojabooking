@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\PujaBooking;
 use App\Models\TempleProduct;
+use App\Models\Sanatan;
 use App\Models\CustomerBookingCancellation;
 use Illuminate\Support\Facades\DB;
 
@@ -27,6 +28,12 @@ class DashboardController extends Controller
         $samgriBookings = collect();
         $completedSamgriBookingCount = 0;
         $completedSamgriBookings = collect();
+        $sanatanEventCount = 0;
+        $activeSanatanEventCount = 0;
+        $inactiveSanatanEventCount = 0;
+        $sanatanEvents = collect();
+        $sanatanEventBookingCount = 0;
+        $sanatanEventBookings = collect();
         if ($user->hasRole('Customer')) {
             $bookingQuery = PujaBooking::where('user_id', $user->id);
             $bookingCount = (clone $bookingQuery)->count();
@@ -102,6 +109,29 @@ class DashboardController extends Controller
             $completedSamgriBookingCount = (clone $completedSamgriQuery)->count();
             $completedSamgriBookings = $completedSamgriQuery->latest()->take(5)->get();
         }
+        if ($user->hasRole('Event Creator')) {
+            $sanatanEventQuery = Sanatan::where('created_by', $user->id);
+            $sanatanEventCount = (clone $sanatanEventQuery)->count();
+            $activeSanatanEventCount = (clone $sanatanEventQuery)->where('status', 1)->count();
+            $inactiveSanatanEventCount = (clone $sanatanEventQuery)->where('status', 0)->count();
+            $sanatanEvents = (clone $sanatanEventQuery)->latest()->take(5)->get();
+            $sanatanEventBookingQuery = DB::table('sanatan_event_orders as bookings')
+                ->join('sanatans as events', 'events.id', '=', 'bookings.sanatan_id')
+                ->leftJoin('users as customers', 'customers.id', '=', 'bookings.user_id')
+                ->where('events.created_by', $user->id)
+                ->select(
+                    'bookings.*',
+                    'events.name as event_name',
+                    'customers.name as customer_name',
+                    'customers.email as customer_email',
+                    'customers.phone as customer_phone'
+                );
+            $sanatanEventBookingCount = (clone $sanatanEventBookingQuery)->count();
+            $sanatanEventBookings = (clone $sanatanEventBookingQuery)
+                ->orderByDesc('bookings.created_at')
+                ->take(5)
+                ->get();
+        }
         return view('dashboard', compact(
             'bookingCount',
             'bookings',
@@ -116,7 +146,9 @@ class DashboardController extends Controller
             'samgriBookingCount',
             'samgriBookings',
             'completedSamgriBookingCount',
-            'completedSamgriBookings'
+            'completedSamgriBookings',
+            'sanatanEventCount',
+            'sanatanEvents',
         ));
     }
 }
