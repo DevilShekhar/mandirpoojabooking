@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\PujaBooking;
+use App\Models\TempleProduct;
 use App\Models\CustomerBookingCancellation;
 use Illuminate\Support\Facades\DB;
 
@@ -20,7 +21,12 @@ class DashboardController extends Controller
         $cancellations = collect();
         $ticketBookingCount = 0;
         $ticketBookings = collect();
-
+        $templeProductCount = 0;
+        $templeProducts = collect();
+        $samgriBookingCount = 0;
+        $samgriBookings = collect();
+        $completedSamgriBookingCount = 0;
+        $completedSamgriBookings = collect();
         if ($user->hasRole('Customer')) {
             $bookingQuery = PujaBooking::where('user_id', $user->id);
             $bookingCount = (clone $bookingQuery)->count();
@@ -68,6 +74,34 @@ class DashboardController extends Controller
             $ticketBookingCount = DB::query()->fromSub(clone $ticketBookingQuery, 'ticket_orders')->count();
             $ticketBookings = (clone $ticketBookingQuery)->orderByDesc('latest_id')->take(5)->get();
         }
+        if ($user->hasRole('Store Manager') && $user->temple_id) {
+            $templeProductQuery = TempleProduct::where('temple_id', $user->temple_id)->where('created_by', $user->id);
+            $templeProductCount = (clone $templeProductQuery)->count();
+            $templeProducts = $templeProductQuery->latest()->take(5)->get();
+            $samgriBookingQuery = PujaBooking::with(['user','temple','puja','pujaPackage',])
+                ->where('temple_id', $user->temple_id)
+                ->whereNotNull('selected_products')
+                ->whereJsonLength('selected_products', '>', 0)
+                ->where('samgri_otp_verified', 0)
+                ->whereDate('schedule_date', '>=', today());
+            $samgriBookingCount = (clone $samgriBookingQuery)->count();
+            $samgriBookings = $samgriBookingQuery->orderBy('schedule_date', 'asc')->orderBy('schedule_time', 'asc')
+                ->take(5)
+                ->get();
+            $completedSamgriQuery = PujaBooking::with([
+                'user',
+                'temple',
+                'puja',
+                'pujaPackage',
+                'samgriVerification.verifiedBy',
+            ])
+                ->where('temple_id', $user->temple_id)
+                ->whereNotNull('selected_products')
+                ->whereJsonLength('selected_products', '>', 0)
+                ->where('samgri_otp_verified', 1);
+            $completedSamgriBookingCount = (clone $completedSamgriQuery)->count();
+            $completedSamgriBookings = $completedSamgriQuery->latest()->take(5)->get();
+        }
         return view('dashboard', compact(
             'bookingCount',
             'bookings',
@@ -76,7 +110,13 @@ class DashboardController extends Controller
             'cancellationCount',
             'cancellations',
             'ticketBookingCount',
-            'ticketBookings'
+            'ticketBookings',
+            'templeProductCount',
+            'templeProducts',
+            'samgriBookingCount',
+            'samgriBookings',
+            'completedSamgriBookingCount',
+            'completedSamgriBookings'
         ));
     }
 }
