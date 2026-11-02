@@ -1523,6 +1523,621 @@
                 </div>
             </div>
         </section>
+    @elseif(auth()->user()->hasRole('Temple Manager'))
+        <section class="section">
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h4 class="font-weight-bold">Temple Manager Dashboard</h4>
+                    <p class="text-muted">
+                        Welcome back, {{ auth()->user()->name }}.
+                        Manage your temple Pandits here.
+                    </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                    <div class="card card-statistic-1">
+                        <div class="card-icon l-bg-purple">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <div class="card-wrap">
+                            <div class="padding-20">
+                                <div class="text-right">
+                                    <h3 class="font-light mb-0">
+                                        {{ $panditCount ?? 0 }}
+                                    </h3>
+                                    <span class="text-muted">
+                                        <a href="{{ route('pandits.index') }}">
+                                            Total Pandits
+                                        </a>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-lg-6 col-md-6 col-sm-6">
+                    <div class="card card-statistic-1">
+                        <div class="card-icon l-bg-purple">
+                            <i class="fas fa-newspaper"></i>
+                        </div>
+
+                        <div class="card-wrap">
+                            <div class="padding-20">
+                                <div class="text-right">
+                                    <h3 class="font-weight-bold mb-2">
+                                        {{ $newsCount ?? 0 }}
+                                    </h3>
+                                    <span class="text-muted">Total News</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-6 col-12">
+                    <div class="card card-statistic-1">
+                        <div class="card-icon l-bg-purple">
+                            <i class="fas fa-praying-hands"></i>
+                        </div>
+                        <div class="card-wrap">
+                            <div class="padding-20">
+                                <div class="text-right">
+                                    <h3 class="font-weight-bold mb-0">
+                                        {{ $pujaCount ?? 0 }}
+                                    </h3>
+                                    <span class="text-muted">Total Pujas</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                    <div class="card card-statistic-1">
+                        <div class="card-icon l-bg-green"><i class="fas fa-check-circle"></i></div>
+                        <div class="card-wrap"><div class="padding-20"><div class="text-right">
+                            <h3 class="font-light mb-0">{{ $successfulPujaBookingCount ?? 0 }}</h3>
+                            <span class="text-muted"><a href="{{ route('booking-puja-order.successful') }}">Successful Puja Bookings</a></span>
+                        </div></div></div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                    <div class="card card-statistic-1">
+                        <div class="card-icon l-bg-orange"><i class="fas fa-times-circle"></i></div>
+                        <div class="card-wrap"><div class="padding-20"><div class="text-right">
+                            <h3 class="font-light mb-0">{{ $failedPujaPaymentCount ?? 0 }}</h3>
+                            <span class="text-muted"><a href="{{ route('booking-puja-order.failed') }}">Failed Puja Payments</a></span>
+                        </div></div></div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                    <div class="card card-statistic-1">
+                        <div class="card-icon l-bg-red"><i class="fas fa-calendar-times"></i></div>
+                        <div class="card-wrap"><div class="padding-20"><div class="text-right">
+                            <h3 class="font-light mb-0">{{ $cancelledPujaBookingCount ?? 0 }}</h3>
+                            <span class="text-muted"><a href="{{ route('booking-puja-order.cancelled') }}">Cancelled Puja Bookings</a></span>
+                        </div></div></div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                    <div class="card card-statistic-1">
+                        <div class="card-icon l-bg-orange"><i class="fas fa-calendar-times"></i></div>
+                        <div class="card-wrap">
+                            <div class="padding-20">
+                                <div class="text-right">
+                                    <h3 class="font-light mb-0">{{ $customerCancellationCount ?? 0 }}</h3>
+                                    <span class="text-muted">Customer Cancellation Requests</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                    <div class="card card-statistic-1">
+                         <div class="card-icon l-bg-orange">
+                            <i class="fa fa-ticket-alt"></i>
+                        </div>
+                        <div class="card-wrap">
+                            <div class="padding-20">
+                                <div class="text-right">
+                                    <h3 class="font-light mb-0">{{ $managerTicketBookingCount ?? 0 }}</h3>
+                                    <span class="text-muted">
+                                        <a href="{{ route('admin.tickit-booking-history') }}">Ticket Bookings</a>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">
+                        <i class="fas fa-user-tie text-primary mr-2"></i>
+                        Recent Temple Pandits
+                    </h4>
+                    <a href="{{ route('pandits.index') }}" class="btn btn-primary btn-sm">
+                        View All
+                        <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Pandit Details</th>
+                                    <th>Phone</th>
+                                    <th>Temple</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($pandits ?? [] as $pandit)
+                                    <tr>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td>
+                                            <strong>
+                                                <i class="fas fa-user text-primary mr-1"></i>
+                                                {{ $pandit->name }}
+                                            </strong>
+                                            <br>
+                                            <small class="text-muted">
+                                                <i class="fas fa-envelope mr-1"></i>
+                                                {{ $pandit->email }}
+                                            </small>
+                                        </td>
+                                        <td>
+                                            <i class="fas fa-phone-alt text-primary mr-1"></i>
+                                            {{ $pandit->phone ?? '-' }}
+                                        </td>
+                                        <td>
+                                            @forelse($pandit->temples as $temple)
+                                                <span class="badge badge-info mb-1">
+                                                    <i class="fas fa-place-of-worship mr-1"></i>
+                                                    {{ $temple->name }}
+                                                </span>
+                                            @empty
+                                                <span class="text-muted">
+                                                    Not Assigned
+                                                </span>
+                                            @endforelse
+                                        </td>
+                                        <td>
+                                            @if($pandit->status)
+                                                <span class="badge badge-success">
+                                                    <i class="fas fa-check-circle mr-1"></i>
+                                                    Active
+                                                </span>
+                                            @else
+                                                <span class="badge badge-danger">
+                                                    <i class="fas fa-times-circle mr-1"></i>
+                                                    Inactive
+                                                </span>
+                                            @endif
+                                        </td>                            
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="6" class="text-center py-5">
+                                            <i class="fas fa-user-tie fa-3x text-muted mb-3"></i>
+                                            <h6 class="font-weight-bold">
+                                                No Pandits Found
+                                            </h6>
+                                            <p class="text-muted mb-3">
+                                                No Pandits are currently associated with your approved temples.
+                                            </p>
+                                            <a href="{{ route('pandits.create') }}"
+                                            class="btn btn-primary btn-sm">
+                                                <i class="fas fa-plus mr-1"></i>
+                                                Add Pandit
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="mb-0">
+                            <i class="fas fa-newspaper mr-2"></i> Latest News
+                        </h4>
+                        <small class="text-muted">
+                            News from your approved temples
+                        </small>
+                    </div>
+                    <a href="{{ route('my-news.index') }}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-list mr-1"></i> View All
+                    </a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>News Details</th>
+                                    <th>Temple</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($newsList as $index => $news)
+                                    <tr>
+                                        <td>{{ $index + 1 }}</td>
+                                        <td>
+                                            <strong>{{ $news->title }}</strong>
+                                            <br>
+                                            <small class="text-muted">
+                                                {{ Str::limit($news->short_description, 60) }}
+                                            </small>
+                                        </td>
+                                        <td>
+                                            <i class="fas fa-place-of-worship text-primary mr-1"></i>
+                                            {{ $news->temple?->name ?? 'N/A' }}
+                                        </td>
+                                        <td>
+                                            @if($news->status == 1)
+                                                <span class="badge badge-success">Active</span>
+                                            @else
+                                                <span class="badge badge-danger">Inactive</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            {{ $news->created_at?->format('d M Y') }}
+                                        </td>
+                                        <td>
+                                            <a href="{{ route('my-news.show', $news->id) }}"
+                                            class="btn btn-outline-primary btn-sm" title="View News">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{{ route('my-news.edit', $news->id) }}"
+                                            class="btn btn-outline-warning btn-sm" title="Edit News">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="6" class="text-center py-4">
+                                            <i class="fas fa-newspaper fa-2x text-muted mb-2"></i>
+                                            <h6 class="mb-1">No News Found</h6>
+                                            <p class="text-muted mb-2">
+                                                No news has been added to your approved temples yet.
+                                            </p>
+                                            <a href="{{ route('my-news.create') }}"  class="btn btn-primary btn-sm">
+                                                <i class="fas fa-plus mr-1"></i> Add News
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4>
+                        <i class="fas fa-praying-hands mr-2"></i>
+                        Recent Pujas
+                    </h4>
+                    <a href="{{ route('pujas.index') }}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-list mr-1"></i> View All
+                    </a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Puja Name</th>
+                                    <th>Temple</th>
+                                    <th>Deity</th>
+                                    <th>Category</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($pujas ?? [] as $index => $puja)
+                                    <tr>
+                                        <td>{{ $index + 1 }}</td>
+                                        <td>
+                                            <strong>{{ $puja->name }}</strong>
+                                            @if($puja->puja_code)
+                                                <br>
+                                                <small class="text-muted">
+                                                    {{ $puja->puja_code }}
+                                                </small>
+                                            @endif
+                                        </td>
+                                        <td>{{ $puja->temple->name ?? 'N/A' }}</td>
+                                        <td>{{ $puja->deity->name ?? 'N/A' }}</td>
+                                        <td>{{ $puja->pujaCategory->name ?? 'N/A' }}</td>
+                                        <td>
+                                            @if($puja->status)
+                                                <span class="badge badge-success">Active</span>
+                                            @else
+                                                <span class="badge badge-danger">Inactive</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            {{ $puja->created_at?->format('d M Y') ?? 'N/A' }}
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="7" class="text-center py-4">
+                                            <i class="fas fa-praying-hands fa-2x text-muted mb-2"></i>
+                                            <p class="mb-0">No Pujas found.</p>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0"><i class="fas fa-check-circle text-success mr-2"></i>Recent Successful Puja Bookings</h4>
+                    <a href="{{ route('booking-puja-order.successful') }}" class="btn btn-primary btn-sm">View All <i class="fas fa-arrow-right ml-1"></i></a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover mb-0">
+                            <thead><tr><th>#</th><th>Booking Number</th><th>Customer</th><th>Puja</th><th>Package</th><th>Temple</th><th>Schedule Date</th><th>Payment Status</th><th>Action</th></tr></thead>
+                            <tbody>
+                                @forelse($successfulPujaBookings ?? [] as $booking)
+                                    <tr>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td><strong>{{ $booking->booking_number ?? $booking->id }}</strong></td>
+                                        <td><i class="fas fa-user text-primary mr-1"></i>{{ $booking->customer_name ?? $booking->user?->name ?? '-' }}</td>
+                                        <td><i class="fas fa-praying-hands text-primary mr-1"></i>{{ $booking->puja?->name ?? '-' }}</td>
+                                        <td>{{ $booking->pujaPackage?->name ?? $booking->package_name ?? '-' }}</td>
+                                        <td>{{ $booking->temple?->name ?? '-' }}</td>
+                                        <td>{{ $booking->schedule_date ? \Carbon\Carbon::parse($booking->schedule_date)->format('d M Y') : '-' }}</td>
+                                        <td><span class="badge badge-success"><i class="fas fa-check-circle mr-1"></i>Paid</span></td>
+                                        <td><a href="{{ route('booking-puja-order.show', $booking->id) }}" class="btn btn-outline-primary btn-sm"><i class="fas fa-eye"></i> View</a></td>
+                                    </tr>
+                                @empty
+                                    <tr><td colspan="9" class="text-center py-4"><i class="fas fa-calendar-check fa-2x text-muted mb-2"></i><h6>No Successful Puja Bookings Found</h6><p class="text-muted mb-0">No successful bookings found for your approved temples.</p></td></tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0"><i class="fas fa-exclamation-circle text-danger mr-2"></i>Recent Failed Puja Payments</h4>
+                    <a href="{{ route('booking-puja-order.failed') }}" class="btn btn-primary btn-sm">View All <i class="fas fa-arrow-right ml-1"></i></a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover mb-0">
+                            <thead><tr><th>#</th><th>Payment ID</th><th>Booking Number</th><th>Customer</th><th>Puja</th><th>Amount</th><th>Payment Status</th><th>Date</th><th>Action</th></tr></thead>
+                            <tbody>
+                                @forelse($failedPujaPayments ?? [] as $payment)
+                                    <tr>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td><strong>{{ $payment->id }}</strong></td>
+                                        <td>{{ $payment->booking?->booking_number ?? $payment->booking?->id ?? '-' }}</td>
+                                        <td><i class="fas fa-user text-primary mr-1"></i>{{ $payment->user?->name ?? $payment->booking?->customer_name ?? '-' }}</td>
+                                        <td><i class="fas fa-praying-hands text-primary mr-1"></i>{{ $payment->puja?->name ?? $payment->booking?->puja?->name ?? '-' }}</td>
+                                        <td><strong>₹{{ number_format((float) ($payment->amount ?? 0), 2) }}</strong></td>
+                                        <td><span class="badge badge-danger"><i class="fas fa-times-circle mr-1"></i>Failed</span></td>
+                                        <td>{{ $payment->created_at ? \Carbon\Carbon::parse($payment->created_at)->format('d M Y') : '-' }}</td>
+                                        <td>
+                                            @if($payment->booking)
+                                                <a href="{{ route('booking-puja-order.show', $payment->booking->id) }}" class="btn btn-outline-primary btn-sm"><i class="fas fa-eye"></i> View</a>
+                                            @else
+                                                -
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr><td colspan="9" class="text-center py-4"><i class="fas fa-credit-card fa-2x text-muted mb-2"></i><h6>No Failed Payments Found</h6><p class="text-muted mb-0">No failed payments found for your approved temples.</p></td></tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0"><i class="fas fa-calendar-times text-danger mr-2"></i>Recent Cancelled Puja Bookings</h4>
+                    <a href="{{ route('booking-puja-order.cancelled') }}" class="btn btn-primary btn-sm">View All <i class="fas fa-arrow-right ml-1"></i></a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover mb-0">
+                            <thead><tr><th>#</th><th>Booking Number</th><th>Customer</th><th>Puja</th><th>Package</th><th>Temple</th><th>Schedule Date</th><th>Booking Status</th><th>Action</th></tr></thead>
+                            <tbody>
+                                @forelse($cancelledPujaBookings ?? [] as $booking)
+                                    <tr>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td><strong>{{ $booking->booking_number ?? $booking->id }}</strong></td>
+                                        <td><i class="fas fa-user text-primary mr-1"></i>{{ $booking->customer_name ?? $booking->user?->name ?? '-' }}</td>
+                                        <td><i class="fas fa-praying-hands text-primary mr-1"></i>{{ $booking->puja?->name ?? '-' }}</td>
+                                        <td>{{ $booking->pujaPackage?->name ?? $booking->package_name ?? '-' }}</td>
+                                        <td>{{ $booking->temple?->name ?? '-' }}</td>
+                                        <td>{{ $booking->schedule_date ? \Carbon\Carbon::parse($booking->schedule_date)->format('d M Y') : '-' }}</td>
+                                        <td><span class="badge badge-danger"><i class="fas fa-ban mr-1"></i>Cancelled</span></td>
+                                        <td><a href="{{ route('booking-puja-order.show', $booking->id) }}" class="btn btn-outline-primary btn-sm"><i class="fas fa-eye"></i> View</a></td>
+                                    </tr>
+                                @empty
+                                    <tr><td colspan="9" class="text-center py-4"><i class="fas fa-calendar-times fa-2x text-muted mb-2"></i><h6>No Cancelled Puja Bookings Found</h6><p class="text-muted mb-0">No cancelled bookings found for your approved temples.</p></td></tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0"><i class="fas fa-calendar-times text-danger mr-2"></i>Recent Customer Cancellation Requests</h4>
+                    <span class="badge badge-warning">{{ $customerCancellationCount ?? 0 }} Requests</span>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Booking Number</th>
+                                    <th>Customer</th>
+                                    <th>Puja</th>
+                                    <th>Temple</th>
+                                    <th>Cancellation Reason</th>
+                                    <th>Request Date</th>
+                                    <th>Status</th>
+                                    <th>Refund Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($customerCancellations ?? [] as $cancellation)
+                                    <tr>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td><strong>{{ $cancellation->booking?->booking_number ?? $cancellation->puja_booking_id }}</strong></td>
+                                        <td><i class="fas fa-user text-primary mr-1"></i>{{ $cancellation->booking?->customer_name ?? $cancellation->customer?->name ?? $cancellation->booking?->user?->name ?? '-' }}</td>
+                                        <td><i class="fas fa-praying-hands text-primary mr-1"></i>{{ $cancellation->booking?->puja?->name ?? '-' }}</td>
+                                        <td>{{ $cancellation->booking?->temple?->name ?? '-' }}</td>
+                                        <td>{{ $cancellation->cancellation_reason ?: '-' }}</td>
+                                        <td>{{ $cancellation->created_at?->format('d M Y') ?? '-' }}</td>
+                                        <td>
+                                            @if($cancellation->status === 'approved')
+                                                <span class="badge badge-success">Approved</span>
+                                            @elseif($cancellation->status === 'rejected')
+                                                <span class="badge badge-danger">Rejected</span>
+                                            @else
+                                                <span class="badge badge-warning">Pending</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($cancellation->refund_status === 'processed')
+                                                <span class="badge badge-success">Processed</span>
+                                            @elseif($cancellation->refund_status === 'processing')
+                                                <span class="badge badge-info">Processing</span>
+                                            @else
+                                                <span class="badge badge-secondary">{{ ucfirst(str_replace('_', ' ', $cancellation->refund_status ?? 'Not Required')) }}</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="9" class="text-center py-5">
+                                            <i class="fas fa-calendar-check fa-3x text-muted mb-3"></i>
+                                            <h6 class="font-weight-bold">No Customer Cancellation Requests Found</h6>
+                                            <p class="text-muted mb-0">There are no cancellation requests for your approved temples.</p>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">
+                        <i class="fas fa-ticket-alt text-primary mr-2"></i>
+                        Recent Ticket Bookings
+                    </h4>
+                    <a href="{{ route('admin.tickit-booking-history') }}" class="btn btn-primary btn-sm">
+                        View All
+                        <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Booking Reference</th>
+                                    <th>Customer Details</th>
+                                    <th>Temple</th>
+                                    <th>Total Members</th>
+                                    <th>Total Amount</th>
+                                    <th>Booking Date</th>
+                                    <th>Payment Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($managerTicketBookings ?? [] as $ticketBooking)
+                                    <tr>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td>
+                                            <strong>{{ $ticketBooking->booking_reference ?? '-' }}</strong>
+                                            <br>
+                                            <small class="text-muted">
+                                                {{ $ticketBooking->razorpay_order_id }}
+                                            </small>
+                                        </td>
+                                        <td>
+                                            <strong>
+                                                <i class="fas fa-user text-primary mr-1"></i>
+                                                {{ $ticketBooking->customer_name ?? '-' }}
+                                            </strong>
+                                            <br>
+                                            <small class="text-muted">
+                                                <i class="fas fa-envelope mr-1"></i>
+                                                {{ $ticketBooking->customer_email ?? '-' }}
+                                            </small>
+                                        </td>
+                                        <td>
+                                            <i class="fas fa-place-of-worship text-primary mr-1"></i>
+                                            {{ $ticketBooking->temple_name ?? '-' }}
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-info">
+                                                {{ $ticketBooking->total_members }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <strong>₹{{ number_format((float) $ticketBooking->total_amount, 2) }}</strong>
+                                        </td>
+                                        <td>
+                                            {{ $ticketBooking->booking_date ? \Carbon\Carbon::parse($ticketBooking->booking_date)->format('d M Y') : '-' }}
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-success">
+                                                {{ ucfirst($ticketBooking->payment_status) }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a href="{{ route('admin.tickit-booking-history.show', $ticketBooking->razorpay_order_id) }}" class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-eye"></i> View
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="9" class="text-center py-5">
+                                            <i class="fas fa-ticket-alt fa-3x text-muted mb-3"></i>
+                                            <h6 class="font-weight-bold">No Ticket Bookings Found</h6>
+                                            <p class="text-muted mb-0">
+                                                There are no confirmed ticket bookings for your approved temples yet.
+                                            </p>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
     @else
         <section class="section">
             <div class="row mb-4">
