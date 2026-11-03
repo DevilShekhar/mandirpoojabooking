@@ -241,7 +241,9 @@ class PermissionSeeder extends Seeder
             'news.create',
             'complete-puja-booking',
             'reports.view',
-            'reports.index'
+            'reports.index',
+            'reports-event.index',
+            'reports-store.index'
         ];
         foreach ($permissions as $permission) {
             Permission::firstOrCreate([

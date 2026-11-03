@@ -57,6 +57,7 @@ use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Frontend\NewsFrontendController;
 use App\Http\Controllers\Admin\MandirPujaPanditReportController;
 use App\Http\Controllers\Admin\EventBookingCompletedReportController;
+use App\Http\Controllers\Admin\StoreManagerCompletedReportController;
 
 Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
 Route::get('our-temples', [OurTemplesContoller::class, 'index'])->name('frontend.our-temples');
@@ -220,25 +221,15 @@ Route::middleware('auth')->group(function () {
         Route::get('/mandir-puja-pandit/export/pdf',[MandirPujaPanditReportController::class, 'exportPdf'])->name('mandir-puja-pandit.pdf');
         Route::get('/mandir-puja-pandit/export/csv',[MandirPujaPanditReportController::class, 'exportCsv'])->name('mandir-puja-pandit.csv');
         Route::get('/mandir-puja-pandit/export/excel',[MandirPujaPanditReportController::class, 'exportExcel'])->name('mandir-puja-pandit.excel');
-         Route::get('/event-booking-completed', [
-        EventBookingCompletedReportController::class,
-        'index'
-    ])->name('event-booking-completed.index');
-
-    Route::get('/event-booking-completed/export/pdf', [
-        EventBookingCompletedReportController::class,
-        'exportPdf'
-    ])->name('event-booking-completed.pdf');
-
-    Route::get('/event-booking-completed/export/csv', [
-        EventBookingCompletedReportController::class,
-        'exportCsv'
-    ])->name('event-booking-completed.csv');
-
-    Route::get('/event-booking-completed/export/excel', [
-        EventBookingCompletedReportController::class,
-        'exportExcel'
-    ])->name('event-booking-completed.excel');
+        Route::get('/event-booking-completed', [EventBookingCompletedReportController::class,'index'])->name('event-booking-completed.index');
+        Route::get('/event-booking-completed/export/pdf', [EventBookingCompletedReportController::class,'exportPdf'])->name('event-booking-completed.pdf');
+        Route::get('/event-booking-completed/export/csv', [EventBookingCompletedReportController::class,'exportCsv'])->name('event-booking-completed.csv');
+        Route::get('/event-booking-completed/export/excel', [EventBookingCompletedReportController::class,'exportExcel'])->name('event-booking-completed.excel');
+        Route::get('/store-manager-completed',[StoreManagerCompletedReportController::class, 'index'])->name('store-manager-completed.index');
+        Route::get('/store-manager-completed/temple/{templeId}/manager',[StoreManagerCompletedReportController::class, 'getStoreManager'])->name('store-manager-completed.manager');
+        Route::get('/store-manager-completed/export/pdf',[StoreManagerCompletedReportController::class, 'exportPdf'])->name('store-manager-completed.pdf');
+        Route::get('/store-manager-completed/export/csv',[StoreManagerCompletedReportController::class, 'exportCsv'])->name('store-manager-completed.csv');
+        Route::get('/store-manager-completed/export/excel',[StoreManagerCompletedReportController::class, 'exportExcel'])->name('store-manager-completed.excel');
     });
 });
 Route::middleware('auth')->prefix('payment/razorpay')->name('razorpay.')->group(function () {
