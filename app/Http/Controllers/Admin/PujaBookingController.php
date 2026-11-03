@@ -76,6 +76,7 @@ class PujaBookingController extends Controller
             'pandit',
             'createdBy',
             'updatedBy',
+            'completedBy',
         ]);
 
         $selectedProducts = $this->normalizeSelectedProducts(
@@ -317,5 +318,80 @@ class PujaBookingController extends Controller
         }
 
         return null;
+    }
+    
+    
+    public function complete(PujaBooking $pujaBooking)
+    {
+        $user = auth()->user();
+        if (!$user || !$user->can('complete-puja-booking')) {
+            abort(403, 'You do not have permission to complete Puja bookings.');
+        }
+        if (!$this->canViewBooking($user, $pujaBooking)) {
+            abort(403, 'You are not authorized to complete this booking.');
+        }
+        try {
+            DB::transaction(function () use ($pujaBooking, $user) {
+                $booking = PujaBooking::whereKey($pujaBooking->id)
+                    ->lockForUpdate()
+                    ->firstOrFail();
+                if (strtolower((string) $booking->booking_status) === 'completed') {
+                    throw new \RuntimeException('This booking has already been completed.');
+                }
+                if (strtolower((string) $booking->booking_status) !== 'confirmed') {
+                    throw new \RuntimeException('Only confirmed bookings can be completed.');
+                }
+                if (!in_array(strtolower((string) $booking->payment_status),['paid', 'success', 'captured'], true)) {
+                    throw new \RuntimeException(
+                        'Payment must be successful before completing this booking.'
+                    );
+                }
+                $booking->booking_status = 'completed';
+                $booking->completed_by = $user->id;
+                $booking->completed_at = now();
+                $booking->updated_by = $user->id;
+                $booking->save();
+            });
+            return redirect()
+                ->route('booking-puja-order-completed')
+                ->with('success', 'Puja booking successfully marked as completed.');
+        } catch (\RuntimeException $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        } catch (\Throwable $e) {
+            report($e);
+            return redirect()->back()->with(
+                'error',
+                'Something went wrong while completing the booking.'
+            );
+        }
+    }
+    
+    public function completed(Request $request)
+    {
+        $user = auth()->user();
+        $query = PujaBooking::with([
+            'user',
+            'temple',
+            'deity',
+            'puja',
+            'pujaPackage',
+            'pandit',
+            'completedBy',
+        ])->where('booking_status', 'completed');
+        if ($user->hasRole('Temple Manager')) {
+            $query->whereIn(
+                'temple_id',
+                $this->getManagedTempleIds($user)
+            );
+        } elseif ($user->hasRole('Pandit')) {
+            $query->where('pandit_id', $user->id);
+        } elseif (!$user->hasAnyRole(['Admin', 'Super Admin'])) {
+            $query->where('user_id', $user->id);
+        }
+        $bookings = $query
+            ->orderByDesc('completed_at')
+            ->orderByDesc('id')
+            ->get();
+        return view('admin.booking-puja-order.completed',compact('bookings'));
     }
 }

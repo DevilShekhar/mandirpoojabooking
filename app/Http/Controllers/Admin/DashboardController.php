@@ -48,6 +48,8 @@ class DashboardController extends Controller
         $failedPujaPayments = collect();
         $cancelledPujaBookingCount = 0;
         $cancelledPujaBookings = collect();
+        $completedPujaBookingCount = 0;
+        $completedPujaBookingAmount = 0;
         $panditCount = 0;
         $pandits = collect();
         $newsCount = 0;
@@ -222,6 +224,9 @@ class DashboardController extends Controller
                 ->latest()
                 ->take(5)
                 ->get();
+            $completedPujaQuery = PujaBooking::where('pandit_id', $user->id)->where('booking_status', 'completed');
+            $completedPujaBookingCount = (clone $completedPujaQuery)->count();
+            $completedPujaBookingAmount = (clone $completedPujaQuery)->sum('total_amount');
         }     
         if ($user->hasRole('Temple Manager')) {
             $templeIds = $user->temples()
@@ -480,6 +485,8 @@ class DashboardController extends Controller
             'pujaCancelledAmount',
             'pujaRefundCount',
             'pujaRefundAmount',
+            'completedPujaBookingCount',
+            'completedPujaBookingAmount',
         ));
     }
 }

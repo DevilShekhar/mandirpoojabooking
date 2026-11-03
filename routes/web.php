@@ -179,6 +179,8 @@ Route::middleware('auth')->group(function () {
     Route::get('booking-puja-order-successful',[PujaBookingController::class, 'successful'])->name('booking-puja-order.successful');
     Route::get('booking-puja-order-failed',[PujaBookingController::class, 'failed'])->name('booking-puja-order.failed');
     Route::get('booking-puja-order-cancelled',[PujaBookingController::class, 'cancelled'])->name('booking-puja-order.cancelled');
+    Route::get('/puja-bookings/completed',[PujaBookingController::class, 'completed'])->name('booking-puja-order-completed');
+    Route::post('/puja-bookings/{pujaBooking}/complete',[PujaBookingController::class, 'complete'])->name('booking-puja-order.complete');
     Route::post('/puja-reviews/{id}/reject',[PujaReviewController::class, 'reject'])->name('admin.puja-reviews.reject');
     Route::resource('sanatan-events', SanatanController::class)->names('admin.sanatan-events')->parameters(['sanatan-events' => 'sanatan']);
     Route::get('/all-templae-register', [TempleRegistrationListController::class,'index'])->name('all-templae-register');
