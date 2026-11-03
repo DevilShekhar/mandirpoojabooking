@@ -55,6 +55,7 @@ use App\Http\Controllers\Admin\TempleProductController;
 use App\Http\Controllers\Admin\SamgriBookingController;
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Frontend\NewsFrontendController;
+use App\Http\Controllers\Admin\MandirPujaPanditReportController;
 
 Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
 Route::get('our-temples', [OurTemplesContoller::class, 'index'])->name('frontend.our-temples');
@@ -212,6 +213,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/completed-samgri-booking/{booking}/view', [SamgriBookingController::class, 'completedShow'])->name('completed-samgri-booking.show');
     Route::post('/samgri-booking/{id}/verify-otp',[SamgriBookingController::class, 'verifyOtp'])->name('samgri-booking.verify-otp');
     Route::resource('my-news', NewsController::class)->names('my-news');
+    Route::prefix('reports')->name('reports.')->group(function () {
+        Route::get('/mandir-puja-pandit',[MandirPujaPanditReportController::class, 'index'])->name('mandir-puja-pandit.index');
+        Route::get('/mandir-puja-pandit/pandits',[MandirPujaPanditReportController::class, 'getPandits'])->name('mandir-puja-pandit.pandits');
+        Route::get('/mandir-puja-pandit/export/pdf',[MandirPujaPanditReportController::class, 'exportPdf'])->name('mandir-puja-pandit.pdf');
+        Route::get('/mandir-puja-pandit/export/csv',[MandirPujaPanditReportController::class, 'exportCsv'])->name('mandir-puja-pandit.csv');
+        Route::get('/mandir-puja-pandit/export/excel',[MandirPujaPanditReportController::class, 'exportExcel'])->name('mandir-puja-pandit.excel');
+    });
 });
 Route::middleware('auth')->prefix('payment/razorpay')->name('razorpay.')->group(function () {
     Route::post('/create-order', [RazorpayPaymentController::class, 'createOrder'])->name('create-order');
