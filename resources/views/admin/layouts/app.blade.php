@@ -611,7 +611,7 @@
                                 <ul class="dropdown-menu">
                                     <li class="{{ request()->routeIs('booking-puja-order.successful') ? 'active' : '' }}">
                                         <a class="nav-link" href="{{ route('booking-puja-order.successful') }}">
-                                            Successful
+                                            Assigned
                                         </a>
                                     </li>
                                     <li class="{{ request()->routeIs('booking-puja-order.failed') ? 'active' : '' }}">
@@ -622,6 +622,11 @@
                                     <li class="{{ request()->routeIs('booking-puja-order.cancelled') ? 'active' : '' }}">
                                         <a class="nav-link" href="{{ route('booking-puja-order.cancelled') }}">
                                             Cancelled
+                                        </a>
+                                    </li>
+                                    <li class="{{ request()->routeIs('booking-puja-order-completed') ? 'active' : '' }}">
+                                        <a class="nav-link" href="{{ route('booking-puja-order-completed') }}">
+                                            Completed
                                         </a>
                                     </li>
                                 </ul>

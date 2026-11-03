@@ -6,6 +6,12 @@
     $isCustomer = $currentUser && $currentUser->hasRole('Customer') && (int) $currentUser->id === (int) $pujaBooking->user_id;
     $bookingStatus = strtolower($pujaBooking->booking_status ?? 'pending');
     $paymentStatus = strtolower($pujaBooking->payment_status ?? 'pending');
+    $isCompleted = $bookingStatus === 'completed';
+    $completedBy = $pujaBooking->completedBy;
+    $completedAt = $pujaBooking->completed_at;
+    $hasCompletionPermission = $currentUser && $currentUser->can('complete-puja-booking');
+    $canCompletePuja = $bookingStatus === 'confirmed'
+        && in_array($paymentStatus, ['paid', 'success', 'captured'], true);
     $cancellationRequest = $isCustomer
         ? \App\Models\CustomerBookingCancellation::where('puja_booking_id', $pujaBooking->id)
             ->where('customer_id', $currentUser->id)->first()
@@ -427,12 +433,15 @@
                                 $status = strtolower($payment->status ?? 'pending');
                                 $paymentRowBadge = in_array(
                                     $status,
-                                    ['paid', 'success', 'captured', 'completed']
+                                    ['paid', 'success', 'captured', 'completed'],true
                                 )
                                     ? 'success'
                                     : ($status === 'refunded'
                                         ? 'info'
                                         : ($status === 'failed' ? 'danger' : 'warning'));
+                                $failureDetail = $payment->error_description
+                                    ?: $payment->error_reason
+                                    ?: $payment->error_code;
                             @endphp
                             <tr>
                                 <td>{{ $index + 1 }}</td>
@@ -464,6 +473,199 @@
                     No Razorpay payments are linked to this booking.
                 </p>
             @endif
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card puja-completion-card mb-4">
+                <div class="card-header puja-completion-header">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap">
+                        <div class="d-flex align-items-center">
+                            <div class="completion-header-icon">
+                                <i class="fas fa-check-double"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-1">Puja Completion Details</h5>
+                                <p class="mb-0">
+                                    Booking completion status and verification information
+                                </p>
+                            </div>
+                        </div>
+                        @if($isCompleted)
+                            <span class="completion-status completed">
+                                <i class="fas fa-check-circle"></i>
+                                Completed
+                            </span>
+                        @else
+                            <span class="completion-status pending">
+                                <i class="fas fa-clock"></i>
+                                Pending Completion
+                            </span>
+                        @endif
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if($isCompleted)
+                        <div class="completion-success-banner mb-4">
+                            <div class="completion-success-icon">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div>
+                                <h6>Puja Successfully Completed</h6>
+                                <p class="mb-0">
+                                    This puja booking has been marked as completed.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4 col-md-6 mb-3">
+                                <div class="completion-info-box">
+                                    <div class="completion-info-icon">
+                                        <i class="fas fa-receipt"></i>
+                                    </div>
+                                    <div>
+                                        <span>Booking Number</span>
+                                        <strong>
+                                            {{ $pujaBooking->booking_number ?: '#'.$pujaBooking->id }}
+                                        </strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6 mb-3">
+                                <div class="completion-info-box">
+                                    <div class="completion-info-icon">
+                                        <i class="fas fa-user-check"></i>
+                                    </div>
+                                    <div>
+                                        <span>Completed By</span>
+                                        <strong>
+                                            {{ $completedBy?->name ?? 'N/A' }}
+                                        </strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6 mb-3">
+                                <div class="completion-info-box">
+                                    <div class="completion-info-icon">
+                                        <i class="fas fa-calendar-check"></i>
+                                    </div>
+                                    <div>
+                                        <span>Completion Date</span>
+                                        <strong>
+                                            {{ $completedAt
+                                                ? \Illuminate\Support\Carbon::parse($completedAt)->format('d M Y')
+                                                : 'N/A' }}
+                                        </strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6 mb-3">
+                                <div class="completion-info-box">
+                                    <div class="completion-info-icon">
+                                        <i class="fas fa-clock"></i>
+                                    </div>
+                                    <div>
+                                        <span>Completion Time</span>
+                                        <strong>
+                                            {{ $completedAt
+                                                ? \Illuminate\Support\Carbon::parse($completedAt)->format('h:i A')
+                                                : 'N/A' }}
+                                        </strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6 mb-3">
+                                <div class="completion-info-box">
+                                    <div class="completion-info-icon">
+                                        <i class="fas fa-tasks"></i>
+                                    </div>
+                                    <div>
+                                        <span>Booking Status</span>
+                                        <strong class="text-success">
+                                            {{ ucfirst($bookingStatus) }}
+                                        </strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6 mb-3">
+                                <div class="completion-info-box">
+                                    <div class="completion-info-icon">
+                                        <i class="fas fa-wallet"></i>
+                                    </div>
+                                    <div>
+                                        <span>Payment Status</span>
+                                        <strong class="text-success">
+                                            {{ ucfirst($paymentStatus) }}
+                                        </strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @else
+                        <div class="row align-items-center">
+                            <div class="col-lg-8 mb-3 mb-lg-0">
+                                <div class="completion-pending-info">
+                                    <div class="completion-pending-icon">
+                                        <i class="fas fa-hourglass-half"></i>
+                                    </div>
+                                    <div>
+                                        <h6>Puja Completion Pending</h6>
+                                        <p class="mb-2">
+                                            This booking has not yet been marked as completed.
+                                        </p>
+                                        <div class="completion-booking-meta">
+                                            <span>
+                                                <i class="fas fa-receipt"></i>
+                                                {{ $pujaBooking->booking_number ?: '#'.$pujaBooking->id }}
+                                            </span>
+                                            <span>
+                                                <i class="fas fa-calendar-alt"></i>
+                                                {{ $pujaBooking->schedule_date?->format('d M Y') ?? 'Date not available' }}
+                                            </span>
+                                        </div>
+                                        @if($bookingStatus !== 'confirmed')
+                                            <small class="text-danger">
+                                                Only confirmed bookings can be completed.
+                                            </small>
+                                        @elseif(!$canCompletePuja)
+                                            <small class="text-danger">
+                                                Payment must be successful before completion.
+                                            </small>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 text-lg-right">
+                                @if($hasCompletionPermission)
+                                    @if($canCompletePuja)
+                                        <form action="{{ route('booking-puja-order.complete', $pujaBooking->id) }}" method="POST" id="completePujaBookingForm">
+                                            @csrf
+                                            <button type="button" class="btn btn-success completion-action-btn" id="completePujaBookingBtn">
+                                                <i class="fas fa-check-circle mr-1"></i>
+                                                Mark as Completed
+                                            </button>
+                                        </form>
+                                    @else
+                                        <div class="completion-notice completion-notice-warning">
+                                            <i class="fas fa-info-circle"></i>
+                                            @if($bookingStatus !== 'confirmed')
+                                                Only confirmed bookings can be completed.
+                                            @else
+                                                Payment must be paid, successful, or captured before completion.
+                                            @endif
+                                        </div>
+                                    @endif
+                                @else
+                                    <div class="completion-notice completion-notice-muted">
+                                        <i class="fas fa-lock"></i>
+                                        You do not have permission to complete this booking.
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    @endif
+                </div>
+            </div>
         </div>
     </div>
     <div class="card mb-4 puja-pandit-card">
@@ -644,6 +846,271 @@
 }
 
 
+/* Ensure the Bootstrap row wrapping the completion card spans the full grid. */
+@media (min-width: 992px) {
+    .puja-details-page > .row {
+        grid-column: 1 / -1;
+        min-width: 0;
+        width: 100%;
+    }
+}
+
+.completion-notice {
+    display: inline-block;
+    max-width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    line-height: 1.5;
+    text-align: left;
+}
+
+.completion-notice-warning {
+    color: #8a5a08;
+    background: #fff7e5;
+    border: 1px solid #f3dfb4;
+}
+
+.completion-notice-muted {
+    color: #64748b;
+    background: #f4f6f9;
+    border: 1px solid #e2e8f0;
+}
+
+/* Puja Completion Card */
+
+.puja-completion-card {
+    border: 1px solid #e5eaf1;
+    border-radius: 13px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 5px 20px rgba(16, 38, 74, 0.06);
+}
+
+.puja-completion-header {
+    background: linear-gradient(110deg, #fff8ed, #ffffff);
+    border-bottom: 1px solid #f1e7d8;
+    padding: 17px 20px;
+}
+
+.completion-header-icon {
+    width: 43px;
+    height: 43px;
+    border-radius: 11px;
+    background: #fff0d8;
+    color: #df870d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 19px;
+    margin-right: 13px;
+}
+
+.puja-completion-header h5 {
+    font-size: 16px;
+    font-weight: 800;
+    color: #10264a;
+}
+
+.puja-completion-header p {
+    font-size: 12px;
+    color: #75839a;
+}
+
+.completion-status {
+    padding: 7px 14px;
+    border-radius: 30px;
+    font-size: 11px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.completion-status.completed {
+    color: #08783b;
+    background: #e6f8ed;
+    border: 1px solid #c6eed5;
+}
+
+.completion-status.pending {
+    color: #a16207;
+    background: #fff5dd;
+    border: 1px solid #f8e4b2;
+}
+
+.completion-success-banner {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 15px 17px;
+    background: #effbf3;
+    border: 1px solid #d3f0dc;
+    border-radius: 10px;
+}
+
+.completion-success-icon {
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #16a34a;
+    color: #fff;
+    font-size: 16px;
+}
+
+.completion-success-banner h6 {
+    margin-bottom: 4px;
+    font-size: 14px;
+    font-weight: 800;
+    color: #08783b;
+}
+
+.completion-success-banner p {
+    font-size: 12px;
+    color: #52735e;
+}
+
+.completion-info-box {
+    height: 100%;
+    min-height: 75px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px;
+    background: #fff;
+    border: 1px solid #edf0f5;
+    border-radius: 10px;
+    transition: all .2s ease;
+}
+
+.completion-info-box:hover {
+    border-color: #f3d8ad;
+    background: #fffdf9;
+}
+
+.completion-info-icon {
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff3e2;
+    color: #e88708;
+    border-radius: 10px;
+    font-size: 15px;
+}
+
+.completion-info-box span {
+    display: block;
+    color: #7b879a;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .45px;
+    margin-bottom: 5px;
+}
+
+.completion-info-box strong {
+    display: block;
+    color: #193354;
+    font-size: 13px;
+    font-weight: 800;
+    overflow-wrap: anywhere;
+}
+
+.completion-pending-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+}
+
+.completion-pending-icon {
+    width: 45px;
+    height: 45px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: #fff4dd;
+    color: #d97706;
+    font-size: 19px;
+}
+
+.completion-pending-info h6 {
+    font-size: 15px;
+    color: #10264a;
+    font-weight: 800;
+    margin-bottom: 5px;
+}
+
+.completion-pending-info p {
+    font-size: 12px;
+    color: #75839a;
+}
+
+.completion-booking-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 8px;
+}
+
+.completion-booking-meta span {
+    color: #53647c;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.completion-booking-meta i {
+    color: #e88708;
+    margin-right: 4px;
+}
+
+.completion-action-btn {
+    padding: 11px 20px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    background: #159447;
+    border: 0;
+    box-shadow: 0 4px 12px rgba(21, 148, 71, .17);
+}
+
+.completion-action-btn:hover {
+    background: #08783b;
+    transform: translateY(-1px);
+}
+
+@media(max-width: 575px) {
+    .puja-completion-header {
+        padding: 13px;
+    }
+
+    .puja-completion-header h5 {
+        font-size: 14px;
+    }
+
+    .completion-status {
+        margin-top: 12px;
+    }
+
+    .completion-info-box {
+        min-height: 65px;
+    }
+
+    .completion-pending-info {
+        gap: 10px;
+    }
+
+    .completion-action-btn {
+        width: 100%;
+    }
+}
+
 </style>
 
 @endsection
@@ -651,6 +1118,47 @@
 @push('scripts')
 <script>
     $(document).ready(function () {
+
+        // SweetAlert2 confirmation for puja completion.
+        $('#completePujaBookingBtn').on('click', function () {
+            const form = $('#completePujaBookingForm');
+
+            if (!form.length) {
+                return;
+            }
+
+            if (typeof Swal === 'undefined') {
+                if (window.confirm('Are you sure you want to mark this puja booking as completed?')) {
+                    $('#completePujaBookingBtn')
+                        .prop('disabled', true)
+                        .html('<i class="fas fa-spinner fa-spin"></i> Processing...');
+                    form.trigger('submit');
+                }
+                return;
+            }
+
+            Swal.fire({
+                title: 'Complete Puja Booking?',
+                html: '<p>Are you sure you want to mark this puja booking as completed?</p>' +
+                    '<small class="text-muted">The booking status will be updated after confirmation.</small>',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#159447',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="fas fa-check-circle"></i> Yes, Complete',
+                cancelButtonText: 'Cancel',
+                reverseButtons: true,
+                allowOutsideClick: false
+            }).then(function (result) {
+                if (result.isConfirmed) {
+                    $('#completePujaBookingBtn')
+                        .prop('disabled', true)
+                        .html('<i class="fas fa-spinner fa-spin"></i> Processing...');
+                    form.trigger('submit');
+                }
+            });
+        });
+
         @if($errors->has('cancellation_reason') && $canRequestCancellation)
             $('#cancelBookingModal').modal('show');
         @endif

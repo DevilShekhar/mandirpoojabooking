@@ -1205,7 +1205,7 @@
                                     </h3>
                                     <span class="text-muted">
                                         <a href="{{ url('booking-puja-order-successful') }}">
-                                            Successful Puja Bookings
+                                            Assigned Puja Bookings
                                         </a>
                                     </span>
                                 </div>
@@ -1249,6 +1249,54 @@
                                         <a href="{{ url('booking-puja-order-cancelled') }}">
                                             Cancelled Puja Bookings
                                         </a>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            <div class="row mb-4">
+                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+                    <div class="card card-statistic-1">
+                        <div class="card-icon l-bg-green">
+                            <i class="fas fa-clipboard-check"></i>
+                        </div>
+
+                        <div class="card-wrap">
+                            <div class="padding-20">
+                                <div class="text-right">
+                                    <h3 class="font-light mb-0">
+                                        {{ $completedPujaBookingCount ?? 0 }}
+                                    </h3>
+
+                                    <span class="text-muted">
+                                        <a href="{{ route('booking-puja-order-completed') }}">
+                                            Completed Puja Bookings
+                                        </a>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+                    <div class="card card-statistic-1">
+                        <div class="card-icon l-bg-blue">
+                            <i class="fas fa-rupee-sign"></i>
+                        </div>
+
+                        <div class="card-wrap">
+                            <div class="padding-20">
+                                <div class="text-right">
+                                    <h3 class="font-light mb-0">
+                                        ₹{{ number_format((float) ($completedPujaBookingAmount ?? 0), 2) }}
+                                    </h3>
+
+                                    <span class="text-muted">
+                                        Completed Puja Booking Amount
                                     </span>
                                 </div>
                             </div>

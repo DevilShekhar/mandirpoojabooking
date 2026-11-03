@@ -39,20 +39,23 @@ class PujaBooking extends Model
         'samgri_otp',
         'created_by',
         'updated_by',
+        'completed_by',
+        'completed_at',
     ];
 
     protected $casts = [
         'schedule_date' => 'date',
         'schedule_time' => 'string',
-        'base_amount' => 'decimal:2',
+        'completed_at'  => 'datetime',
+        'base_amount'     => 'decimal:2',
         'discount_amount' => 'decimal:2',
         'coupon_discount' => 'decimal:2',
-        'addon_amount' => 'decimal:2',
+        'addon_amount'    => 'decimal:2',
         'shipping_amount' => 'decimal:2',
-        'tax_amount' => 'decimal:2',
-        'total_amount' => 'decimal:2',
+        'tax_amount'      => 'decimal:2',
+        'total_amount'    => 'decimal:2',
         'selected_products' => 'array',
-        'samgri_otp' => 'string',
+        'samgri_otp'        => 'string',
     ];
 
     public function user()
@@ -116,8 +119,12 @@ class PujaBooking extends Model
     }
     public function samgriVerification()
     {
-        return $this->hasOne( 
+        return $this->hasOne(
             SamgriBookingVerification::class,'puja_booking_id','id'
         );
+    }
+    public function completedBy()
+    {
+        return $this->belongsTo(User::class, 'completed_by');
     }
 }

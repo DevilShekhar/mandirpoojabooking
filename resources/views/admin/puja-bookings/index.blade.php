@@ -145,13 +145,13 @@
                                             </td>
                                             <td>
                                                 <div class="d-flex align-items-center">
-                                                    @can('puja-bookings.show')
+                                                   
                                                         <a href="{{ route('booking-puja-order.show', $booking->id) }}"
                                                            class="btn btn-info btn-sm mr-1"
                                                            title="View Booking">
                                                             View
                                                         </a>
-                                                    @endcan
+                                                   
                                                 </div>
                                             </td>
                                         </tr>
