@@ -265,21 +265,26 @@
                             </a>
                         </li>
                         @can('reports.view')
-                        <li class="nav-item {{ request()->routeIs('reports.*') ? 'active' : '' }}">
-                            <a href="#reportsMenu" data-toggle="collapse" aria-expanded="{{ request()->routeIs('reports.*') ? 'true' : 'false' }}"
-                            class="nav-link">
-                                <i class="fas fa-chart-bar"></i>
-                                <span>Reports</span>
-                            </a>
-                            <ul class="collapse list-unstyled {{ request()->routeIs('reports.*') ? 'show' : '' }}"
-                                id="reportsMenu">
-                                <li class="{{ request()->routeIs('reports.mandir-puja-pandit.*') ? 'active' : '' }}">
-                                    <a href="{{ route('reports.mandir-puja-pandit.index') }}">
-                                        Mandir / Puja / Pandit
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
+                            <li class="{{ request()->routeIs('reports.*') ? 'active' : '' }}">
+                                <a href="javascript:void(0);" class="nav-link has-dropdown">
+                                    <i data-feather="bar-chart-2"></i>
+                                    <span>Reports</span>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li class="{{ request()->routeIs('reports.mandir-puja-pandit.*') ? 'active' : '' }}">
+                                        <a href="{{ route('reports.mandir-puja-pandit.index') }}">
+                                            <i data-feather="file-text"></i>
+                                            Mandir Pandit
+                                        </a>
+                                    </li>
+                                    <li class="{{ request()->routeIs('reports.event-booking-completed.*') ? 'active' : '' }}">
+                                        <a href="{{ route('reports.event-booking-completed.index') }}">
+                                            <i data-feather="calendar"></i>
+                                            Sanatan Events
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
                         @endcan
                         @can('home-banners.view')
                             <li class="{{ request()->routeIs('home-banners.*') ? 'active' : '' }}">
