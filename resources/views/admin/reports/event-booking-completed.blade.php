@@ -1,6 +1,5 @@
-
+@can('reports-event.index')
 @extends('admin.layouts.app')
-
 @section('content')
 <div class="container-fluid">
 
@@ -333,3 +332,8 @@
 
 </div>
 @endsection
+@else
+    @php
+        abort(403);
+    @endphp
+@endcan

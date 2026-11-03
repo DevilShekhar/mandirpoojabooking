@@ -270,19 +270,33 @@
                                     <i data-feather="bar-chart-2"></i>
                                     <span>Reports</span>
                                 </a>
+
                                 <ul class="dropdown-menu">
+
+                                    {{-- Mandir Pandit Report --}}
                                     <li class="{{ request()->routeIs('reports.mandir-puja-pandit.*') ? 'active' : '' }}">
                                         <a href="{{ route('reports.mandir-puja-pandit.index') }}">
                                             <i data-feather="file-text"></i>
                                             Mandir Pandit
                                         </a>
                                     </li>
+
+                                    {{-- Sanatan Events Report --}}
                                     <li class="{{ request()->routeIs('reports.event-booking-completed.*') ? 'active' : '' }}">
                                         <a href="{{ route('reports.event-booking-completed.index') }}">
                                             <i data-feather="calendar"></i>
                                             Sanatan Events
                                         </a>
                                     </li>
+
+                                    {{-- Store Manager Report --}}
+                                    <li class="{{ request()->routeIs('reports.store-manager-completed.*') ? 'active' : '' }}">
+                                        <a href="{{ route('reports.store-manager-completed.index') }}">
+                                            <i data-feather="package"></i>
+                                            Store Manager
+                                        </a>
+                                    </li>
+
                                 </ul>
                             </li>
                         @endcan
