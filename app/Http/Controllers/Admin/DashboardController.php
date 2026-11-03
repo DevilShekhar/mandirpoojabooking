@@ -86,6 +86,9 @@ class DashboardController extends Controller
         $pujaCancelledAmount = 0;
         $pujaRefundCount = 0;
         $pujaRefundAmount = 0;
+        $completedSanatanEventBookingCount = 0;
+        $completedSanatanEventBookingAmount = 0;
+        $completedSanatanEventBookings = collect();
         if ($user->hasRole('Customer')) {
             $bookingQuery = PujaBooking::where('user_id', $user->id);
             $bookingCount = (clone $bookingQuery)->count();
@@ -183,6 +186,19 @@ class DashboardController extends Controller
                 ->orderByDesc('bookings.created_at')
                 ->take(5)
                 ->get();
+                // Completed bookings belonging to this Event Creator's events
+$completedSanatanEventBookingQuery = DB::table('sanatan_event_orders as bookings')
+    ->join('sanatans as events', 'events.id', '=', 'bookings.sanatan_id')
+    ->where('events.created_by', $user->id)
+    ->where('bookings.booking_status', 'completed');
+
+// Total completed bookings
+$completedSanatanEventBookingCount = (clone $completedSanatanEventBookingQuery)
+    ->count();
+
+// Total amount from completed bookings
+$completedSanatanEventBookingAmount = (clone $completedSanatanEventBookingQuery)
+    ->sum('bookings.amount');
         }
         if ($user->hasRole('Pandit')) {
             $successfulPujaQuery = PujaBooking::with([
@@ -487,6 +503,8 @@ class DashboardController extends Controller
             'pujaRefundAmount',
             'completedPujaBookingCount',
             'completedPujaBookingAmount',
+            'completedSanatanEventBookingCount',
+            'completedSanatanEventBookingAmount',
         ));
     }
 }

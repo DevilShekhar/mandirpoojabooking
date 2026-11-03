@@ -941,6 +941,49 @@
                         </div>
                     </div>
                 </div>
+                {{-- Completed Event Bookings Count --}}
+<div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+    <div class="card card-statistic-1">
+        <div class="card-icon l-bg-green">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="card-wrap">
+            <div class="padding-20">
+                <div class="text-right">
+                    <h3 class="font-light mb-0">
+                        {{ number_format($completedSanatanEventBookingCount ?? 0) }}
+                    </h3>
+                    <span class="text-muted">
+                        <a href="{{ route('customer.sanatan-event-bookings.completed') }}">
+                            Completed Bookings
+                        </a>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- Completed Event Booking Amount --}}
+<div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+    <div class="card card-statistic-1">
+        <div class="card-icon l-bg-purple">
+            <i class="fas fa-rupee-sign"></i>
+        </div>
+        <div class="card-wrap">
+            <div class="padding-20">
+                <div class="text-right">
+                    <h3 class="font-light mb-0">
+                        ₹{{ number_format((float) ($completedSanatanEventBookingAmount ?? 0), 2) }}
+                    </h3>
+                    <span class="text-muted">
+                        Completed Booking Amount
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
             </div>
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">

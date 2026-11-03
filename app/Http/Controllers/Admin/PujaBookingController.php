@@ -136,7 +136,7 @@ class PujaBookingController extends Controller
     {
         $user = auth()->user();
         $query = PujaBooking::with(['user', 'temple', 'deity', 'puja', 'pujaPackage', 'pandit', 'createdBy', 'updatedBy', 'payments'])
-            ->where('payment_status', 'paid');
+        ->where('payment_status', 'paid')->where('booking_status', '!=', 'completed');
         if ($user->hasRole('Temple Manager')) {
             $query->whereIn('temple_id', $this->getManagedTempleIds($user));
         } elseif ($user->hasRole('Pandit')) {
