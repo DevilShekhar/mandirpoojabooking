@@ -588,10 +588,24 @@
                         @endcan
                         @can('view-event-bookings')
                             <li class="{{ request()->routeIs('customer.sanatan-event-bookings.*') ? 'active' : '' }}">
-                                <a href="{{ route('customer.sanatan-event-bookings.index') }}" class="nav-link">
-                                    <i data-feather="clipboard"></i>
+                                <a href="javascript:void(0);" class="nav-link has-dropdown">
+                                    <i data-feather="calendar"></i>
                                     <span>Event Bookings</span>
                                 </a>
+                                <ul class="dropdown-menu">
+                                    <li class="{{ request()->routeIs('customer.sanatan-event-bookings.index') ? 'active' : '' }}">
+                                        <a href="{{ route('customer.sanatan-event-bookings.index') }}">
+                                            <i data-feather="list"></i>
+                                            All Bookings
+                                        </a>
+                                    </li>
+                                    <li class="{{ request()->routeIs('customer.sanatan-event-bookings.completed') ? 'active' : '' }}">
+                                        <a href="{{ route('customer.sanatan-event-bookings.completed') }}">
+                                            <i data-feather="check-circle"></i>
+                                            Completed Bookings
+                                        </a>
+                                    </li>
+                                </ul>
                             </li>
                         @endcan
                         @can('view-event-calendar')

@@ -28,6 +28,7 @@ class SanatanEventBookingController extends Controller
             ->leftJoin('users as customers', 'customers.id', '=', 'bookings.user_id')
             ->leftJoin('users as event_creators', 'event_creators.id', '=', 'events.created_by')
             ->leftJoin('users as cancelled_users', 'cancelled_users.id', '=', 'bookings.cancelled_by')
+            ->leftJoin('users as completed_users', 'completed_users.id', '=', 'bookings.completed_by')
             ->select(
                 'bookings.*',
                 'events.name as event_name',
@@ -37,26 +38,104 @@ class SanatanEventBookingController extends Controller
                 'customers.email as customer_email',
                 'customers.phone as customer_phone',
                 'event_creators.name as event_creator_name',
-                'cancelled_users.name as cancelled_by_name'
-            );
+                'cancelled_users.name as cancelled_by_name',
+                'completed_users.name as completed_by_name'
+            )
+            // Exclude completed bookings
+            ->where(function ($q) {
+                $q->whereNull('bookings.booking_status')
+                ->orWhere('bookings.booking_status', '!=', 'completed');
+            });
+
+            if (!$isAdmin && !$isSuperAdmin) {
+                if ($isCustomer && $isEventCreator) {
+                    $query->where(function ($q) use ($user) {
+                        $q->where('bookings.user_id', $user->id)
+                            ->orWhere('events.created_by', $user->id);
+                    });
+                } elseif ($isCustomer) {
+                    $query->where('bookings.user_id', $user->id);
+                } elseif ($isEventCreator) {
+                    $query->where('events.created_by', $user->id);
+                } else {
+                    abort(403, 'You are not authorized to view these bookings.');
+                }
+            }
+        $bookings = $query->orderByDesc('bookings.created_at')->get();
+        return view('admin.sanatanevents.bookings.index',compact('bookings'));
+    }
+
+    /**
+     * Display completed bookings according to logged-in user role.
+     */
+    public function completed()
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            abort(403, 'You are not authorized to view these bookings.');
+        }
+
+        $isAdmin = $user->hasRole('Admin');
+        $isSuperAdmin = $user->hasRole('Super Admin');
+        $isCustomer = $user->hasRole('Customer');
+        $isEventCreator = $user->hasRole('Event Creator');
+
+        $query = DB::table('sanatan_event_orders as bookings')
+            ->join('sanatans as events', 'events.id', '=', 'bookings.sanatan_id')
+            ->leftJoin('users as customers', 'customers.id', '=', 'bookings.user_id')
+            ->leftJoin('users as event_creators', 'event_creators.id', '=', 'events.created_by')
+            ->leftJoin('users as cancelled_users', 'cancelled_users.id', '=', 'bookings.cancelled_by')
+            ->leftJoin('users as completed_users', 'completed_users.id', '=', 'bookings.completed_by')
+            ->select(
+                'bookings.*',
+                'events.name as event_name',
+                'events.description as event_description',
+                'events.created_by as event_created_by',
+                'customers.name as customer_name',
+                'customers.email as customer_email',
+                'customers.phone as customer_phone',
+                'event_creators.name as event_creator_name',
+                'cancelled_users.name as cancelled_by_name',
+                'completed_users.name as completed_by_name'
+            )
+            ->where('bookings.booking_status', 'completed');
+
         if (!$isAdmin && !$isSuperAdmin) {
+
             if ($isCustomer && $isEventCreator) {
+
                 $query->where(function ($q) use ($user) {
                     $q->where('bookings.user_id', $user->id)
                         ->orWhere('events.created_by', $user->id);
                 });
+
             } elseif ($isCustomer) {
+
                 $query->where('bookings.user_id', $user->id);
+
             } elseif ($isEventCreator) {
+
                 $query->where('events.created_by', $user->id);
+
             } else {
                 abort(403, 'You are not authorized to view these bookings.');
             }
         }
-        $bookings = $query->orderByDesc('bookings.created_at')->get();
-        return view('admin.sanatanevents.bookings.index', compact('bookings'));
+
+        $bookings = $query
+            ->orderByDesc('bookings.completed_at')
+            ->get();
+
+        return view(
+            'admin.sanatanevents.bookings.index',
+            compact('bookings')
+        );
     }
 
+    /**
+     * Display individual booking details.
+     */
     public function show($id)
     {
         $user = Auth::user();
@@ -75,6 +154,7 @@ class SanatanEventBookingController extends Controller
             ->leftJoin('users as customers', 'customers.id', '=', 'bookings.user_id')
             ->leftJoin('users as event_creators', 'event_creators.id', '=', 'events.created_by')
             ->leftJoin('users as cancelled_users', 'cancelled_users.id', '=', 'bookings.cancelled_by')
+            ->leftJoin('users as completed_users', 'completed_users.id', '=', 'bookings.completed_by')
             ->select(
                 'bookings.*',
                 'events.name as event_name',
@@ -84,7 +164,8 @@ class SanatanEventBookingController extends Controller
                 'customers.email as customer_email',
                 'customers.phone as customer_phone',
                 'event_creators.name as event_creator_name',
-                'cancelled_users.name as cancelled_by_name'
+                'cancelled_users.name as cancelled_by_name',
+                'completed_users.name as completed_by_name'
             )
             ->where('bookings.id', $id);
 
@@ -95,6 +176,7 @@ class SanatanEventBookingController extends Controller
                         ->orWhere('events.created_by', $user->id);
                 });
             } elseif ($isCustomer) {
+
                 $query->where('bookings.user_id', $user->id);
             } elseif ($isEventCreator) {
                 $query->where('events.created_by', $user->id);
@@ -151,9 +233,109 @@ class SanatanEventBookingController extends Controller
             }
         }
 
-        return view('admin.sanatanevents.bookings.show', compact('booking'));
+        return view('admin.sanatanevents.bookings.show',compact('booking'));
     }
 
+    /**
+     * Mark a confirmed and paid booking as completed.
+     */
+    public function complete($id)
+    {
+        $user = Auth::user();
+
+        if (!$user || !$user->hasAnyRole([
+            'Admin',
+            'Super Admin',
+            'Event Creator'
+        ])) {
+            abort(403, 'You are not authorized to complete bookings.');
+        }
+
+        try {
+
+            DB::transaction(function () use ($id, $user) {
+
+                $query = DB::table('sanatan_event_orders as bookings')
+                    ->join('sanatans as events', 'events.id', '=', 'bookings.sanatan_id')
+                    ->where('bookings.id', $id);
+
+                // Event Creator can complete only their own event bookings.
+                // Admin and Super Admin can complete any booking.
+                if (!$user->hasAnyRole(['Admin', 'Super Admin'])) {
+                    $query->where('events.created_by', $user->id);
+                }
+
+                $booking = $query
+                    ->select('bookings.*')
+                    ->lockForUpdate()
+                    ->first();
+
+                if (!$booking) {
+                    throw new RuntimeException(
+                        'Booking not found or you are not authorized to complete it.'
+                    );
+                }
+
+                if ($booking->booking_status !== 'confirmed') {
+                    throw new RuntimeException(
+                        'Only confirmed bookings can be marked as completed.'
+                    );
+                }
+
+                if ($booking->payment_status !== 'paid') {
+                    throw new RuntimeException(
+                        'Only successfully paid bookings can be completed.'
+                    );
+                }
+
+                if (!empty($booking->completed_at)) {
+                    throw new RuntimeException(
+                        'This booking has already been completed.'
+                    );
+                }
+
+                if (!empty($booking->cancelled_at)) {
+                    throw new RuntimeException(
+                        'Cancelled bookings cannot be completed.'
+                    );
+                }
+
+                DB::table('sanatan_event_orders')
+                    ->where('id', $booking->id)
+                    ->update([
+                        'booking_status' => 'completed',
+                        'completed_by' => $user->id,
+                        'completed_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+            });
+
+            return redirect()
+                ->route('customer.sanatan-event-bookings.show', $id)
+                ->with('success', 'Booking marked as completed successfully.');
+
+        } catch (RuntimeException $e) {
+
+            return back()->withErrors([
+                'booking' => $e->getMessage(),
+            ]);
+
+        } catch (Throwable $e) {
+
+            Log::error('Sanatan event booking completion failed.', [
+                'booking_id' => $id,
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return back()->withErrors([
+                'booking' => 'Unable to complete this booking. Please try again.',
+            ]);
+        }
+    }
+    /**
+     * Cancel booking and request Razorpay refund.
+     */
     public function cancel(Request $request, $id)
     {
         $user = Auth::user();
@@ -167,7 +349,9 @@ class SanatanEventBookingController extends Controller
         ]);
 
         try {
+
             $booking = DB::transaction(function () use ($id, $user, $validated) {
+
                 $bookingQuery = DB::table('sanatan_event_orders as bookings')
                     ->join('sanatans as events', 'events.id', '=', 'bookings.sanatan_id')
                     ->where('bookings.id', $id);
@@ -176,13 +360,18 @@ class SanatanEventBookingController extends Controller
                 $isEventCreator = $user->hasRole('Event Creator');
 
                 if ($isCustomer && $isEventCreator) {
+
                     $bookingQuery->where(function ($q) use ($user) {
                         $q->where('bookings.user_id', $user->id)
                             ->orWhere('events.created_by', $user->id);
                     });
+
                 } elseif ($isCustomer) {
+
                     $bookingQuery->where('bookings.user_id', $user->id);
+
                 } elseif ($isEventCreator) {
+
                     $bookingQuery->where('events.created_by', $user->id);
                 }
 
@@ -192,15 +381,21 @@ class SanatanEventBookingController extends Controller
                     ->first();
 
                 if (!$booking) {
-                    throw new RuntimeException('Booking not found or you are not authorized to cancel it.');
+                    throw new RuntimeException(
+                        'Booking not found or you are not authorized to cancel it.'
+                    );
                 }
 
                 if ($booking->booking_status !== 'confirmed') {
-                    throw new RuntimeException('Only confirmed bookings can be cancelled.');
+                    throw new RuntimeException(
+                        'Only confirmed bookings can be cancelled.'
+                    );
                 }
 
                 if ($booking->payment_status !== 'paid') {
-                    throw new RuntimeException('A successful payment is required for a refund.');
+                    throw new RuntimeException(
+                        'A successful payment is required for a refund.'
+                    );
                 }
 
                 if (
@@ -208,17 +403,23 @@ class SanatanEventBookingController extends Controller
                     !empty($booking->razorpay_refund_id) ||
                     !empty($booking->cancelled_at)
                 ) {
-                    throw new RuntimeException('Cancellation or refund has already been requested.');
+                    throw new RuntimeException(
+                        'Cancellation or refund has already been requested.'
+                    );
                 }
 
                 if (empty($booking->razorpay_payment_id)) {
-                    throw new RuntimeException('Razorpay payment ID is missing. Please contact support.');
+                    throw new RuntimeException(
+                        'Razorpay payment ID is missing. Please contact support.'
+                    );
                 }
 
                 $refundAmount = (int) round((float) $booking->amount * 100);
 
                 if ($refundAmount <= 0) {
-                    throw new RuntimeException('The booking amount is invalid for a refund.');
+                    throw new RuntimeException(
+                        'The booking amount is invalid for a refund.'
+                    );
                 }
 
                 DB::table('sanatan_event_orders')
@@ -235,9 +436,15 @@ class SanatanEventBookingController extends Controller
 
                 return $booking;
             });
+
         } catch (RuntimeException $e) {
-            return back()->withErrors(['booking' => $e->getMessage()]);
+
+            return back()->withErrors([
+                'booking' => $e->getMessage(),
+            ]);
+
         } catch (Throwable $e) {
+
             Log::error('Sanatan event booking cancellation failed.', [
                 'booking_id' => $id,
                 'user_id' => $user->id,
@@ -249,7 +456,9 @@ class SanatanEventBookingController extends Controller
             ]);
         }
 
+        // Submit refund request to Razorpay.
         try {
+
             $api = new Api(
                 config('services.razorpay.key'),
                 config('services.razorpay.secret')
@@ -287,7 +496,9 @@ class SanatanEventBookingController extends Controller
             return redirect()
                 ->route('customer.sanatan-event-bookings.show', $booking->id)
                 ->with('success', 'Booking cancelled and refund request submitted successfully.');
+
         } catch (Throwable $e) {
+
             Log::error('Razorpay refund request could not be confirmed.', [
                 'booking_id' => $booking->id,
                 'user_id' => $user->id,
