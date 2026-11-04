@@ -11,11 +11,11 @@ use Illuminate\Support\Str;
 
 class SanatanController extends Controller
 {
-    public function index()
-    {
-        $sanatans = Sanatan::where('created_by', Auth::id())->latest()->paginate(10);
-        return view('admin.sanatans.index', compact('sanatans'));
-    }
+public function index()
+{
+    $sanatans = Sanatan::where('created_by', Auth::id())->latest()->get();
+    return view('admin.sanatans.index', compact('sanatans'));
+}
 
     public function create()
     {
