@@ -572,16 +572,7 @@
                                                 Deity
                                             </a>
                                         </li>
-                                    @endcan
-
-                                    @can('temple-deities.view')
-                                        <li class="{{ request()->routeIs('temple-deities.*') ? 'active' : '' }}">
-                                            <a class="nav-link" href="{{ route('temple-deities.index') }}">
-                                                Temple Deities
-                                            </a>
-                                        </li>
-                                    @endcan
-
+                                    @endcan                                   
                                 </ul>
                             </li>
                         @endcanany

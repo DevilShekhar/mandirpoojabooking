@@ -23,7 +23,6 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\StateController;
 use App\Http\Controllers\Admin\TempleController;
-use App\Http\Controllers\Admin\TempleDeityController;
 use App\Http\Controllers\Admin\PasswordController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\HomeBannerController;
@@ -162,7 +161,6 @@ Route::middleware('auth')->group(function () {
     //Deities
     Route::resource('deities', DeityController::class);
     //TempleDeities
-    Route::resource('temple-deities', TempleDeityController::class);
     //PujaCategories
     Route::resource('puja-categories', PujaCategoryController::class);
     //Puja
