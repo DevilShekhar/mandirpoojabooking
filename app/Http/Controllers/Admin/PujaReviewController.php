@@ -54,29 +54,12 @@ class PujaReviewController extends Controller
     public function index()
     {
         $query = $this->reviewQuery();
-
-        // Dashboard statistics using the same role restrictions.
         $totalReviews = (clone $query)->count();
-
         $averageRating = (clone $query)->avg('rating') ?? 0;
-
-        $approvedReviews = (clone $query)
-            ->where('status', 1)
-            ->count();
-
-        $pendingReviews = (clone $query)
-            ->where('status', 0)
-            ->count();
-
-        $rejectedReviews = (clone $query)
-            ->where('status', 2)
-            ->count();
-
-        // Paginated review listing.
-        $reviews = $query
-            ->latest()
-            ->paginate(20);
-
+        $approvedReviews = (clone $query)->where('status', 1)->count();
+        $pendingReviews = (clone $query)->where('status', 0)->count();
+        $rejectedReviews = (clone $query)->where('status', 2)->count();
+        $reviews = $query->with(['puja.temple', 'user'])->latest()->get();
         return view('admin.puja-reviews.index', compact(
             'reviews',
             'totalReviews',

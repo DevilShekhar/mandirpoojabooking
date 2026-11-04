@@ -199,45 +199,110 @@
                         <!-- Begin Header Top Right Area -->
                         <div class="col-lg-9 col-md-8">
                             <div class="header-top-right">
+                                <style>
+                                    .ht-menu li a {
+                                        display: inline-flex;
+                                        align-items: center;
+                                        gap: 7px;
+                                        padding: 10px 16px;
+                                        margin: 0 4px;
+                                        border-radius: 8px;
+                                        color: #fff !important;
+                                        font-size: 13px;
+                                        font-weight: 600;
+                                        text-decoration: none !important;
+                                        transition: all 0.3s ease;
+                                        box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+                                    }
+
+                                    .ht-menu li a i {
+                                        font-size: 15px;
+                                    }
+
+                                    /* Checkout - Green */
+                                    .ht-menu li:nth-child(1) a {
+                                        background: linear-gradient(135deg, #11998e, #38ef7d);
+                                    }
+
+                                    .ht-menu li:nth-child(1) a:hover {
+                                        background: linear-gradient(135deg, #0b7d74, #22c55e);
+                                        transform: translateY(-3px);
+                                        box-shadow: 0 5px 12px rgba(17,153,142,0.3);
+                                    }
+
+                                    /* Logout - Red */
+                                    .ht-menu li:nth-child(2) a {
+                                        background: linear-gradient(135deg, #eb3349, #f45c43);
+                                    }
+
+                                    .ht-menu li:nth-child(2) a:hover {
+                                        background: linear-gradient(135deg, #c81e35, #dc4435);
+                                        transform: translateY(-3px);
+                                        box-shadow: 0 5px 12px rgba(235,51,73,0.3);
+                                    }
+
+                                    /* Sign In - Blue */
+                                    .ht-menu li:nth-child(1) a {
+                                        background: linear-gradient(135deg, #396afc, #2948ff);
+                                    }
+
+                                    .ht-menu li:nth-child(1) a:hover {
+                                        background: linear-gradient(135deg, #2451d8, #1d35db);
+                                    }
+
+                                    /* Customer Registration - Purple */
+                                    .ht-menu li:nth-child(2) a {
+                                        background: linear-gradient(135deg, #8e2de2, #4a00e0);
+                                    }
+
+                                    .ht-menu li:nth-child(2) a:hover {
+                                        background: linear-gradient(135deg, #7020ba, #3800b0);
+                                    }
+
+                                    /* Temple Registration - Orange */
+                                    .ht-menu li:nth-child(3) a {
+                                        background: linear-gradient(135deg, #f7971e, #ffd200);
+                                        color: #333 !important;
+                                    }
+
+                                    .ht-menu li:nth-child(3) a:hover {
+                                        background: linear-gradient(135deg, #e8870c, #edbd00);
+                                        transform: translateY(-3px);
+                                    }
+                                </style>
+
                                 <ul class="ht-menu">
-                                    <!-- Begin Setting Area -->
-                                    <li>
-                                        <div class="ht-setting-trigger"><span>Setting</span></div>
-                                        <div class="setting ht-setting">
-                                            <ul class="ht-setting-list">
-                                                <li><a href="login-register.html">My Account</a></li>
-                                                <li><a href="checkout.html">Checkout</a></li>
-                                                <li><a href="login-register.html">Sign In</a></li>
-                                            </ul>
-                                        </div>
-                                    </li>
-                                    <!-- Setting Area End Here -->
-                                    <!-- Begin Currency Area -->
-                                    <li>
-                                        <span class="currency-selector-wrapper">Currency :</span>
-                                        <div class="ht-currency-trigger"><span>USD $</span></div>
-                                        <div class="currency ht-currency">
-                                            <ul class="ht-setting-list">
-                                                <li><a href="#">EUR €</a></li>
-                                                <li class="active"><a href="#">USD $</a></li>
-                                            </ul>
-                                        </div>
-                                    </li>
-                                    <!-- Currency Area End Here -->
-                                    <!-- Begin Language Area -->
-                                    <li>
-                                        <span class="language-selector-wrapper">Language :</span>
-                                        <div class="ht-language-trigger"><span>English</span></div>
-                                        <div class="language ht-language">
-                                            <ul class="ht-setting-list">
-                                                <li class="active"><a href="#"><img src="images/menu/flag-icon/1.jpg"
-                                                            alt="">English</a></li>
-                                                <li><a href="#"><img src="images/menu/flag-icon/2.jpg"
-                                                            alt="">Français</a></li>
-                                            </ul>
-                                        </div>
-                                    </li>
-                                    <!-- Language Area End Here -->
+                                    @auth
+                                        <li>
+                                            <a href="{{ route('logout') }}"
+                                            onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                            <i class="fa fa-sign-out" aria-hidden="true"></i>
+                                                Logout
+                                            </a>
+                                            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                                @csrf
+                                            </form>
+                                        </li>
+                                    @else
+                                        <li>
+                                            <a href="{{ route('login') }}">
+                                            <i class="fa fa-sign-in" aria-hidden="true"></i>
+                                                Sign In
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="{{ route('customer.register') }}">
+                                                <i class="fa fa-user-plus"></i>
+                                                Customer Registration
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="{{ route('temple.register') }}">
+                                                <i class="fa fa-registered" aria-hidden="true"></i>
+                                                Temple Registration
+                                            </a>
+                                        </li>
+                                    @endauth
                                 </ul>
                             </div>
                         </div>
