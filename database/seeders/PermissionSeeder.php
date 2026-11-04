@@ -70,12 +70,7 @@ class PermissionSeeder extends Seeder
             'deities.index',
             'deities.delete',
 
-            // Temple Deities
-            'temple-deities.view',
-            'temple-deities.create',
-            'temple-deities.edit',
-            'temple-deities.index',
-            'temple-deities.delete',
+            
 
             // Puja Categories
             'puja-categories.view',
