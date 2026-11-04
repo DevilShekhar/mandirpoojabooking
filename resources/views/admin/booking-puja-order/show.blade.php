@@ -42,6 +42,14 @@
                     <p class="mb-0">
                         Booking: {{ $pujaBooking->booking_number ?: '#' . $pujaBooking->id }}
                     </p>
+                    @can('samgri-otp.show')
+                    <div class="samgri-otp-info">
+                        <span class="otp-label text-white">
+                            <i class="fas fa-shield-alt"></i> Samgri OTP:
+                        </span>
+                        <strong class="text-white">{{ $pujaBooking->samgri_otp ?? 'N/A' }}</strong>
+                    </div>
+                    @endcan
                 </div>
             </div>
         </div>
@@ -66,7 +74,7 @@
         </div>
     @endif
     @if($isCustomer)
-        <div class="card mb-4 puja-cancellation-card">
+        <div class="card mb-4 puja-cancellation-card mt-4">
             <div class="card-header">
                 <h5 class="mb-0">Booking Cancellation</h5>
             </div>
@@ -303,11 +311,22 @@
         </div>
     </div>
     <div class="card mb-4 puja-products-card mt-4">
-        <div class="card-header">
-            <h5 class="mb-0">
-                <i class="fas fa-shopping-basket"></i> Selected Products
-            </h5>
+        <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
+
+        <h5 class="mb-0">
+            <i class="fas fa-shopping-basket"></i> Selected Products
+        </h5>
+        @can('samgri-otp.show')
+        <div class="samgri-otp-info">
+            <span class="otp-label">
+                <i class="fas fa-shield-alt"></i> Samgri OTP:
+            </span>
+
+            <strong>{{ $pujaBooking->samgri_otp ?? 'N/A' }}</strong>
         </div>
+        @endcan
+
+    </div>
         <div class="card-body table-responsive">
             @if($selectedProducts->isNotEmpty())
                 <table class="table table-bordered table-striped table-hover">
