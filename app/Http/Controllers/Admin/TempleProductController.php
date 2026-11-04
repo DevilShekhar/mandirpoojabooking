@@ -97,16 +97,16 @@ class TempleProductController extends Controller
     }
 
     public function index()
-    {
-        $templeId = $this->templeId();
+{
+    $templeId = $this->templeId();
 
-        $products = TempleProduct::where('temple_id', $templeId)
-            ->where('created_by', auth()->id())
-            ->latest()
-            ->paginate(10);
+    $products = TempleProduct::where('temple_id', $templeId)
+        ->where('created_by', auth()->id())
+        ->latest()
+        ->get();
 
-        return view('admin.temple-products.index', compact('products'));
-    }
+    return view('admin.temple-products.index', compact('products'));
+}
 
     public function create()
     {
