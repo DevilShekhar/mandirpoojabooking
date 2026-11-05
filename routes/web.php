@@ -57,6 +57,7 @@ use App\Http\Controllers\Frontend\NewsFrontendController;
 use App\Http\Controllers\Admin\MandirPujaPanditReportController;
 use App\Http\Controllers\Admin\EventBookingCompletedReportController;
 use App\Http\Controllers\Admin\StoreManagerCompletedReportController;
+use App\Http\Controllers\Admin\TicketBookingTempleReportController;
 
 Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
 Route::get('our-temples', [OurTemplesContoller::class, 'index'])->name('frontend.our-temples');
@@ -228,6 +229,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/store-manager-completed/export/pdf',[StoreManagerCompletedReportController::class, 'exportPdf'])->name('store-manager-completed.pdf');
         Route::get('/store-manager-completed/export/csv',[StoreManagerCompletedReportController::class, 'exportCsv'])->name('store-manager-completed.csv');
         Route::get('/store-manager-completed/export/excel',[StoreManagerCompletedReportController::class, 'exportExcel'])->name('store-manager-completed.excel');
+        // Ticket Booking Temple Report
+        Route::get('/ticket-booking-temple-reports', [TicketBookingTempleReportController::class, 'index'])->name('ticket-booking-temple-reports.index');
+        Route::get('/ticket-booking-temple-reports/export/pdf', [TicketBookingTempleReportController::class, 'exportPdf'])->name('ticket-booking-temple-reports.pdf');
+        Route::get('/ticket-booking-temple-reports/export/csv', [TicketBookingTempleReportController::class, 'exportCsv'])->name('ticket-booking-temple-reports.csv');
+        Route::get('/ticket-booking-temple-reports/export/excel', [TicketBookingTempleReportController::class, 'exportExcel'])->name('ticket-booking-temple-reports.excel');
     });
 });
 Route::middleware('auth')->prefix('payment/razorpay')->name('razorpay.')->group(function () {
