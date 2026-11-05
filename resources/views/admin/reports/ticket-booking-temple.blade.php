@@ -1,3 +1,4 @@
+@can('reports-ticket.index')
 @extends('admin.layouts.app')
 @section('content')
 <style>
@@ -534,3 +535,8 @@
     </div>
 </section>
 @endsection
+@else
+    @php
+        abort(403);
+    @endphp
+@endcan

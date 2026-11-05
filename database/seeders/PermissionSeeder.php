@@ -239,7 +239,8 @@ class PermissionSeeder extends Seeder
             'reports.index',
             'reports-event.index',
             'reports-store.index',
-            'samgri-otp.show'
+            'samgri-otp.show',
+            'reports-ticket.index'
         ];
         foreach ($permissions as $permission) {
             Permission::firstOrCreate([

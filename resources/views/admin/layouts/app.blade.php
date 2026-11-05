@@ -296,6 +296,13 @@
                                             Store Manager
                                         </a>
                                     </li>
+                                    {{-- Ticket Booking Temple Report --}}
+                                    <li class="{{ request()->routeIs('reports.ticket-booking-temple-reports.*') ? 'active' : '' }}">
+                                        <a href="{{ route('reports.ticket-booking-temple-reports.index') }}">
+                                            <i data-feather="tag"></i>
+                                            Ticket Booking Temple
+                                        </a>
+                                    </li>
 
                                 </ul>
                             </li>
