@@ -11,6 +11,7 @@ class TicketBooking extends Model
         'user_id',
         'temple_id',
         'booking_date',
+        'booking_time',
         'member_name',
         'aadhaar_number',
         'aadhaar_photo',
@@ -29,6 +30,7 @@ class TicketBooking extends Model
     {
         return [
             'booking_date' => 'date',
+            'booking_time' => 'string',
             'price' => 'decimal:2',
         ];
     }

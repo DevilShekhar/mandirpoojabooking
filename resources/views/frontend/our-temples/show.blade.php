@@ -1683,9 +1683,18 @@ body.ticket-modal-open {
                         <label for="bookingDate">Visit Date <span>*</span></label>
                         <input type="date" id="bookingDate" name="booking_date" required>
                         <p class="ticket-price-note" id="ticketAvailabilityMessage">
-                            Select a visit date to check available tickets.
+                            Select a visit date and time to check daily ticket availability.
                         </p>
                     </div>
+
+                    <div class="ticket-field">
+                        <label for="bookingTime">Visit Time <span>*</span></label>
+                        <input type="time" id="bookingTime" name="booking_time" required>
+                        <p class="ticket-price-note">
+                            Select the time you plan to visit the temple.
+                        </p>
+                    </div>
+
                     <input type="hidden" id="memberCount" name="member_count" value="1">
                 </div>
                 <div class="ticket-member-list" id="ticketMemberList"></div>
@@ -1970,7 +1979,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const memberCount = document.getElementById('memberCount');
     const memberList = document.getElementById('ticketMemberList');
     const bookingDate = document.getElementById('bookingDate');
-    if (bookingDate) bookingDate.min = new Date().toISOString().split('T')[0];
+    const bookingTime = document.getElementById('bookingTime');
     const totalAmount = document.getElementById('ticketTotalAmount');
     const message = document.getElementById('ticketFormMessage');
 
@@ -2115,6 +2124,7 @@ document.addEventListener('DOMContentLoaded', function () {
         renderMembers();
 
         if (bookingDate.value) {
+            updateMinimumVisitTime();
             checkTicketAvailability();
         } else {
             availabilityMessage.textContent = 'Select a visit date to check available tickets.';
@@ -2429,7 +2439,31 @@ document.addEventListener('DOMContentLoaded', function () {
     const localDate = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().split('T')[0];
     bookingDate.min = localDate;
     submitButton.disabled = true;
-    bookingDate.addEventListener('change', checkTicketAvailability);
+
+    function updateMinimumVisitTime() {
+        if (!bookingDate.value || !bookingTime) return;
+
+        if (bookingDate.value === localDate) {
+            const now = new Date();
+            const localTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+                .toISOString()
+                .slice(11, 16);
+            bookingTime.min = localTime;
+
+            if (bookingTime.value && bookingTime.value <= localTime) {
+                bookingTime.value = '';
+            }
+        } else {
+            bookingTime.removeAttribute('min');
+        }
+    }
+
+    bookingDate.addEventListener('change', function () {
+        updateMinimumVisitTime();
+        checkTicketAvailability();
+    });
+
+    bookingTime.addEventListener('change', updateMinimumVisitTime);
 
     form.addEventListener('submit', async function (event) {
         event.preventDefault();
@@ -2454,7 +2488,13 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        if (!bookingDate.value || !getAvailableTicketTypes().length) {
+        if (!bookingDate.value || !bookingTime.value) {
+            message.textContent = 'Please select both the temple visit date and visit time.';
+            message.classList.add('is-visible');
+            return;
+        }
+
+        if (!getAvailableTicketTypes().length) {
             message.textContent = 'Select a visit date with available tickets before continuing.';
             message.classList.add('is-visible');
             submitButton.disabled = true;
@@ -2513,7 +2553,9 @@ document.addEventListener('DOMContentLoaded', function () {
             message.textContent = error.message || 'Something went wrong. Please try again.';
             message.classList.add('is-visible');
         } finally {
-            submitButton.disabled = !bookingDate.value || !getAvailableTicketTypes().length;
+            submitButton.disabled = !bookingDate.value ||
+                !bookingTime.value ||
+                !getAvailableTicketTypes().length;
             submitButton.textContent = originalButtonText;
         }
     });

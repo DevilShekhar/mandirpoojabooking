@@ -12,6 +12,7 @@ class TicketCart extends Model
         'temple_id',
         'user_id',
         'booking_date',
+        'booking_time',
         'member_name',
         'aadhaar_number',
         'aadhaar_photo',
@@ -27,6 +28,7 @@ class TicketCart extends Model
     {
         return [
             'booking_date' => 'date',
+            'booking_time' => 'string',
             'age' => 'integer',
             'price' => 'decimal:2',
         ];

@@ -11,6 +11,7 @@ use App\Models\TempleDailyTicketLimit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Carbon;
 use Illuminate\Validation\ValidationException;
 use DomainException;
 
@@ -24,6 +25,7 @@ class TicketCartController extends Controller
 
         $validated = $request->validate([
             'booking_date' => ['required', 'date_format:Y-m-d', 'after_or_equal:today'],
+            'booking_time' => ['required', 'date_format:H:i'],
             'members' => ['required', 'array', 'min:1', 'max:10'],
             'members.*.name' => ['required', 'string', 'max:150'],
             'members.*.aadhaar_number' => ['required', 'regex:/^[0-9]{12}$/'],
@@ -32,6 +34,21 @@ class TicketCartController extends Controller
             'members.*.type' => ['required', 'in:Adult,Child,Senior Citizen'],
             'members.*.age' => ['required', 'integer', 'min:0', 'max:120'],
         ]);
+
+        // A visit selected for today must still be in the future.
+        $visitDateTime = Carbon::createFromFormat(
+            'Y-m-d H:i',
+            $validated['booking_date'] . ' ' . $validated['booking_time']
+        );
+
+        if ($visitDateTime->lessThanOrEqualTo(now())) {
+            throw ValidationException::withMessages([
+                'booking_time' => ['Please select a future visit time.'],
+            ]);
+        }
+
+        // Store the selected time consistently in database TIME format (HH:MM:SS).
+        $bookingTime = $visitDateTime->format('H:i:s');
 
         $uploadedPhotos = [];
 
@@ -65,6 +82,7 @@ class TicketCartController extends Controller
                 $members[] = [
                     'temple_id' => $temple->id,
                     'booking_date' => $validated['booking_date'],
+                    'booking_time' => $bookingTime,
                     'member_name' => $member['name'],
                     'aadhaar_number' => $member['aadhaar_number'],
                     'aadhaar_photo' => $photoPath,
