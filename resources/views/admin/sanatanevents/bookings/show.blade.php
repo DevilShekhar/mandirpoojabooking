@@ -381,35 +381,79 @@
         $bookingStatus = strtolower($booking->booking_status ?? 'pending');
         $paymentStatus = strtolower($booking->payment_status ?? 'pending');
         $refundStatus = $booking->refund_status ?? 'not_requested';
-        $canCancelBooking = $currentUser && (
-            (
-                $currentUser->hasRole('Customer') &&
-                (int) $currentUser->id === (int) $booking->user_id
-            ) ||
-            (
-                $currentUser->hasRole('Event Creator') &&
-                (int) $currentUser->id === (int) $booking->event_created_by
-            )
-        );
+
+        $isPlatformSide = $currentUser && $currentUser->hasAnyRole(['Admin', 'Super Admin']);
+        $isCustomerOwner = $currentUser && $currentUser->hasRole('Customer')
+            && (int) $currentUser->id === (int) $booking->user_id;
+        $isEventCreatorOwner = $currentUser && $currentUser->hasRole('Event Creator')
+            && (int) $currentUser->id === (int) ($booking->event_created_by ?? 0);
+        $isVerifiedTempleManager = $currentUser && $currentUser->hasRole('Temple Manager')
+            && ($canManageBooking ?? false);
+
+        // Platform side and event creator (event/temple side) get 100% refund.
+        $isFullRefundCancellation = $isPlatformSide || $isEventCreatorOwner || $isVerifiedTempleManager;
+        $canCancelBooking = $isFullRefundCancellation || $isCustomerOwner;
+
+        $estimatedRefundPercentage = 0;
+        $estimatedRefundAmount = 0;
+        $eventMinutesRemaining = null;
+        $elapsedBookingSeconds = null;
+        $customerCancellationWindowOpen = false;
+        $bookingCreatedAt = $booking->created_at
+            ? \Carbon\Carbon::parse($booking->created_at, 'Asia/Kolkata')
+            : null;
+        $nowForEstimate = now('Asia/Kolkata');
+
+        if ($bookingCreatedAt) {
+            $customerDeadline = $bookingCreatedAt->copy()->addHours(72);
+            $customerCancellationWindowOpen = $nowForEstimate->lessThanOrEqualTo($customerDeadline);
+            $elapsedBookingSeconds = $bookingCreatedAt->diffInSeconds($nowForEstimate);
+        }
+
+        // Event must still be in the future, but refund bands are NOT based on event time.
+        $eventIsUpcoming = false;
+        if ($booking->event_date && $booking->event_time) {
+            $eventDateTime = \Carbon\Carbon::parse(
+                $booking->event_date . ' ' . $booking->event_time,
+                'Asia/Kolkata'
+            );
+            $eventIsUpcoming = $nowForEstimate->lt($eventDateTime);
+            if ($eventIsUpcoming) {
+                $eventMinutesRemaining = $nowForEstimate->diffInMinutes($eventDateTime, false);
+            }
+        }
+
+        if ($isFullRefundCancellation) {
+            // Platform/event-side cancellation always receives a 100% refund.
+            $estimatedRefundPercentage = 100;
+        } elseif ($isCustomerOwner && $customerCancellationWindowOpen && $elapsedBookingSeconds !== null) {
+            // Calculate the customer's refund using elapsed time since created_at.
+            if ($elapsedBookingSeconds >= 48 * 3600) $estimatedRefundPercentage = 10;
+            elseif ($elapsedBookingSeconds >= 24 * 3600) $estimatedRefundPercentage = 20;
+            elseif ($elapsedBookingSeconds >= 12 * 3600) $estimatedRefundPercentage = 30;
+            elseif ($elapsedBookingSeconds >= 6 * 3600) $estimatedRefundPercentage = 40;
+            elseif ($elapsedBookingSeconds >= 3 * 3600) $estimatedRefundPercentage = 60;
+            elseif ($elapsedBookingSeconds >= 1 * 3600) $estimatedRefundPercentage = 80;
+            else $estimatedRefundPercentage = 100;
+        }
+
+        $estimatedRefundAmount = round(((float) ($booking->amount ?? 0) * $estimatedRefundPercentage) / 100, 2);
         $canShowCancelForm = $canCancelBooking
             && $bookingStatus === 'confirmed'
             && $paymentStatus === 'paid'
             && empty($booking->cancelled_at)
-            && $refundStatus === 'not_requested'
+            && in_array($refundStatus, ['not_requested', 'not_required'], true)
             && empty($booking->razorpay_refund_id)
-            && empty($booking->completed_at);
+            && empty($booking->completed_at)
+            && $eventIsUpcoming
+            && ($isFullRefundCancellation || ($isCustomerOwner && $customerCancellationWindowOpen && $bookingCreatedAt !== null));
+
         $canCompleteBooking = $currentUser && (
             $currentUser->hasAnyRole(['Admin', 'Super Admin']) ||
-            (
-                $currentUser->hasRole('Event Creator') &&
-                (int) $currentUser->id === (int) $booking->event_created_by
-            )
+            ($currentUser->hasRole('Event Creator') && (int) $currentUser->id === (int) ($booking->event_created_by ?? 0))
         );
-        $canShowCompleteButton = $canCompleteBooking
-            && $bookingStatus === 'confirmed'
-            && $paymentStatus === 'paid'
-            && empty($booking->completed_at)
-            && empty($booking->cancelled_at);
+        $canShowCompleteButton = $canCompleteBooking && $bookingStatus === 'confirmed'
+            && $paymentStatus === 'paid' && empty($booking->completed_at) && empty($booking->cancelled_at);
         $statusClass = match($bookingStatus) {
             'completed', 'confirmed' => 'seb-status-success',
             'cancelled', 'failed' => 'seb-status-danger',
@@ -579,7 +623,7 @@
                             </div>
                             <div class="seb-info-item">
                                 <div class="seb-info-label">
-                                    <i class="fas fa-phone-alt"></i> Phone Number
+                                    <i class="fa fa-phone" aria-hidden="true"></i> Phone Number
                                 </div>
                                 <div class="seb-info-value">
                                     {{ $booking->customer_phone ?? '-' }}
@@ -674,6 +718,15 @@
                         </form>
                     </div>
                 @endif
+                @if($isCustomerOwner && !$customerCancellationWindowOpen && $bookingStatus === 'confirmed' && $paymentStatus === 'paid' && empty($booking->cancelled_at) && empty($booking->completed_at))
+                    <div class="alert alert-warning">
+                        Customer cancellation is no longer available. Cancellation is allowed only within 72 hours after booking creation.
+                        @if($bookingCreatedAt)
+                            <br>Booking created: {{ $bookingCreatedAt->format('d M Y, h:i A') }}
+                            <br>Cancellation deadline: {{ $bookingCreatedAt->copy()->addHours(72)->format('d M Y, h:i A') }}
+                        @endif
+                    </div>
+                @endif
                 @if($canShowCancelForm)
                     <div class="seb-action-card seb-cancel-action">
                         <div class="seb-action-title text-danger">
@@ -681,9 +734,64 @@
                             Cancel Booking
                         </div>
                         <p class="seb-action-description">
-                            Enter the reason for cancellation. A refund request
-                            will be submitted to Razorpay.
+                            Enter the reason for cancellation. Your refund is calculated
+                            according to the cancellation policy shown below.
                         </p>
+                        <div class="alert alert-info">
+                            <strong>Estimated refund: {{ number_format($estimatedRefundPercentage, 0) }}%</strong>
+                            ({{ $booking->currency ?? 'INR' }} {{ number_format($estimatedRefundAmount, 2) }})
+                            @if($isCustomerOwner)
+                                <br>Customer cancellation is allowed only within 72 hours after booking creation.
+                                @if($bookingCreatedAt)
+                                    <br>Booking created: {{ $bookingCreatedAt->format('d M Y, h:i A') }}
+                                    <br>Cancellation deadline: {{ $bookingCreatedAt->copy()->addHours(72)->format('d M Y, h:i A') }}
+                                    @if($elapsedBookingSeconds !== null)
+                                        <br>Time since booking: {{ intdiv($elapsedBookingSeconds, 86400) }} days {{ intdiv($elapsedBookingSeconds % 86400, 3600) }} hours {{ intdiv($elapsedBookingSeconds % 3600, 60) }} minutes
+                                    @endif
+                                @endif
+                            @else
+                                <br>Platform/event-side cancellation: 100% refund.
+                            @endif
+                        </div>
+
+                        <div class="seb-amount-box">
+                            <small>CANCELLATION REFUND ESTIMATE</small>
+                            <div class="seb-info-grid mt-2">
+                                <div class="seb-info-item">
+                                    <div class="seb-info-label">Booking Amount</div>
+                                    <div class="seb-info-value">
+                                        {{ $booking->currency ?? 'INR' }} {{ number_format((float) $booking->amount, 2) }}
+                                    </div>
+                                </div>
+                                <div class="seb-info-item">
+                                    <div class="seb-info-label">Refund Percentage</div>
+                                    <div class="seb-info-value">{{ number_format($estimatedRefundPercentage, 2) }}%</div>
+                                </div>
+                                <div class="seb-info-item">
+                                    <div class="seb-info-label">Estimated Refund</div>
+                                    <div class="seb-info-value text-success">
+                                        {{ $booking->currency ?? 'INR' }} {{ number_format($estimatedRefundAmount, 2) }}
+                                    </div>
+                                </div>
+                                <div class="seb-info-item">
+                                    <div class="seb-info-label">Time Since Booking</div>
+                                    <div class="seb-info-value">
+                                        @if($elapsedBookingSeconds !== null)
+                                            {{ intdiv($elapsedBookingSeconds, 86400) }} days
+                                            {{ intdiv($elapsedBookingSeconds % 86400, 3600) }} hours
+                                            {{ intdiv($elapsedBookingSeconds % 3600, 60) }} minutes
+                                        @else
+                                            Not available
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                            @if($isCustomerOwner)
+                                <small class="text-muted d-block mt-2">Refund percentage is calculated from the time elapsed since booking creation. Customer cancellation is disabled after 72 hours. The server recalculates the final refund when you submit cancellation.</small>
+                            @else
+                                <small class="text-muted d-block mt-2">Platform/event-side cancellation receives a 100% refund. The server verifies the final amount when cancellation is submitted.</small>
+                            @endif
+                        </div>
                         <form id="cancelBookingForm"  action="{{ route('customer.sanatan-event-bookings.cancel', $booking->id) }}"
                             method="POST">
                             @csrf
@@ -823,6 +931,15 @@
                                 @else
                                     -
                                 @endif
+                            </div>
+                        </div>
+                        <div class="seb-info-item">
+                            <div class="seb-info-label">
+                                <i class="fas fa-percentage"></i>
+                                Refund Percentage
+                            </div>
+                            <div class="seb-info-value">
+                                {{ number_format((float) ($booking->refund_percentage ?? 0), 2) }}%
                             </div>
                         </div>
                     </div>
@@ -1045,11 +1162,12 @@ document.addEventListener('DOMContentLoaded', function () {
                         Refund Amount:
                         <strong>
                             {{ $booking->currency ?? 'INR' }}
-                            {{ number_format((float) $booking->amount, 2) }}
+                            {{ number_format((float) $estimatedRefundAmount, 2) }}
                         </strong>
                     </p>
+                    <p>Refund Percentage: <strong>{{ number_format($estimatedRefundPercentage, 2) }}%</strong></p>
                     <small class="text-muted">
-                        A refund request will be submitted to Razorpay.
+                        The final refund will be recalculated by the server.
                     </small>
                 `,
                 showCancelButton: true,
