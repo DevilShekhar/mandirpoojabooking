@@ -609,7 +609,7 @@
                         @can('puja-bookings-my.view')
                             <li class="{{ request()->routeIs('puja-bookings.*', 'booking-puja-order.*') ? 'active' : '' }}">
                                 <a class="nav-link" href="{{ route('booking-puja-order.index') }}">
-                                   <i data-feather="shopping-cart"></i>  My Booking
+                                   <i data-feather="shopping-cart"></i>  Mandir Puja Booking
                                 </a>
                             </li>
                         @endcan
