@@ -12,11 +12,46 @@
     $hasCompletionPermission = $currentUser && $currentUser->can('complete-puja-booking');
     $canCompletePuja = $bookingStatus === 'confirmed'
         && in_array($paymentStatus, ['paid', 'success', 'captured'], true);
-    $cancellationRequest = $isCustomer
-        ? \App\Models\CustomerBookingCancellation::where('puja_booking_id', $pujaBooking->id)
-            ->where('customer_id', $currentUser->id)->first()
+    $isTempleManager = $currentUser && $currentUser->hasRole('Temple Manager')
+        && \Illuminate\Support\Facades\DB::table('temple_user')
+            ->where('temple_id', $pujaBooking->temple_id)
+            ->where('user_id', $currentUser->id)
+            ->exists();
+    $isAssignedPandit = $currentUser && $currentUser->hasRole('Pandit')
+        && (int) $pujaBooking->pandit_id === (int) $currentUser->id;
+    $isPlatformAdmin = $currentUser && $currentUser->hasAnyRole(['Admin', 'Super Admin']);
+    $canCancelByRole = $isCustomer || $isTempleManager || $isAssignedPandit || $isPlatformAdmin;
+
+    // Cancellation window is calculated from booking created_at, not Puja schedule time.
+    $bookingCreatedAt = $pujaBooking->created_at
+        ? \Carbon\Carbon::parse($pujaBooking->created_at)->timezone(config('app.timezone'))
         : null;
-    $canRequestCancellation = $isCustomer && !in_array($bookingStatus, ['cancelled', 'completed']) && !$cancellationRequest;
+    $elapsedHoursForCancellation = $bookingCreatedAt
+        ? (now(config('app.timezone'))->getTimestamp() - $bookingCreatedAt->getTimestamp()) / 3600
+        : null;
+
+    $previewCancellationPercentage = 0;
+    if ($isCustomer && $elapsedHoursForCancellation !== null && $elapsedHoursForCancellation >= 0 && $elapsedHoursForCancellation <= 72) {
+        if ($elapsedHoursForCancellation >= 48) $previewCancellationPercentage = 10;
+        elseif ($elapsedHoursForCancellation >= 24) $previewCancellationPercentage = 20;
+        elseif ($elapsedHoursForCancellation >= 12) $previewCancellationPercentage = 30;
+        elseif ($elapsedHoursForCancellation >= 6) $previewCancellationPercentage = 40;
+        elseif ($elapsedHoursForCancellation >= 3) $previewCancellationPercentage = 60;
+        elseif ($elapsedHoursForCancellation >= 1) $previewCancellationPercentage = 80;
+        else $previewCancellationPercentage = 100;
+    }
+
+    $cancellationRequest = $canCancelByRole
+        ? \App\Models\CustomerBookingCancellation::where('puja_booking_id', $pujaBooking->id)->latest('id')->first()
+        : null;
+    $bookingCanBeCancelled = !in_array($bookingStatus, ['cancelled', 'completed'], true);
+    $customerWithinCancellationWindow = $elapsedHoursForCancellation !== null
+        && $elapsedHoursForCancellation >= 0
+        && $elapsedHoursForCancellation <= 72;
+    $canRequestCancellation = $canCancelByRole
+        && $bookingCanBeCancelled
+        && !$cancellationRequest
+        && (!$isCustomer || $customerWithinCancellationWindow);
     $bookingBadge = match ($bookingStatus) {
         'confirmed' => 'success',
         'cancelled', 'failed' => 'danger',
@@ -25,6 +60,7 @@
     };
     $paymentBadge = match ($paymentStatus) {
         'paid', 'success', 'captured' => 'success',
+        'partially_refunded' => 'info',
         'failed', 'refunded' => 'danger',
         default => 'warning',
     };
@@ -73,7 +109,15 @@
             </button>
         </div>
     @endif
-    @if($isCustomer)
+    @if(session('warning'))
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            {{ session('warning') }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    @endif
+    @if($canCancelByRole || $cancellationRequest)
         <div class="card mb-4 puja-cancellation-card mt-4">
             <div class="card-header">
                 <h5 class="mb-0">Booking Cancellation</h5>
@@ -81,29 +125,39 @@
             <div class="card-body">
                 @if($cancellationRequest)
                     @php
-                        $cancellationStatus = strtolower($cancellationRequest->status ?? 'pending');
-                        $refundStatus = strtolower($cancellationRequest->refund_status ?? 'not_required');
+                        $cancellationStatus = strtolower((string) ($cancellationRequest->status ?? 'cancelled'));
+                        $refundStatus = strtolower((string) ($cancellationRequest->refund_status ?? 'not_required'));
                         $cancellationBadge = match ($cancellationStatus) {
-                            'approved' => 'success',
-                            'rejected' => 'danger',
+                            'cancelled' => 'danger',
+                            'approved' => 'success', // Existing records from the earlier approval workflow.
+                            'rejected' => 'secondary',
                             default => 'warning',
                         };
                         $refundBadge = match ($refundStatus) {
                             'processed' => 'success',
                             'failed' => 'danger',
+                            'not_required' => 'secondary',
                             default => 'warning',
                         };
+                        $cancelledAtValue = $cancellationRequest->cancelled_at ?: $cancellationRequest->created_at;
                     @endphp
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <strong>Request Status</strong>
+                        <div class="col-md-4 mb-3">
+                            <strong>Cancellation Status</strong>
                             <div>
                                 <span class="badge badge-{{ $cancellationBadge }}">
-                                    {{ ucfirst($cancellationStatus) }}
+                                    {{ $cancellationStatus === 'approved' ? 'Approved (Legacy)' : ucfirst($cancellationStatus) }}
                                 </span>
                             </div>
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-4 mb-3">
+                            <strong>Cancelled By</strong>
+                            <div>
+                                {{ $cancellationRequest->cancellation_role
+                                    ?: ($cancellationRequest->cancelled_by ? 'User #' . $cancellationRequest->cancelled_by : 'Not recorded in older record') }}
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
                             <strong>Refund Status</strong>
                             <div>
                                 <span class="badge badge-{{ $refundBadge }}">
@@ -111,25 +165,32 @@
                                 </span>
                             </div>
                         </div>
+                        <div class="col-md-4 mb-3">
+                            <strong>Cancellation Charge</strong>
+                            <div>
+                                {{ number_format((float) ($cancellationRequest->cancellation_percentage ?? 0), 2) }}%
+                                (₹{{ number_format((float) ($cancellationRequest->cancellation_charge ?? 0), 2) }})
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <strong>Refund Amount</strong>
+                            <div>₹{{ number_format((float) ($cancellationRequest->refund_amount ?? 0), 2) }}</div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <strong>Cancelled At</strong>
+                            <div>
+                                {{ $cancelledAtValue ? \Carbon\Carbon::parse($cancelledAtValue)->format('d M Y, h:i A') : '-' }}
+                            </div>
+                        </div>
                     </div>
                     <div class="mb-3">
                         <strong>Cancellation Reason</strong>
-                        <p class="mb-0">
-                            {{ $cancellationRequest->cancellation_reason }}
-                        </p>
+                        <p class="mb-0">{{ $cancellationRequest->cancellation_reason ?: '-' }}</p>
                     </div>
                     @if($cancellationRequest->review_notes)
                         <div class="mb-3">
-                            <strong>Admin Review Notes</strong>
+                            <strong>Previous Admin Review Notes</strong>
                             <p class="mb-0">{{ $cancellationRequest->review_notes }}</p>
-                        </div>
-                    @endif
-                    @if((float) $cancellationRequest->refund_amount > 0)
-                        <div class="mb-3">
-                            <strong>Refund Amount</strong>
-                            <div>
-                                ₹{{ number_format((float) $cancellationRequest->refund_amount, 2) }}
-                            </div>
                         </div>
                     @endif
                     @if($cancellationRequest->razorpay_refund_id)
@@ -138,40 +199,44 @@
                             <div>{{ $cancellationRequest->razorpay_refund_id }}</div>
                         </div>
                     @endif
-                    @if($cancellationStatus === 'pending')
-                        <div class="alert alert-warning mb-0">
-                            Your cancellation request is awaiting admin review.
+                    @if($cancellationRequest->refund_error)
+                        <div class="alert alert-danger mb-3">
+                            <strong>Refund Error:</strong> {{ $cancellationRequest->refund_error }}
                         </div>
-                    @elseif($cancellationStatus === 'rejected')
-                        <div class="alert alert-danger mb-0">
-                            Your cancellation request was rejected.
-                            Please contact support if you need assistance.
-                        </div>
-                    @elseif($refundStatus === 'processing')
+                    @endif
+                    @if(in_array($refundStatus, ['processing', 'pending'], true))
                         <div class="alert alert-info mb-0">
-                            Your refund is being processed. Please wait for confirmation.
+                            The booking is cancelled. The refund of ₹{{ number_format((float) $cancellationRequest->refund_amount, 2) }} is pending or being processed.
                         </div>
                     @elseif($refundStatus === 'failed')
                         <div class="alert alert-danger mb-0">
-                            The refund could not be confirmed.
-                            Please contact support for assistance.
+                            The booking is cancelled, but the refund could not be confirmed. Please contact support. Do not submit another refund until the Razorpay payment and refund history have been checked.
                         </div>
                     @elseif($refundStatus === 'processed')
                         <div class="alert alert-success mb-0">
-                            Your refund has been processed.
+                            The booking is cancelled and the refund has been processed successfully.
+                        </div>
+                    @else
+                        <div class="alert alert-secondary mb-0">
+                            The booking is cancelled. No refund is due for this cancellation.
                         </div>
                     @endif
-                @elseif(in_array($bookingStatus, ['cancelled', 'completed']))
-                    <p class="text-muted mb-0">
-                        This booking cannot be cancelled because it is {{ $bookingStatus }}.
-                    </p>
-                @else
+                @elseif(in_array($bookingStatus, ['cancelled', 'completed'], true))
+                    <p class="text-muted mb-0">This booking cannot be cancelled because it is {{ $bookingStatus }}.</p>
+                @elseif($isCustomer && $elapsedHoursForCancellation !== null && $elapsedHoursForCancellation > 72)
+                    <div class="alert alert-warning mb-0">Cancellation is not allowed because more than 72 hours have passed since this booking was created.</div>
+                @elseif($isCustomer && ($elapsedHoursForCancellation === null || $elapsedHoursForCancellation < 0))
+                    <div class="alert alert-warning mb-0">Cancellation is not available because the booking creation time is missing or invalid.</div>
+                @elseif($canRequestCancellation)
                     <div class="d-flex flex-wrap justify-content-between align-items-center">
-                        <p class="text-muted mb-2 mb-md-0">
-                            Submit a cancellation request with your reason.
-                            Your booking will not be cancelled until the request is reviewed
-                            and any applicable refund is confirmed.
-                        </p>
+                        <div class="text-muted mb-2 mb-md-0">
+                            <p class="mb-1">Cancelling this booking will happen immediately after confirmation.</p>
+                            @if($isCustomer)
+                                <strong>Applicable cancellation charge: {{ $previewCancellationPercentage }}%</strong>
+                            @else
+                                <strong>Temple/Platform cancellation: 0% charge and 100% refund of the captured payment.</strong>
+                            @endif
+                        </div>
                         <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#cancelBookingModal">
                             <i class="fas fa-times-circle"></i> Cancel Booking
                         </button>
@@ -228,21 +293,21 @@
         </div>
         <div class="card-body">
             <div class="row">
-                <div class="col-md-4 mb-3 puja-detail-item">
+                <div class="col-md-12 mb-3 puja-detail-item">
                     <span class="puja-detail-icon"><i class="fas fa-user"></i></span>
                     <div class="puja-detail-copy">
                         <strong>Name</strong>
                         <div>{{ $pujaBooking->customer_name ?: ($pujaBooking->user?->name ?? '-') }}</div>
                     </div>
                 </div>
-                <div class="col-md-4 mb-3 puja-detail-item">
+                <div class="col-md-12 mb-3 puja-detail-item">
                     <span class="puja-detail-icon"><i class="fas fa-envelope"></i></span>
                     <div class="puja-detail-copy">
                         <strong>Email</strong>
                         <div>{{ $pujaBooking->customer_email ?: ($pujaBooking->user?->email ?? '-') }}</div>
                     </div>
                 </div>
-                <div class="col-md-4 mb-3 puja-detail-item">
+                <div class="col-md-12 mb-3 puja-detail-item">
                     <span class="puja-detail-icon"><i class="fas fa-phone"></i></span>
                     <div class="puja-detail-copy">
                         <strong>Mobile</strong>
@@ -728,44 +793,38 @@
     </a>
 </div>
 @if($canRequestCancellation)
-    <div class="modal fade"  id="cancelBookingModal" tabindex="-1" role="dialog" aria-labelledby="cancelBookingModalLabel" aria-hidden="true">
+    <div class="modal fade" id="cancelBookingModal" tabindex="-1" role="dialog" aria-labelledby="cancelBookingModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <form action="{{ route('customer-cancel-booking.store', $pujaBooking->id) }}" method="POST">
                     @csrf
                     <div class="modal-header">
-                        <h5 class="modal-title" id="cancelBookingModalLabel">
-                            Request Booking Cancellation
-                        </h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+                        <h5 class="modal-title" id="cancelBookingModalLabel">Confirm Booking Cancellation</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     </div>
                     <div class="modal-body">
                         <div class="alert alert-warning">
-                            Your booking will not be cancelled immediately.
-                            The administration must review your request.
+                            <strong>Important:</strong> Your booking will be cancelled immediately after you submit this form.
+                            @if($isCustomer)
+                                A {{ $previewCancellationPercentage }}% cancellation charge will apply according to the time elapsed since this booking was created.
+                            @else
+                                Temple/Platform cancellation has a 0% cancellation charge and a 100% refund of the captured payment.
+                            @endif
                         </div>
                         <div class="form-group">
-                            <label for="cancellation_reason">
-                                Cancellation Reason <span class="text-danger">*</span>
-                            </label>
+                            <label for="cancellation_reason">Cancellation Reason <span class="text-danger">*</span></label>
                             <textarea name="cancellation_reason" id="cancellation_reason"
-                                      class="form-control @error('cancellation_reason') is-invalid @enderror"
-                                      rows="4"  minlength="5"  maxlength="2000" placeholder="Please explain why you want to cancel this booking..."
-                                      required>{{ old('cancellation_reason') }}</textarea>
+                                class="form-control @error('cancellation_reason') is-invalid @enderror"
+                                rows="4" minlength="5" maxlength="2000"
+                                placeholder="Please explain why you want to cancel this booking..." required>{{ old('cancellation_reason') }}</textarea>
                             @error('cancellation_reason')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                            Close
-                        </button>
-                        <button type="submit" class="btn btn-danger">
-                            Submit Cancellation Request
-                        </button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Keep Booking</button>
+                        <button type="submit" class="btn btn-danger">Confirm Cancellation</button>
                     </div>
                 </form>
             </div>

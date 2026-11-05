@@ -18,15 +18,15 @@ class PujaBookingController extends Controller
     $user = auth()->user();
 
     $query = PujaBooking::with([
-        'user',
-        'temple',
-        'deity',
-        'puja',
-        'pujaPackage',
-        'pandit',
-        'createdBy',
-        'updatedBy',
-    ]);
+            'user',
+            'temple',
+            'deity',
+            'puja',
+            'pujaPackage',
+            'pandit',
+            'createdBy',
+            'updatedBy',
+        ])->where('booking_status', 'confirmed');
 
     if ($user->hasRole('Temple Manager')) {
 

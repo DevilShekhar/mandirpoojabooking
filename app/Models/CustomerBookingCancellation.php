@@ -12,6 +12,7 @@ class CustomerBookingCancellation extends Model
     protected $fillable = [
         'puja_booking_id',
         'customer_id',
+        'cancelled_by',
         'cancellation_reason',
         'status',
         'reviewed_by',
@@ -22,14 +23,21 @@ class CustomerBookingCancellation extends Model
         'refund_error',
         'reviewed_at',
         'refunded_at',
+        'cancellation_role',
+        'cancellation_percentage',
+        'cancellation_charge',
+        'cancelled_at',
     ];
 
     protected function casts(): array
     {
         return [
             'refund_amount' => 'decimal:2',
+            'cancellation_percentage' => 'decimal:2',
+            'cancellation_charge' => 'decimal:2',
             'reviewed_at' => 'datetime',
             'refunded_at' => 'datetime',
+            'cancelled_at' => 'datetime',
         ];
     }
 
@@ -41,6 +49,10 @@ class CustomerBookingCancellation extends Model
     public function customer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'customer_id');
+    }
+    public function cancelledBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'cancelled_by');
     }
 
     public function reviewer(): BelongsTo

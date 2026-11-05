@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\CustomerBookingCancellation;
 use App\Models\PujaBooking;
 use App\Models\PujaBookingPayment;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -20,7 +21,23 @@ class CustomerBookingCancellationController extends Controller
     {
         return $user && $user->hasAnyRole(['Admin', 'Super Admin']);
     }
+    private function getCustomerCancellationPercentage(float $elapsedHours): int
+    {
+        abort_if(
+            $elapsedHours > 72,
+            422,
+            'Cancellation is not allowed because more than 72 hours have passed since the booking was created.'
+        );
 
+        if ($elapsedHours >= 48) return 10;
+        if ($elapsedHours >= 24) return 20;
+        if ($elapsedHours >= 12) return 30;
+        if ($elapsedHours >= 6) return 40;
+        if ($elapsedHours >= 3) return 60;
+        if ($elapsedHours >= 1) return 80;
+
+        return 100;
+    }
     /**
      * Send a cancellation email to a recipient.
      */
@@ -59,7 +76,7 @@ class CustomerBookingCancellationController extends Controller
             'recipientRole' => $recipientRole,
             'messageText' => $messageText,
             'bookingNumber' => $booking->booking_number
-                ?: '#' . $booking->id,
+             ?: '#' . $booking->id,
             'customerName' => $booking->customer_name
                 ?: $cancellation->customer?->name
                 ?: $booking->user?->name
@@ -111,28 +128,21 @@ class CustomerBookingCancellationController extends Controller
         $panditEmail = $booking->pandit?->email;
         $panditName = $booking->pandit?->name ?? 'Pandit';
 
-        $subject = 'Puja Booking Cancellation Request';
-        $message = 'A cancellation request has been submitted for this puja booking. The request is awaiting admin review. The booking is not cancelled yet.';
+        $subject = 'Puja Booking Cancelled';
+        $message = 'This Puja booking has been cancelled successfully. The applicable refund has been initiated according to the cancellation policy.';
 
         $recipients = [
-            [
-                'email' => $customerEmail,
-                'name' => $customerName,
-                'role' => 'Customer',
-            ],
-            [
-                'email' => $panditEmail,
-                'name' => $panditName,
-                'role' => 'Pandit',
-            ],
+            ['email' => $customerEmail, 'name' => $customerName, 'role' => 'Customer'],
+            ['email' => $panditEmail, 'name' => $panditName, 'role' => 'Pandit'],
         ];
 
         $sentAddresses = [];
 
         foreach ($recipients as $recipient) {
             $email = $recipient['email'];
+            $normalizedEmail = strtolower((string) $email);
 
-            if (!$email || in_array(strtolower($email), $sentAddresses, true)) {
+            if (!$email || in_array($normalizedEmail, $sentAddresses, true)) {
                 continue;
             }
 
@@ -146,7 +156,7 @@ class CustomerBookingCancellationController extends Controller
                     $message
                 );
 
-                $sentAddresses[] = strtolower($email);
+                $sentAddresses[] = $normalizedEmail;
             } catch (Throwable $e) {
                 Log::error('Cancellation email failed.', [
                     'cancellation_id' => $cancellation->id,
@@ -158,61 +168,208 @@ class CustomerBookingCancellationController extends Controller
     }
 
     /**
-     * Notify the customer after admin approval or rejection.
+     * Customer submits cancellation; authorized Temple/Platform staff can
+     * also cancel directly. Booking cancellation is immediate.
      */
-    private function notifyCustomer(
-        CustomerBookingCancellation $cancellation,
-        string $subject,
-        string $message
-    ): void {
-        $cancellation->loadMissing([
-            'booking.user',
-            'booking.puja',
-            'booking.pandit',
-            'customer',
+    public function store(Request $request, $bookingId)
+    {
+        $validated = $request->validate([
+            'cancellation_reason' => 'required|string|min:5|max:2000',
         ]);
 
-        $booking = $cancellation->booking;
+        $user = Auth::user();
+        abort_unless($user, 401, 'Please log in to cancel this booking.');
 
-        if (!$booking) {
-            return;
-        }
+        $cancellation = DB::transaction(function () use ($bookingId, $user, $validated) {
+            $booking = PujaBooking::whereKey($bookingId)
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        $email = $booking->customer_email
-            ?: $cancellation->customer?->email
-            ?: $booking->user?->email;
+            $bookingStatus = strtolower((string) $booking->booking_status);
 
-        if (!$email) {
-            Log::warning('Customer notification skipped: email missing.', [
-                'cancellation_id' => $cancellation->id,
+            abort_if(
+                in_array($bookingStatus, ['cancelled', 'completed'], true),
+                422,
+                'This booking is already cancelled or completed.'
+            );
+
+            // Do not allow duplicate cancellation records.
+            $existing = CustomerBookingCancellation::where('puja_booking_id', $booking->id)
+                ->lockForUpdate()
+                ->first();
+
+            abort_if($existing, 422, 'Cancellation already exists for this booking.');
+
+            $role = null;
+            $percentage = 0;
+            if ($user->hasRole('Customer')) {
+                abort_unless(
+                    (int) $booking->user_id === (int) $user->id,
+                    403,
+                    'You are not authorized to cancel this booking.'
+                );
+
+                $role = 'Customer';
+                abort_unless(
+                    $booking->created_at,
+                    422,
+                    'Booking creation time is missing. Please contact support.'
+                );
+
+                $createdAt = Carbon::parse($booking->created_at)->timezone(config('app.timezone'));
+                $elapsedHours = (
+                    now(config('app.timezone'))->getTimestamp() - $createdAt->getTimestamp()
+                ) / 3600;
+
+                abort_if(
+                    $elapsedHours < 0,
+                    422,
+                    'Invalid booking creation time. Please contact support.'
+                );
+
+                $percentage = $this->getCustomerCancellationPercentage($elapsedHours);
+            } elseif ($user->hasRole('Temple Manager')) {
+                $hasTempleAccess = DB::table('temple_user')
+                    ->where('temple_id', $booking->temple_id)
+                    ->where('user_id', $user->id)
+                    ->where('approval_status', 'approved')
+                    ->exists();
+
+                abort_unless(
+                    $hasTempleAccess,
+                    403,
+                    'You are not authorized to cancel this temple booking.'
+                );
+
+                $role = 'Temple Manager';
+                $percentage = 0; // Temple-side cancellation: 100% refund.
+            } elseif ($user->hasRole('Pandit')) {
+                abort_unless(
+                    (int) $booking->pandit_id === (int) $user->id,
+                    403,
+                    'You are not authorized to cancel this booking.'
+                );
+
+                $role = 'Pandit';
+                $percentage = 0; // Retains the existing temple-side staff rule.
+            } elseif ($user->hasRole('Super Admin')) {
+                $role = 'Super Admin';
+                $percentage = 0; // Platform-side cancellation: 100% refund.
+            } elseif ($user->hasRole('Admin')) {
+                $role = 'Admin';
+                $percentage = 0; // Platform-side cancellation: 100% refund.
+            } else {
+                abort(403, 'You are not authorized to cancel this booking.');
+            }
+
+            // Use the captured Razorpay payment record as the source of truth.
+            $isBookingPaid = in_array(
+                strtolower((string) $booking->payment_status),
+                ['paid', 'success', 'captured'],
+                true
+            );
+
+            $payment = null;
+            $paidAmount = 0.00;
+
+            if ($isBookingPaid) {
+                $payment = PujaBookingPayment::where('puja_booking_id', $booking->id)
+                    ->whereIn('status', ['paid', 'success', 'captured'])
+                    ->whereNotNull('razorpay_payment_id')
+                    ->latest('id')
+                    ->lockForUpdate()
+                    ->first();
+
+                abort_unless(
+                    $payment && (int) $payment->amount_paise > 0,
+                    422,
+                    'A successful captured payment record was not found. Please contact support before cancelling.'
+                );
+
+                $paidAmount = round(((int) $payment->amount_paise) / 100, 2);
+            }
+
+            $cancellationCharge = round(($paidAmount * $percentage) / 100, 2);
+            $refundAmount = round(max(0, $paidAmount - $cancellationCharge), 2);
+
+            $refundStatus = $refundAmount > 0 ? 'pending' : 'not_required';
+
+            $cancellation = CustomerBookingCancellation::create([
+                'puja_booking_id' => $booking->id,
+                'customer_id' => $booking->user_id,
+                'cancelled_by' => $user->id,
+                'cancellation_role' => $role,
+                'cancellation_reason' => $validated['cancellation_reason'],
+                'cancellation_percentage' => $percentage,
+                'cancellation_charge' => $cancellationCharge,
+                'status' => 'cancelled',
+                'refund_status' => $refundStatus,
+                'refund_amount' => $refundAmount,
+                'cancelled_at' => now(),
             ]);
 
-            return;
+            $booking->update([
+                'booking_status' => 'cancelled',
+                'updated_by' => $user->id,
+            ]);
+
+            return $cancellation;
+        });
+
+        // Submit the refund after the database transaction commits.
+        if ((float) $cancellation->refund_amount > 0) {
+            try {
+                $this->processRefund($cancellation);
+            } catch (Throwable $e) {
+                $cancellation->refresh();
+
+                // If the request reached Razorpay, its result may be unknown
+                // (for example, a network timeout). Keep it in processing so
+                // the same refund is not submitted again without reconciliation.
+                $cancellation->update([
+                    'refund_status' => $cancellation->refund_status === 'processing'
+                        ? 'processing'
+                        : 'failed',
+                    'refund_error' => $e->getMessage(),
+                ]);
+
+                Log::error('Automatic Puja booking refund could not be confirmed.', [
+                    'cancellation_id' => $cancellation->id,
+                    'refund_status' => $cancellation->refund_status,
+                    'exception' => $e->getMessage(),
+                ]);
+            }
         }
 
         try {
-            $this->sendCancellationEmail(
-                $cancellation,
-                $email,
-                $booking->customer_name
-                    ?: $cancellation->customer?->name
-                    ?: $booking->user?->name
-                    ?: 'Customer',
-                'Customer',
-                $subject,
-                $message
-            );
+            $this->notifyCustomerAndPandit($cancellation->fresh());
         } catch (Throwable $e) {
-            Log::error('Cancellation customer email failed.', [
+            Log::error('Cancellation notification failed.', [
                 'cancellation_id' => $cancellation->id,
                 'exception' => $e->getMessage(),
             ]);
         }
+
+        $cancellation->refresh();
+
+        if (in_array($cancellation->refund_status, ['failed', 'processing'], true)) {
+            return back()->with(
+                'warning',
+                'Booking cancelled successfully, but the refund is not yet confirmed. Please contact support. Check the refund in Razorpay before attempting any retry.'
+            );
+        }
+
+        return back()->with(
+            'success',
+            'Booking cancelled successfully. The applicable refund has been initiated.'
+        );
     }
 
+    /** Customer and Temple Manager cancellation history. */
     public function customerIndex()
     {
-        $user = auth()->user();
+        $user = Auth::user();
+        abort_unless($user, 401);
 
         $query = CustomerBookingCancellation::with([
             'booking.user',
@@ -220,15 +377,22 @@ class CustomerBookingCancellationController extends Controller
             'booking.puja',
             'booking.pujaPackage',
             'customer',
+            'cancelledBy',
         ]);
 
-        if ($user->hasRole('Temple Manager')) {
+        if ($user->hasRole('Admin') || $user->hasRole('Super Admin')) {
+            // Admins can see all cancellation records.
+        } elseif ($user->hasRole('Temple Manager')) {
             $templeIds = $user->temples()
                 ->wherePivot('approval_status', 'approved')
                 ->pluck('temples.id');
 
             $query->whereHas('booking', function ($bookingQuery) use ($templeIds) {
                 $bookingQuery->whereIn('temple_id', $templeIds);
+            });
+        } elseif ($user->hasRole('Pandit')) {
+            $query->whereHas('booking', function ($bookingQuery) use ($user) {
+                $bookingQuery->where('pandit_id', $user->id);
             });
         } else {
             $query->where('customer_id', $user->id);
@@ -238,6 +402,7 @@ class CustomerBookingCancellationController extends Controller
         $pendingCancellationCount = (clone $query)->where('status', 'pending')->count();
         $approvedCancellationCount = (clone $query)->where('status', 'approved')->count();
         $rejectedCancellationCount = (clone $query)->where('status', 'rejected')->count();
+        $cancelledCancellationCount = (clone $query)->where('status', 'cancelled')->count();
 
         $cancellations = (clone $query)->latest()->paginate(10)->withQueryString();
 
@@ -246,102 +411,29 @@ class CustomerBookingCancellationController extends Controller
             'cancellationCount',
             'pendingCancellationCount',
             'approvedCancellationCount',
-            'rejectedCancellationCount'
+            'rejectedCancellationCount',
+            'cancelledCancellationCount'
         ));
     }
 
-    /**
-     * Customer submits a cancellation request.
-     */
-    public function store(Request $request, $bookingId)
-    {
-        $request->validate([
-            'cancellation_reason' => 'required|string|min:5|max:2000',
-        ]);
-
-        $user = Auth::user();
-
-        $cancellation = DB::transaction(function () use (
-            $bookingId,
-            $user,
-            $request
-        ) {
-            $booking = PujaBooking::whereKey($bookingId)
-                ->lockForUpdate()
-                ->firstOrFail();
-
-            abort_unless(
-                (int) $booking->user_id === (int) $user->id,
-                403,
-                'You are not authorized to cancel this booking.'
-            );
-
-            if (in_array(
-                strtolower((string) $booking->booking_status),
-                ['cancelled', 'completed'],
-                true
-            )) {
-                abort(422, 'This booking cannot be cancelled.');
-            }
-
-            $existing = CustomerBookingCancellation::where(
-                'puja_booking_id',
-                $booking->id
-            )
-                ->where('customer_id', $user->id)
-                ->lockForUpdate()
-                ->first();
-
-            if ($existing) {
-                abort(
-                    422,
-                    'A cancellation request already exists for this booking.'
-                );
-            }
-
-            return CustomerBookingCancellation::create([
-                'puja_booking_id' => $booking->id,
-                'customer_id' => $user->id,
-                'cancellation_reason' => $request->cancellation_reason,
-                'status' => 'pending',
-                'refund_status' => 'not_required',
-                'refund_amount' => 0,
-            ]);
-        });
-
-        // Send email notifications to customer and assigned Pandit.
-        $this->notifyCustomerAndPandit($cancellation);
-
-        return back()->with(
-            'success',
-            'Cancellation request submitted successfully. Email notifications have been attempted.'
-        );
-    }
-
-    /**
-     * Admin cancellation request list.
-     */
+    /** Admin-only read access to cancellation history. */
     public function staffIndex()
     {
         abort_unless($this->isAdmin(Auth::user()), 403);
 
         $cancellations = CustomerBookingCancellation::with([
             'booking.user',
+            'booking.temple',
             'booking.puja',
             'booking.pandit',
             'customer',
-            'reviewer',
-        ])->latest()->paginate(10);
+            'cancelledBy',
+        ])->latest()->paginate(10)->withQueryString();
 
-        return view(
-            'admin.customer-cancel-booking.index',
-            compact('cancellations')
-        );
+        return view('admin.customer-cancel-booking.index', compact('cancellations'));
     }
 
-    /**
-     * Admin views cancellation details.
-     */
+    /** Admin-only read access to one cancellation record. */
     public function show(CustomerBookingCancellation $cancellation)
     {
         abort_unless($this->isAdmin(Auth::user()), 403);
@@ -354,137 +446,65 @@ class CustomerBookingCancellationController extends Controller
             'booking.pujaPackage',
             'booking.pandit',
             'customer',
-            'reviewer',
+            'cancelledBy',
         ]);
 
-        return view(
-            'admin.customer-cancel-booking.show',
-            compact('cancellation')
-        );
+        return view('admin.customer-cancel-booking.show', compact('cancellation'));
     }
 
     /**
-     * Admin approves the cancellation.
+     * Submit the calculated partial/full refund to Razorpay.
+     * A refund already carrying a Razorpay ID is never submitted again.
      */
-    public function approve(
-        Request $request,
-        CustomerBookingCancellation $cancellation
-    ) {
-        abort_unless($this->isAdmin(Auth::user()), 403);
-
-        $validated = $request->validate([
-            'review_notes' => 'nullable|string|max:2000',
-        ]);
-
-        DB::transaction(function () use ($cancellation, $validated) {
-            $locked = CustomerBookingCancellation::whereKey($cancellation->id)
-                ->lockForUpdate()
-                ->firstOrFail();
-
-            if ($locked->status !== 'pending') {
-                abort(
-                    422,
-                    'This cancellation request has already been reviewed.'
-                );
-            }
-
-            $locked->update([
-                'status' => 'approved',
-                'reviewed_by' => Auth::id(),
-                'review_notes' => $validated['review_notes'] ?? null,
-                'reviewed_at' => now(),
-                'refund_status' => 'processing',
-            ]);
-        });
-
-        try {
-            $this->processRefund($cancellation->fresh());
-        } catch (Throwable $e) {
-            Log::error('Puja booking cancellation refund failed.', [
-                'cancellation_id' => $cancellation->id,
-                'exception' => $e->getMessage(),
-            ]);
-
-            return redirect()
-                ->route('admin.customer-cancel-booking.show', $cancellation)
-                ->with(
-                    'error',
-                    'Cancellation approved, but refund status could not be confirmed. Check the Razorpay dashboard before retrying.'
-                );
-        }
-
+    private function processRefund(CustomerBookingCancellation $cancellation): void
+    {
         $cancellation->refresh();
 
-        $message = match ($cancellation->refund_status) {
-            'not_required' => 'Your cancellation request has been approved. No refund was required.',
-            'processed' => 'Your cancellation request has been approved and your refund has been processed.',
-            default => 'Your cancellation request has been approved. Your refund is being processed.',
-        };
-
-        $this->notifyCustomer(
-            $cancellation,
-            'Puja Booking Cancellation Approved',
-            $message
-        );
-
-        return redirect()
-            ->route('admin.customer-cancel-booking.show', $cancellation)
-            ->with('success', 'Cancellation approved. Check the refund status below.');
-    }
-
-    /**
-     * Process Razorpay refund.
-     */
-    private function processRefund(
-        CustomerBookingCancellation $cancellation
-    ): void {
-        $cancellation->refresh();
-
-        if ($cancellation->refund_status === 'processed') {
+        if ($cancellation->razorpay_refund_id) {
             return;
         }
 
-        if ($cancellation->razorpay_refund_id) {
+        if (in_array($cancellation->refund_status, ['processed', 'not_required'], true)) {
+            return;
+        }
+
+        if ($cancellation->refund_status === 'processing') {
             throw new \RuntimeException(
-                'A Razorpay refund ID already exists. Verify its status before attempting another refund.'
+                'Refund is already marked as processing. Verify its status in Razorpay before retrying.'
             );
         }
 
-        $booking = PujaBooking::findOrFail(
-            $cancellation->puja_booking_id
-        );
+        $refundAmountPaise = (int) round((float) $cancellation->refund_amount * 100);
 
-        $payment = PujaBookingPayment::where(
-            'puja_booking_id',
-            $booking->id
-        )
+        if ($refundAmountPaise <= 0) {
+            $cancellation->update(['refund_status' => 'not_required']);
+            return;
+        }
+
+        $booking = PujaBooking::findOrFail($cancellation->puja_booking_id);
+
+        $payment = PujaBookingPayment::where('puja_booking_id', $booking->id)
             ->whereIn('status', ['paid', 'success', 'captured'])
             ->whereNotNull('razorpay_payment_id')
-            ->latest()
+            ->latest('id')
             ->first();
 
         if (!$payment) {
-            DB::transaction(function () use ($cancellation, $booking) {
-                $cancellation->update([
-                    'refund_amount' => 0,
-                    'refund_status' => 'not_required',
-                ]);
-
-                $booking->update([
-                    'booking_status' => 'cancelled',
-                ]);
-            });
-
-            return;
+            throw new \RuntimeException('Successful Razorpay payment not found for this booking.');
         }
 
-        $amountPaise = (int) $payment->amount_paise;
+        $capturedAmountPaise = (int) $payment->amount_paise;
 
-        if ($amountPaise <= 0) {
-            throw new \RuntimeException(
-                'The payment amount is invalid. Please verify the payment record.'
-            );
+        if ($capturedAmountPaise <= 0 || $refundAmountPaise > $capturedAmountPaise) {
+            throw new \RuntimeException('Refund amount is invalid or exceeds the captured payment amount.');
         }
+
+        // Mark processing before making the external API request. If the API
+        // times out, reconcile against Razorpay before any manual retry.
+        $cancellation->update([
+            'refund_status' => 'processing',
+            'refund_error' => null,
+        ]);
 
         $api = new Api(
             config('services.razorpay.key'),
@@ -494,98 +514,58 @@ class CustomerBookingCancellationController extends Controller
         $refund = $api->payment
             ->fetch($payment->razorpay_payment_id)
             ->refund([
-                'amount' => $amountPaise,
+                'amount' => $refundAmountPaise,
+                'notes' => [
+                    'cancellation_id' => (string) $cancellation->id,
+                    'puja_booking_id' => (string) $booking->id,
+                ],
             ]);
 
         $refundId = $refund['id'] ?? null;
-        $refundStatus = strtolower(
-            (string) ($refund['status'] ?? 'pending')
-        );
+        $refundStatus = strtolower((string) ($refund['status'] ?? 'pending'));
 
         if (!$refundId) {
-            throw new \RuntimeException(
-                'Razorpay did not return a refund ID.'
-            );
+            throw new \RuntimeException('Razorpay did not return a refund ID.');
         }
 
-        $processed = in_array(
-            $refundStatus,
-            ['processed', 'completed'],
-            true
-        );
+        $processed = in_array($refundStatus, ['processed', 'completed'], true);
+        $failed = $refundStatus === 'failed';
 
         DB::transaction(function () use (
             $cancellation,
             $booking,
             $payment,
             $refundId,
-            $refundStatus,
-            $amountPaise,
-            $processed
+            $refundAmountPaise,
+            $capturedAmountPaise,
+            $processed,
+            $failed
         ) {
-            $cancellation->update([
-                'refund_amount' => $amountPaise / 100,
-                'razorpay_refund_id' => $refundId,
-                'refund_status' => $processed ? 'processed' : 'processing',
-                'refunded_at' => $processed ? now() : null,
-                'refund_error' => null,
-            ]);
-
-            if ($processed) {
-                $booking->update([
-                    'booking_status' => 'cancelled',
-                    'payment_status' => 'refunded',
-                ]);
-
-                $payment->update([
-                    'status' => 'refunded',
-                ]);
-            }
-        });
-    }
-
-    /**
-     * Admin rejects the cancellation.
-     */
-    public function reject(
-        Request $request,
-        CustomerBookingCancellation $cancellation
-    ) {
-        abort_unless($this->isAdmin(Auth::user()), 403);
-
-        $validated = $request->validate([
-            'review_notes' => 'required|string|min:3|max:2000',
-        ]);
-
-        DB::transaction(function () use ($cancellation, $validated) {
-            $locked = CustomerBookingCancellation::whereKey($cancellation->id)
+            $lockedCancellation = CustomerBookingCancellation::whereKey($cancellation->id)
                 ->lockForUpdate()
                 ->firstOrFail();
 
-            if ($locked->status !== 'pending') {
-                abort(
-                    422,
-                    'This cancellation request has already been reviewed.'
-                );
-            }
-
-            $locked->update([
-                'status' => 'rejected',
-                'reviewed_by' => Auth::id(),
-                'review_notes' => $validated['review_notes'],
-                'reviewed_at' => now(),
-                'refund_status' => 'not_required',
+            $lockedCancellation->update([
+                'razorpay_refund_id' => $refundId,
+                'refund_amount' => $refundAmountPaise / 100,
+                'refund_status' => $processed ? 'processed' : ($failed ? 'failed' : 'processing'),
+                'refunded_at' => $processed ? now() : null,
+                'refund_error' => $failed
+                    ? 'Razorpay returned a failed refund status. Check Razorpay Dashboard for details.'
+                    : null,
             ]);
+
+            // Do not mark a partially refunded payment as fully refunded.
+            if ($processed) {
+                if ($refundAmountPaise >= $capturedAmountPaise) {
+                    $payment->update(['status' => 'refunded']);
+                    $booking->update(['payment_status' => 'refunded']);
+                } else {
+                    // Keep partial refunds explicit instead of showing the payment as fully paid.
+                    $payment->update(['status' => 'partially_refunded']);
+                    $booking->update(['payment_status' => 'partially_refunded']);
+                }
+            }
         });
-
-        $this->notifyCustomer(
-            $cancellation->fresh(),
-            'Puja Booking Cancellation Rejected',
-            'Unfortunately, your cancellation request has been rejected. Please review the admin notes or contact support.'
-        );
-
-        return redirect()
-            ->route('admin.customer-cancel-booking.show', $cancellation)
-            ->with('success', 'Cancellation request rejected.');
     }
 }
