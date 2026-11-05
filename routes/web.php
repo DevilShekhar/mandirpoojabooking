@@ -203,9 +203,11 @@ Route::middleware('auth')->group(function () {
     });
     Route::resource('ticket-prices', TicketPriceController::class);
     Route::resource('temple-daily-ticket-limits',TempleDailyTicketLimitController::class);
-    Route::get('/my-tickit-booking',[TicketBookingHistoryController::class, 'myBookings'])->name('admin.my-tickit-booking');
+    Route::get('/my-tickit-booking', [TicketBookingHistoryController::class,'myBookings'])->name('admin.my-tickit-booking');
+    Route::get('/my-tickit-booking/cancelled', [TicketBookingHistoryController::class,'cancelledBookings'])->name('admin.my-tickit-booking.cancelled');
     Route::get('/my-tickit-booking/{orderId}',[TicketBookingHistoryController::class, 'myBookingDetails'])->name('admin.my-tickit-booking.show');
     // Temple Manager: Ticket Booking History
+    Route::post('/my-tickit-booking/{orderId}/cancel-request',[TicketBookingHistoryController::class, 'storeCancellationRequest'])->name('admin.my-tickit-booking.cancel-request');
     Route::get('/tickit-booking-history',[TicketBookingHistoryController::class, 'managerHistory'])->name('admin.tickit-booking-history');
     Route::get('/tickit-booking-history/{bookingReference}',[TicketBookingHistoryController::class, 'managerBookingDetails'])->name('admin.tickit-booking-history.show');
     Route::resource('store-managers', StoreManagerController::class)->names('admin.store-managers');

@@ -18,37 +18,37 @@ class OurTemplesContoller extends Controller
         return view('frontend.our-temples.index', compact('temples'));
     }
 
-   public function show(Temple $temple)
-{
-    abort_if($temple->status != 1, 404);
+    public function show(Temple $temple)
+    {
+        abort_if($temple->status != 1, 404);
 
-    $temple->load([
-        'state',
-        'district',
-        'city',
-        'pujas' => function ($query) {
-            $query->where('status', 1)
-                ->with('creator:id,name')
-                ->latest();
-        }
-    ]);
-
-    $ticketPrices = TicketPrice::where('temple_id', $temple->id)
-        ->where('status', 1)
-        ->get([
-            'id',
-            'temple_id',
-            'ticket_type',
-            'type',
-            'min_age',
-            'max_age',
-            'price',
-            'status'
+        $temple->load([
+            'state',
+            'district',
+            'city',
+            'pujas' => function ($query) {
+                $query->where('status', 1)
+                    ->with('creator:id,name')
+                    ->latest();
+            }
         ]);
 
-    return view('frontend.our-temples.show', compact(
-        'temple',
-        'ticketPrices'
-    ));
-}
+        $ticketPrices = TicketPrice::where('temple_id', $temple->id)
+            ->where('status', 1)
+            ->get([
+                'id',
+                'temple_id',
+                'ticket_type',
+                'type',
+                'min_age',
+                'max_age',
+                'price',
+                'status'
+            ]);
+
+        return view('frontend.our-temples.show', compact(
+            'temple',
+            'ticketPrices'
+        ));
+    }
 }

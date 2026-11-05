@@ -733,9 +733,15 @@
 
                             <ul class="dropdown-menu">
                                 @can('my-tickit-booking.index')
-                                <li class="{{ request()->routeIs('admin.my-tickit-booking*') ? 'active' : '' }}">
+                                <li class="{{ request()->routeIs('admin.my-tickit-booking') ? 'active' : '' }}">
                                     <a class="nav-link" href="{{ route('admin.my-tickit-booking') }}">
-                                        My Tickets
+                                        Confirm
+                                    </a>
+                                </li>
+
+                                <li class="{{ request()->routeIs('admin.my-tickit-booking.cancelled') ? 'active' : '' }}">
+                                    <a class="nav-link" href="{{ route('admin.my-tickit-booking.cancelled') }}">
+                                        Cancelled
                                     </a>
                                 </li>
                                 @endcan
