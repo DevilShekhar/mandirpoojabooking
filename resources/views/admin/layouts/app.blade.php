@@ -738,6 +738,8 @@
                                         Confirm
                                     </a>
                                 </li>
+                                @endcan
+                                @can('my-tickit-booking.cancel')
 
                                 <li class="{{ request()->routeIs('admin.my-tickit-booking.cancelled') ? 'active' : '' }}">
                                     <a class="nav-link" href="{{ route('admin.my-tickit-booking.cancelled') }}">

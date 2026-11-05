@@ -64,37 +64,58 @@ class TicketBookingHistoryController extends Controller
     }
     public function cancelledBookings(Request $request)
     {
+        $user = Auth::user();
+
+        if (!$user) {
+            abort(403, 'You are not authorized to view these bookings.');
+        }
+
+        $isAdmin = $user->hasRole('Admin');
+        $isSuperAdmin = $user->hasRole('Super Admin');
+        $isCustomer = $user->hasRole('Customer');
+
+        if (!$isAdmin && !$isSuperAdmin && !$isCustomer) {
+            abort(403, 'You are not authorized to view these bookings.');
+        }
+
         $query = DB::table('ticket_bookings')
             ->join('temples', 'temples.id', '=', 'ticket_bookings.temple_id')
-            ->where('ticket_bookings.user_id', Auth::id())
             ->where('ticket_bookings.booking_status', 'cancelled')
             ->whereIn('ticket_bookings.payment_status', [
                 'paid',
                 'refunded',
                 'partially_refunded'
-            ])
-            ->select(
-                'ticket_bookings.razorpay_order_id',
-                'ticket_bookings.user_id',
-                'ticket_bookings.temple_id',
-                'ticket_bookings.booking_date',
-                'ticket_bookings.payment_status',
-                'ticket_bookings.booking_status',
-                'temples.name as temple_name',
-                DB::raw('MIN(ticket_bookings.booking_reference) AS booking_reference'),
-                DB::raw('COUNT(ticket_bookings.id) AS total_members'),
-                DB::raw('SUM(ticket_bookings.price) AS total_amount'),
-                DB::raw('MAX(ticket_bookings.id) AS latest_id')
-            )
-            ->groupBy(
-                'ticket_bookings.razorpay_order_id',
-                'ticket_bookings.user_id',
-                'ticket_bookings.temple_id',
-                'ticket_bookings.booking_date',
-                'ticket_bookings.payment_status',
-                'ticket_bookings.booking_status',
-                'temples.name'
-            );
+            ]);
+
+        // Customer: show only their own cancelled bookings
+        if ($isCustomer) {
+            $query->where('ticket_bookings.user_id', $user->id);
+        }
+
+        // Admin and Super Admin: show all customers' cancelled bookings
+
+        $query->select(
+            'ticket_bookings.razorpay_order_id',
+            'ticket_bookings.user_id',
+            'ticket_bookings.temple_id',
+            'ticket_bookings.booking_date',
+            'ticket_bookings.payment_status',
+            'ticket_bookings.booking_status',
+            'temples.name as temple_name',
+            DB::raw('MIN(ticket_bookings.booking_reference) AS booking_reference'),
+            DB::raw('COUNT(ticket_bookings.id) AS total_members'),
+            DB::raw('SUM(ticket_bookings.price) AS total_amount'),
+            DB::raw('MAX(ticket_bookings.id) AS latest_id')
+        )
+        ->groupBy(
+            'ticket_bookings.razorpay_order_id',
+            'ticket_bookings.user_id',
+            'ticket_bookings.temple_id',
+            'ticket_bookings.booking_date',
+            'ticket_bookings.payment_status',
+            'ticket_bookings.booking_status',
+            'temples.name'
+        );
 
         if ($request->filled('search')) {
             $search = trim($request->search);
@@ -106,7 +127,8 @@ class TicketBookingHistoryController extends Controller
             });
         }
 
-        $bookings = $query->orderByDesc('latest_id')
+        $bookings = $query
+            ->orderByDesc('latest_id')
             ->paginate(10)
             ->withQueryString();
 

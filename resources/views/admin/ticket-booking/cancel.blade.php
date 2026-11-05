@@ -3,7 +3,7 @@
 @section('title', 'Cancelled Ticket Bookings')
 
 @section('content')
-@can('my-tickit-booking.index')
+@can('my-tickit-booking.cancel')
 <section class="section">
     <div class="section-body">
         <div class="row">

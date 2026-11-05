@@ -240,7 +240,8 @@ class PermissionSeeder extends Seeder
             'reports-event.index',
             'reports-store.index',
             'samgri-otp.show',
-            'reports-ticket.index'
+            'reports-ticket.index',
+            'my-tickit-booking.cancel'
         ];
         foreach ($permissions as $permission) {
             Permission::firstOrCreate([
