@@ -614,10 +614,25 @@
                             </li>
                         @endcanany
                         @can('puja-bookings-my.view')
-                            <li class="{{ request()->routeIs('puja-bookings.*', 'booking-puja-order.*') ? 'active' : '' }}">
-                                <a class="nav-link" href="{{ route('booking-puja-order.index') }}">
-                                   <i data-feather="shopping-cart"></i>  Mandir Puja Booking
+                            <li class="{{ request()->routeIs('booking-puja-order.*', 'puja-bookings.*', 'customer-cancel-booking.*') ? 'active' : '' }}">
+                                <a href="javascript:void(0);" class="nav-link has-dropdown">
+                                    <i data-feather="shopping-cart"></i>
+                                    <span>Mandir Puja Booking</span>
                                 </a>
+                                <ul class="dropdown-menu">
+                                    <li class="{{ request()->routeIs('booking-puja-order.index') ? 'active' : '' }}">
+                                        <a class="nav-link" href="{{ route('booking-puja-order.index') }}">
+                                            Confirmed
+                                        </a>
+                                    </li>
+                                    @can('my-cancelled-order.view')
+                                        <li class="{{ request()->routeIs('customer-cancel-booking.*') ? 'active' : '' }}">
+                                            <a class="nav-link" href="{{ route('customer-cancel-booking.index') }}">
+                                                Cancelled
+                                            </a>
+                                        </li>
+                                    @endcan
+                                </ul>
                             </li>
                         @endcan
                         @can('view-event-bookings')
@@ -654,7 +669,7 @@
                             <li class="dropdown {{ request()->routeIs('booking-puja-order.*') ? 'active' : '' }}">
                                 <a href="#" class="menu-toggle nav-link has-dropdown">
                                     <i data-feather="shopping-cart"></i>
-                                    <span>Booking Puja Order</span>
+                                    <span>Mandir Puja Order</span>
                                 </a>
                                 <ul class="dropdown-menu">
                                     <li class="{{ request()->routeIs('booking-puja-order.successful') ? 'active' : '' }}">
@@ -679,24 +694,8 @@
                                     </li>
                                 </ul>
                             </li>
-                        @endcan
+                        @endcan                     
                         
-                        @can('customer-cancellled-bookings-order.view')
-                            <li class="{{ request()->routeIs('customer-cancel-booking.*') ? 'active' : '' }}">
-                                <a class="nav-link" href="{{ route('customer-cancel-booking.index') }}">
-                                    <i data-feather="rotate-ccw"></i>
-                                    <span>Customer Cancellation </span>
-                                </a>
-                            </li>
-                        @endcan
-                        @can('my-cancelled-order.view')
-                            <li class="{{ request()->routeIs('customer-cancel-booking.*') ? 'active' : '' }}">
-                                <a class="nav-link" href="{{ route('customer-cancel-booking.index') }}">
-                                    <i data-feather="x-circle"></i>
-                                    <span>My Cancelled Orders</span>
-                                </a>
-                            </li>
-                        @endcan
                         @can('ticket-prices.index')
                             <li class="{{ request()->routeIs('ticket-prices.*') ? 'active' : '' }}">
                                 <a href="{{ route('ticket-prices.index') }}" class="nav-link">
