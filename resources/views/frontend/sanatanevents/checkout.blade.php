@@ -496,11 +496,11 @@ $creatorName = $creatorNames[$sanatan->created_by] ?? 'Sanatan Team';
     <div class="container">
         <div class="se-checkout-header">
             <div>
-                <div class="se-eyebrow"><i class="fas fa-om"></i> Sanatan Events</div>
+                <div class="se-eyebrow"><i class="fa fa-om"></i> Sanatan Events</div>
                 <h1 class="se-title">Checkout</h1>
                 <p class="se-subtitle">Review your booking and select your preferred payment method.</p>
             </div>
-            <div class="se-secure"><i class="fas fa-shield-alt"></i> Secure checkout</div>
+            <div class="se-secure"><i class="fa fa-shield-alt"></i> Secure checkout</div>
         </div>
         @if ($errors->any())
         <div class="alert alert-danger se-alert mb-4">
@@ -522,19 +522,19 @@ $creatorName = $creatorNames[$sanatan->created_by] ?? 'Sanatan Team';
             <div class="col-lg-7">
                 <div class="se-panel">
                     <div class="se-panel-header">
-                        <h2 class="se-panel-title"><span class="se-panel-icon"><i
-                                    class="fas fa-calendar-check"></i></span> Selected event</h2>
+                        <h2 class="se-panel-title"><span class="se-panel-icon">
+                            <i class="fa fa-calendar" aria-hidden="true"></i></span> Selected event</h2>
                     </div>
                     <div class="se-panel-body">
                         <div class="se-event-cover">
                             @if ($imageUrl)
                             <img src="{{ $imageUrl }}" alt="{{ $eventName }}" class="se-event-image"
                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                            <div class="se-event-placeholder" style="display:none;"><i class="fas fa-om"></i></div>
+                            <div class="se-event-placeholder" style="display:none;"><i class="fa fa-om"></i></div>
                             @else
-                            <div class="se-event-placeholder"><i class="fas fa-om"></i></div>
+                            <div class="se-event-placeholder"><i class="fa fa-om"></i></div>
                             @endif
-                            <span class="se-event-badge"><i class="fas fa-check-circle"></i> Your selection</span>
+                            <span class="se-event-badge"><i class="fa fa-check-circle"></i> Your selection</span>
                         </div>
                         <h3 class="se-event-name">{{ $eventName }}</h3>
                         <p class="se-event-description">
@@ -563,7 +563,7 @@ $creatorName = $creatorNames[$sanatan->created_by] ?? 'Sanatan Team';
                 </div>
                 <div class="se-panel">
                     <div class="se-panel-header">
-                        <h2 class="se-panel-title"><span class="se-panel-icon"><i class="fas fa-user"></i></span>
+                        <h2 class="se-panel-title"><span class="se-panel-icon"><i class="fa fa-user"></i></span>
                             Customer details</h2>
                     </div>
                     <div class="se-panel-body">
@@ -571,21 +571,21 @@ $creatorName = $creatorNames[$sanatan->created_by] ?? 'Sanatan Team';
                             <div>
                                 <label class="se-field-label">Full name</label>
                                 <div class="se-field-value"><i
-                                        class="fas fa-user"></i>{{ $user->name ?? 'Not available' }}</div>
+                                        class="fa fa-user"></i>{{ $user->name ?? 'Not available' }}</div>
                             </div>
                             <div>
                                 <label class="se-field-label">Email address</label>
                                 <div class="se-field-value"><i
-                                        class="fas fa-envelope"></i>{{ $user->email ?? 'Not available' }}</div>
+                                        class="fa fa-envelope"></i>{{ $user->email ?? 'Not available' }}</div>
                             </div>
                             @if (!empty($user->phone))
                             <div>
                                 <label class="se-field-label">Phone number</label>
-                                <div class="se-field-value"><i class="fas fa-phone-alt"></i>{{ $user->phone }}</div>
+                                <div class="se-field-value"><i class="fa fa-phone" aria-hidden="true"></i>{{ $user->phone }}</div>
                             </div>
                             @endif
                         </div>
-                        <p class="se-note"><i class="fas fa-info-circle me-1"></i> Customer information is taken from
+                        <p class="se-note"><i class="fa fa-info-circle me-1"></i> Customer information is taken from
                             your account profile.</p>
                     </div>
                 </div>
@@ -593,7 +593,7 @@ $creatorName = $creatorNames[$sanatan->created_by] ?? 'Sanatan Team';
             <div class="col-lg-5">
                 <aside class="se-panel se-summary">
                     <div class="se-panel-header">
-                        <h2 class="se-panel-title"><span class="se-panel-icon"><i class="fas fa-receipt"></i></span>
+                        <h2 class="se-panel-title"><span class="se-panel-icon"><i class="fa fa-shopping-cart" aria-hidden="true"></i></span>
                             Order summary</h2>
                     </div>
                     <div class="se-panel-body">
@@ -601,9 +601,9 @@ $creatorName = $creatorNames[$sanatan->created_by] ?? 'Sanatan Team';
                             @if ($imageUrl)
                             <img src="{{ $imageUrl }}" alt="{{ $eventName }}" class="se-thumb"
                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                            <div class="se-thumb-placeholder" style="display:none;"><i class="fas fa-om"></i></div>
+                            <div class="se-thumb-placeholder" style="display:none;"><i class="fa fa-om"></i></div>
                             @else
-                            <div class="se-thumb-placeholder"><i class="fas fa-om"></i></div>
+                            <div class="se-thumb-placeholder"><i class="fa fa-om"></i></div>
                             @endif
                             <div>
                                 <p class="se-summary-name">{{ $eventName }}</p>
@@ -631,7 +631,7 @@ $creatorName = $creatorNames[$sanatan->created_by] ?? 'Sanatan Team';
                         <p class="se-price-note">Review the event and total amount, then confirm your selected payment
                             method.</p>
                         <button type="button" class="se-primary-btn mt-3" id="confirm-booking-btn">
-                            Confirm booking <i class="fas fa-arrow-right"></i>
+                            Confirm booking <i class="fa fa-arrow-right"></i>
                         </button>
                     </div>
                 </aside>
@@ -651,7 +651,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const verifyUrl = @json(route('frontend.sanatanevents.payment.verify'));
     function resetButton() {
         button.disabled = false;
-        button.innerHTML = 'Confirm booking <i class="fas fa-arrow-right"></i>';
+        button.innerHTML = 'Confirm booking <i class="fa fa-arrow-right"></i>';
     }
     button.addEventListener('click', async function () {
         if (!dateInput.value || !timeInput.value) {
