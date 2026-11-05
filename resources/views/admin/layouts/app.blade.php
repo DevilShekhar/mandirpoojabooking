@@ -648,10 +648,22 @@
                                             All Bookings
                                         </a>
                                     </li>
+                                    <li class="{{ request()->routeIs('customer.sanatan-event-bookings.confirmed') ? 'active' : '' }}">
+                                        <a href="{{ route('customer.sanatan-event-bookings.confirmed') }}">
+                                            <i data-feather="check-square"></i>
+                                            Confirmed Bookings
+                                        </a>
+                                    </li>
                                     <li class="{{ request()->routeIs('customer.sanatan-event-bookings.completed') ? 'active' : '' }}">
                                         <a href="{{ route('customer.sanatan-event-bookings.completed') }}">
                                             <i data-feather="check-circle"></i>
                                             Completed Bookings
+                                        </a>
+                                    </li>
+                                     <li class="{{ request()->routeIs('customer.sanatan-event-bookings.cancelled') ? 'active' : '' }}">
+                                        <a href="{{ route('customer.sanatan-event-bookings.cancelled') }}">
+                                            <i data-feather="x-circle"></i>
+                                            Cancelled Bookings
                                         </a>
                                     </li>
                                 </ul>
