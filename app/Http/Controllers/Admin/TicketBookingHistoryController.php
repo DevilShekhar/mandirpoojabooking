@@ -183,10 +183,39 @@ class TicketBookingHistoryController extends Controller
             abort(403, 'You do not have permission to view ticket booking details.');
         }
 
-        $bookings = TicketBooking::with('temple')
-            ->where('razorpay_order_id', $orderId)
-            ->whereIn('payment_status', ['paid', 'refunded', 'partially_refunded'])
-            ->whereIn('booking_status', ['confirmed', 'cancel_requested', 'cancelled'])
+        $bookingQuery = TicketBooking::with('temple')
+            ->where('razorpay_order_id', $orderId);
+
+        if ($user->hasRole('Admin') || $user->hasRole('Super Admin')) {
+            // Admin and Super Admin can view all bookings.
+        } elseif ($user->hasRole('Temple Manager')) {
+
+            $templeIds = DB::table('temple_user')
+                ->where('user_id', $user->id)
+                ->where('approval_status', 'approved')
+                ->pluck('temple_id');
+
+            $bookingQuery->whereIn('temple_id', $templeIds);
+
+        } elseif ($user->hasRole('Customer')) {
+
+            $bookingQuery->where('user_id', $user->id);
+
+        } else {
+            abort(403, 'You do not have permission to view ticket booking details.');
+        }
+
+        $bookingQuery->whereIn('payment_status', [
+            'paid',
+            'refunded',
+            'partially_refunded'
+        ])->whereIn('booking_status', [
+            'confirmed',
+            'cancel_requested',
+            'cancelled'
+        ]);
+
+        $bookings = (clone $bookingQuery)
             ->orderBy('id')
             ->get();
 
@@ -202,7 +231,11 @@ class TicketBookingHistoryController extends Controller
 
         $existingCancellation = DB::table('ticket_booking_cancellations')
             ->where('razorpay_order_id', $orderId)
-            ->whereIn('cancellation_status', ['pending', 'approved', 'cancelled'])
+            ->whereIn('cancellation_status', [
+                'pending',
+                'approved',
+                'cancelled'
+            ])
             ->latest('id')
             ->first();
 
@@ -216,42 +249,50 @@ class TicketBookingHistoryController extends Controller
                     config('services.razorpay.key'),
                     config('services.razorpay.secret')
                 );
+
                 $refund = $api->refund->fetch(
                     $existingCancellation->razorpay_refund_id
                 );
+
                 $latestRefundStatus = strtolower(
                     (string) ($refund['status'] ?? $existingCancellation->refund_status)
                 );
+
                 $refundUpdates = [
                     'refund_status' => $latestRefundStatus,
                     'updated_at' => now(),
                 ];
+
                 if (
                     $latestRefundStatus === 'processed' &&
                     Schema::hasColumn('ticket_booking_cancellations', 'refunded_at')
                 ) {
                     $refundUpdates['refunded_at'] = now();
                 }
+
                 DB::table('ticket_booking_cancellations')
                     ->where('id', $existingCancellation->id)
                     ->update($refundUpdates);
+
                 $existingCancellation = DB::table('ticket_booking_cancellations')
                     ->where('id', $existingCancellation->id)
                     ->first();
+
                 if ($latestRefundStatus === 'processed') {
-                    TicketBooking::where('razorpay_order_id', $orderId)
-                        ->update([
-                            'payment_status' => (float) $existingCancellation->refund_amount >= $totalAmount
-                                ? 'refunded'
-                                : 'partially_refunded',
-                            'updated_at' => now(),
-                        ]);
-                    $bookings = TicketBooking::with('temple')
-                        ->where('razorpay_order_id', $orderId)
+
+                    (clone $bookingQuery)->update([
+                        'payment_status' => (float) $existingCancellation->refund_amount >= $totalAmount
+                            ? 'refunded'
+                            : 'partially_refunded',
+                        'updated_at' => now(),
+                    ]);
+
+                    $bookings = (clone $bookingQuery)
                         ->where('booking_status', 'cancelled')
                         ->orderBy('id')
                         ->get();
                 }
+
             } catch (Throwable $e) {
                 Log::warning('Unable to refresh ticket booking Razorpay refund status.', [
                     'order_id' => $orderId,
@@ -272,6 +313,7 @@ class TicketBookingHistoryController extends Controller
             'canCancel'
         ));
     }
+
     public function managerHistory(Request $request)
     {
         $user = Auth::user();
