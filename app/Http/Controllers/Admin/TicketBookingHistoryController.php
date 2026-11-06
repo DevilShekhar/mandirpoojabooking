@@ -30,29 +30,48 @@ class TicketBookingHistoryController extends Controller
 
         $query = DB::table('ticket_bookings')
             ->join('temples', 'temples.id', '=', 'ticket_bookings.temple_id')
-            ->where('ticket_bookings.booking_status', 'confirmed')
-            ->select(
-                'ticket_bookings.razorpay_order_id',
-                'ticket_bookings.user_id',
-                'ticket_bookings.temple_id',
-                'ticket_bookings.booking_date',
-                'ticket_bookings.payment_status',
-                'ticket_bookings.booking_status',
-                'temples.name as temple_name',
-                DB::raw('MIN(ticket_bookings.booking_reference) AS booking_reference'),
-                DB::raw('COUNT(ticket_bookings.id) AS total_members'),
-                DB::raw('SUM(ticket_bookings.price) AS total_amount'),
-                DB::raw('MAX(ticket_bookings.id) AS latest_id')
-            )
-            ->groupBy(
-                'ticket_bookings.razorpay_order_id',
-                'ticket_bookings.user_id',
-                'ticket_bookings.temple_id',
-                'ticket_bookings.booking_date',
-                'ticket_bookings.payment_status',
-                'ticket_bookings.booking_status',
-                'temples.name'
-            );
+            ->where('ticket_bookings.booking_status', 'confirmed');
+
+        if ($user->hasRole('Admin') || $user->hasRole('Super Admin')) {
+            // Admin and Super Admin can view all confirmed bookings.
+        } elseif ($user->hasRole('Temple Manager')) {
+
+            $templeIds = DB::table('temple_user')
+                ->where('user_id', $user->id)
+                ->where('approval_status', 'approved')
+                ->pluck('temple_id');
+
+            $query->whereIn('ticket_bookings.temple_id', $templeIds);
+
+        } elseif ($user->hasRole('Customer')) {
+
+            $query->where('ticket_bookings.user_id', $user->id);
+
+        } else {
+            abort(403, 'You do not have permission to view ticket bookings.');
+        }
+
+        $query->select(
+            'ticket_bookings.razorpay_order_id',
+            'ticket_bookings.user_id',
+            'ticket_bookings.temple_id',
+            'ticket_bookings.booking_date',
+            'ticket_bookings.payment_status',
+            'ticket_bookings.booking_status',
+            'temples.name as temple_name',
+            DB::raw('MIN(ticket_bookings.booking_reference) AS booking_reference'),
+            DB::raw('COUNT(ticket_bookings.id) AS total_members'),
+            DB::raw('SUM(ticket_bookings.price) AS total_amount'),
+            DB::raw('MAX(ticket_bookings.id) AS latest_id')
+        )->groupBy(
+            'ticket_bookings.razorpay_order_id',
+            'ticket_bookings.user_id',
+            'ticket_bookings.temple_id',
+            'ticket_bookings.booking_date',
+            'ticket_bookings.payment_status',
+            'ticket_bookings.booking_status',
+            'temples.name'
+        );
 
         if ($request->filled('search')) {
             $search = trim($request->search);
@@ -71,27 +90,48 @@ class TicketBookingHistoryController extends Controller
 
         return view('admin.ticket-booking.my-index', compact('bookings'));
     }
-public function cancelledBookings(Request $request)
-{
-    $user = Auth::user();
 
-    if (!$user) {
-        abort(403, 'You are not authorized to view these bookings.');
-    }
+    public function cancelledBookings(Request $request)
+    {
+        $user = Auth::user();
 
-    if (!$user->can('all-tickit-booking.index')) {
-        abort(403, 'You do not have permission to view cancelled bookings.');
-    }
+        if (!$user) {
+            abort(403, 'You are not authorized to view these bookings.');
+        }
 
-    $query = DB::table('ticket_bookings')
-        ->join('temples', 'temples.id', '=', 'ticket_bookings.temple_id')
-        ->where('ticket_bookings.booking_status', 'cancelled')
-        ->whereIn('ticket_bookings.payment_status', [
-            'paid',
-            'refunded',
-            'partially_refunded'
-        ])
-        ->select(
+        if (!$user->can('all-tickit-booking.index')) {
+            abort(403, 'You do not have permission to view cancelled bookings.');
+        }
+
+        $query = DB::table('ticket_bookings')
+            ->join('temples', 'temples.id', '=', 'ticket_bookings.temple_id')
+            ->where('ticket_bookings.booking_status', 'cancelled')
+            ->whereIn('ticket_bookings.payment_status', [
+                'paid',
+                'refunded',
+                'partially_refunded'
+            ]);
+
+        if ($user->hasRole('Admin') || $user->hasRole('Super Admin')) {
+            // View all cancelled bookings.
+        } elseif ($user->hasRole('Temple Manager')) {
+
+            $templeIds = DB::table('temple_user')
+                ->where('user_id', $user->id)
+                ->where('approval_status', 'approved')
+                ->pluck('temple_id');
+
+            $query->whereIn('ticket_bookings.temple_id', $templeIds);
+
+        } elseif ($user->hasRole('Customer')) {
+
+            $query->where('ticket_bookings.user_id', $user->id);
+
+        } else {
+            abort(403, 'You do not have permission to view cancelled bookings.');
+        }
+
+        $query->select(
             'ticket_bookings.razorpay_order_id',
             'ticket_bookings.user_id',
             'ticket_bookings.temple_id',
@@ -103,8 +143,7 @@ public function cancelledBookings(Request $request)
             DB::raw('COUNT(ticket_bookings.id) AS total_members'),
             DB::raw('SUM(ticket_bookings.price) AS total_amount'),
             DB::raw('MAX(ticket_bookings.id) AS latest_id')
-        )
-        ->groupBy(
+        )->groupBy(
             'ticket_bookings.razorpay_order_id',
             'ticket_bookings.user_id',
             'ticket_bookings.temple_id',
@@ -114,23 +153,24 @@ public function cancelledBookings(Request $request)
             'temples.name'
         );
 
-    if ($request->filled('search')) {
-        $search = trim($request->search);
+        if ($request->filled('search')) {
+            $search = trim($request->search);
 
-        $query->where(function ($q) use ($search) {
-            $q->where('temples.name', 'like', "%{$search}%")
-                ->orWhere('ticket_bookings.razorpay_order_id', 'like', "%{$search}%")
-                ->orWhere('ticket_bookings.booking_reference', 'like', "%{$search}%");
-        });
+            $query->where(function ($q) use ($search) {
+                $q->where('temples.name', 'like', "%{$search}%")
+                    ->orWhere('ticket_bookings.razorpay_order_id', 'like', "%{$search}%")
+                    ->orWhere('ticket_bookings.booking_reference', 'like', "%{$search}%");
+            });
+        }
+
+        $bookings = $query
+            ->orderByDesc('latest_id')
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('admin.ticket-booking.cancel', compact('bookings'));
     }
 
-    $bookings = $query
-        ->orderByDesc('latest_id')
-        ->paginate(10)
-        ->withQueryString();
-
-    return view('admin.ticket-booking.cancel', compact('bookings'));
-}
     public function myBookingDetails(string $orderId)
     {
         $user = Auth::user();
