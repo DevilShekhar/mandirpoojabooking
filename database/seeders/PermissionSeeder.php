@@ -114,20 +114,6 @@ class PermissionSeeder extends Seeder
             'puja-schedules.index',
             'puja-schedules.delete',
 
-            // Festivals
-            'festivals.view',
-            'festivals.create',
-            'festivals.edit',
-            'festivals.index',
-            'festivals.delete',
-
-            // Festival Pujas
-            'festival-pujas.view',
-            'festival-pujas.create',
-            'festival-pujas.edit',
-            'festival-pujas.index',
-            'festival-pujas.delete',
-
             // Pandits
             'pandits.view',
             'pandits.create',
