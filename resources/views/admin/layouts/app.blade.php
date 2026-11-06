@@ -748,7 +748,7 @@
                                 </li>
                                 @endcan
 
-                                @can('all-tickit-booking.view')
+                                @can('all-tickit-booking-history.index')
                                 <li class="{{ request()->routeIs('admin.tickit-booking-history*') ? 'active' : '' }}">
                                     <a class="nav-link" href="{{ route('admin.tickit-booking-history') }}">
                                         All Booking History

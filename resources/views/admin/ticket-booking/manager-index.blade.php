@@ -1,7 +1,7 @@
 @extends('admin.layouts.app')
 @section('title', 'Ticket Booking History')
 @section('content')
-    @can('all-tickit-booking.index')
+    @can('all-tickit-booking-history.index')
         <section class="section">
             <div class="section-body">
                 <div class="row">
