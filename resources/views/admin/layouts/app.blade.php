@@ -335,6 +335,14 @@
                                             </a>
                                         </li>
                                     @endcan
+                                    @can('daily-to-yearly-booking-revenue')
+                                        <li class="{{ request()->routeIs('reports.booking-period.*') ? 'active' : '' }}">
+                                            <a href="{{ route('reports.booking-period.index') }}">
+                                                <i data-feather="calendar"></i>
+                                                Booking Period Report
+                                            </a>
+                                        </li>
+                                    @endcan
                                 </ul>
                             </li>
                         @endcan
