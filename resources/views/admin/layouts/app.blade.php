@@ -319,6 +319,14 @@
                                         </a>
                                     </li>
                                     @endcan
+                                    @can('reports.temple-wise-revenue')
+                                    <li class="{{ request()->routeIs('reports.temple-wise-revenue.*') ? 'active' : '' }}">
+                                        <a href="{{ route('reports.temple-wise-revenue.index') }}">
+                                            <i data-feather="home"></i>
+                                            Temple-wise Revenue
+                                        </a>
+                                    </li>
+                                    @endcan
                                 </ul>
                             </li>
                         @endcan
