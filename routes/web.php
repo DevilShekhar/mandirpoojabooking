@@ -58,6 +58,7 @@ use App\Http\Controllers\Admin\MandirPujaPanditReportController;
 use App\Http\Controllers\Admin\EventBookingCompletedReportController;
 use App\Http\Controllers\Admin\StoreManagerCompletedReportController;
 use App\Http\Controllers\Admin\TicketBookingTempleReportController;
+use App\Http\Controllers\Admin\OverallBusinessPerformanceReportController;
 
 Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
 Route::get('our-temples', [OurTemplesContoller::class, 'index'])->name('frontend.our-temples');
@@ -238,6 +239,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/ticket-booking-temple-reports/export/pdf', [TicketBookingTempleReportController::class, 'exportPdf'])->name('ticket-booking-temple-reports.pdf');
         Route::get('/ticket-booking-temple-reports/export/csv', [TicketBookingTempleReportController::class, 'exportCsv'])->name('ticket-booking-temple-reports.csv');
         Route::get('/ticket-booking-temple-reports/export/excel', [TicketBookingTempleReportController::class, 'exportExcel'])->name('ticket-booking-temple-reports.excel');
+        // Overall Business Performance Report
+        Route::get('/overall-business-performance',[OverallBusinessPerformanceReportController::class, 'index'])->name('overall-business-performance.index');
+        Route::get('/overall-business-performance/export/pdf',[OverallBusinessPerformanceReportController::class, 'exportPdf'])->name('overall-business-performance.pdf');
+        Route::get('/overall-business-performance/export/excel',[OverallBusinessPerformanceReportController::class, 'exportExcel'])->name('overall-business-performance.excel');
+        Route::get('/overall-business-performance/export/csv',[OverallBusinessPerformanceReportController::class, 'exportCsv'])->name('overall-business-performance.csv');
     });
 });
 Route::middleware('auth')->prefix('payment/razorpay')->name('razorpay.')->group(function () {

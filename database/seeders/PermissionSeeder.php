@@ -228,7 +228,8 @@ class PermissionSeeder extends Seeder
             'samgri-otp.show',
             'reports-ticket.index',
             'my-tickit-booking.cancel',
-            'all-tickit-booking-history.index'
+            'all-tickit-booking-history.index',
+            'reports.overall-business'
         ];
         foreach ($permissions as $permission) {
             Permission::firstOrCreate([

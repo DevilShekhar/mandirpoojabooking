@@ -303,7 +303,14 @@
                                             Ticket Booking Temple
                                         </a>
                                     </li>
-
+                                    @can('reports.overall-business')
+                                    <li class="{{ request()->routeIs('reports.overall-business-performance.*') ? 'active' : '' }}">
+                                        <a href="{{ route('reports.overall-business-performance.index') }}">
+                                            <i data-feather="trending-up"></i>
+                                            Overall Business 
+                                        </a>
+                                    </li>
+                                    @endcan
                                 </ul>
                             </li>
                         @endcan
