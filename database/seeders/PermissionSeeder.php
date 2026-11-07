@@ -231,7 +231,8 @@ class PermissionSeeder extends Seeder
             'all-tickit-booking-history.index',
             'reports.overall-business',
             'reports.daily-to-yearly-revenue',
-            'reports.temple-wise-revenue'
+            'reports.temple-wise-revenue',
+            'reports.booking-summary'
         ];
         foreach ($permissions as $permission) {
             Permission::firstOrCreate([

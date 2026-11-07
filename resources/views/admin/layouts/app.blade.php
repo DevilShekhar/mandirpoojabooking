@@ -327,6 +327,14 @@
                                         </a>
                                     </li>
                                     @endcan
+                                    @can('reports.booking-summary')
+                                        <li class="{{ request()->routeIs('reports.booking-summary.*') ? 'active' : '' }}">
+                                            <a href="{{ route('reports.booking-summary.index') }}">
+                                                <i data-feather="clipboard"></i>
+                                                Booking Summary
+                                            </a>
+                                        </li>
+                                    @endcan
                                 </ul>
                             </li>
                         @endcan
