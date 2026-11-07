@@ -62,6 +62,7 @@ use App\Http\Controllers\Admin\OverallBusinessPerformanceReportController;
 use App\Http\Controllers\Admin\DailyWeeklyMonthlyYearlyRevenueReportController;
 use App\Http\Controllers\Admin\TempleWiseRevenueReportController;
 use App\Http\Controllers\Admin\BookingSummaryReportController;
+use App\Http\Controllers\Admin\DailyWeeklyMonthlyYearlyBookingReportController;
 
 Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
 Route::get('our-temples', [OurTemplesContoller::class, 'index'])->name('frontend.our-temples');
@@ -259,6 +260,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/booking-summary/export/pdf', [BookingSummaryReportController::class, 'exportPdf'])->name('booking-summary.pdf');
         Route::get('/booking-summary/export/excel', [BookingSummaryReportController::class, 'exportExcel'])->name('booking-summary.excel');
         Route::get('/booking-summary/export/csv', [BookingSummaryReportController::class, 'exportCsv'])->name('booking-summary.csv');
+        Route::get('/booking-period', [DailyWeeklyMonthlyYearlyBookingReportController::class, 'index'])->name('booking-period.index');
+        Route::get('/booking-period/export/pdf', [DailyWeeklyMonthlyYearlyBookingReportController::class, 'exportPdf'])->name('booking-period.pdf');
+        Route::get('/booking-period/export/excel', [DailyWeeklyMonthlyYearlyBookingReportController::class, 'exportExcel'])->name('booking-period.excel');
+        Route::get('/booking-period/export/csv', [DailyWeeklyMonthlyYearlyBookingReportController::class, 'exportCsv'])->name('booking-period.csv');
     });
 });
 Route::middleware('auth')->prefix('payment/razorpay')->name('razorpay.')->group(function () {
