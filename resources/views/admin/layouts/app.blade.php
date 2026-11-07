@@ -311,6 +311,14 @@
                                         </a>
                                     </li>
                                     @endcan
+                                    @can('reports.daily-to-yearly-revenue')
+                                    <li class="{{ request()->routeIs('reports.revenue-period.*') ? 'active' : '' }}">
+                                        <a href="{{ route('reports.revenue-period.index') }}">
+                                            <i data-feather="bar-chart-2"></i>
+                                            Revenue Report
+                                        </a>
+                                    </li>
+                                    @endcan
                                 </ul>
                             </li>
                         @endcan

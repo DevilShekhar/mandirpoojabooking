@@ -229,7 +229,8 @@ class PermissionSeeder extends Seeder
             'reports-ticket.index',
             'my-tickit-booking.cancel',
             'all-tickit-booking-history.index',
-            'reports.overall-business'
+            'reports.overall-business',
+            'reports.daily-to-yearly-revenue'
         ];
         foreach ($permissions as $permission) {
             Permission::firstOrCreate([
