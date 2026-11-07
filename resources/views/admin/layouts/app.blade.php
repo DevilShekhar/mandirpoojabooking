@@ -335,13 +335,21 @@
                                             </a>
                                         </li>
                                     @endcan
-                                    @can('daily-to-yearly-booking-revenue')
+                                    @can('reports.daily-to-yearly-booking-revenue')
                                         <li class="{{ request()->routeIs('reports.booking-period.*') ? 'active' : '' }}">
                                             <a href="{{ route('reports.booking-period.index') }}">
                                                 <i data-feather="calendar"></i>
                                                 Booking Period Report
                                             </a>
                                         </li>
+                                    @endcan
+                                    @can('reports.service-wise-booking')
+                                    <li class="{{ request()->routeIs('reports.service-wise-booking.*') ? 'active' : '' }}">
+                                        <a href="{{ route('reports.service-wise-booking.index') }}">
+                                            <i data-feather="list"></i>
+                                            Service-wise Booking
+                                        </a>
+                                    </li>
                                     @endcan
                                 </ul>
                             </li>
