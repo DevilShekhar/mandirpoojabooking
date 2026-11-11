@@ -64,6 +64,7 @@ use App\Http\Controllers\Admin\TempleWiseRevenueReportController;
 use App\Http\Controllers\Admin\BookingSummaryReportController;
 use App\Http\Controllers\Admin\DailyWeeklyMonthlyYearlyBookingReportController;
 use App\Http\Controllers\Admin\ServiceWiseBookingReportController;
+use App\Http\Controllers\Admin\RepeatCustomerReportController;
 
 Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
 Route::get('our-temples', [OurTemplesContoller::class, 'index'])->name('frontend.our-temples');
@@ -269,6 +270,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/service-wise-booking/export/pdf', [ServiceWiseBookingReportController::class, 'exportPdf'])->name('service-wise-booking.pdf');
         Route::get('/service-wise-booking/export/excel', [ServiceWiseBookingReportController::class, 'exportExcel'])->name('service-wise-booking.excel');
         Route::get('/service-wise-booking/export/csv', [ServiceWiseBookingReportController::class, 'exportCsv'])->name('service-wise-booking.csv');
+        Route::get('/repeat-customer', [RepeatCustomerReportController::class, 'index'])->name('repeat-customer.index');
+        Route::get('/repeat-customer/export/pdf', [RepeatCustomerReportController::class, 'exportPdf'])->name('repeat-customer.pdf');
+        Route::get('/repeat-customer/export/excel', [RepeatCustomerReportController::class, 'exportExcel'])->name('repeat-customer.excel');
+        Route::get('/repeat-customer/export/csv', [RepeatCustomerReportController::class, 'exportCsv'])->name('repeat-customer.csv');
     });
 });
 Route::middleware('auth')->prefix('payment/razorpay')->name('razorpay.')->group(function () {
