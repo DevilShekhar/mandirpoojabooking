@@ -67,6 +67,7 @@ use App\Http\Controllers\Admin\ServiceWiseBookingReportController;
 use App\Http\Controllers\Admin\RepeatCustomerReportController;
 use App\Http\Controllers\Admin\TemplePerformanceReportController;
 use App\Http\Controllers\Admin\PujariAssignmentPerformanceReportController;
+use App\Http\Controllers\Admin\PaymentTransactionReportController;
 
 Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
 Route::get('our-temples', [OurTemplesContoller::class, 'index'])->name('frontend.our-temples');
@@ -285,6 +286,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/pujari-assignment-performance/pdf',[PujariAssignmentPerformanceReportController::class, 'exportPdf'])->name('pujari-assignment-performance.pdf');
         Route::get('/pujari-assignment-performance/excel',[PujariAssignmentPerformanceReportController::class, 'exportExcel'])->name('pujari-assignment-performance.excel');
         Route::get('/pujari-assignment-performance/csv',[PujariAssignmentPerformanceReportController::class, 'exportCsv'])->name('pujari-assignment-performance.csv');
+        Route::get('/payment-transactions', [PaymentTransactionReportController::class, 'index'])->name('payment-transactions.index');
+        Route::get('/payment-transactions/pdf', [PaymentTransactionReportController::class, 'exportPdf'])->name('payment-transactions.pdf');
+        Route::get('/payment-transactions/excel', [PaymentTransactionReportController::class, 'exportExcel'])->name('payment-transactions.excel');
+        Route::get('/payment-transactions/csv', [PaymentTransactionReportController::class, 'exportCsv'])->name('payment-transactions.csv');
     });
 });
 Route::middleware('auth')->prefix('payment/razorpay')->name('razorpay.')->group(function () {
