@@ -66,6 +66,7 @@ use App\Http\Controllers\Admin\DailyWeeklyMonthlyYearlyBookingReportController;
 use App\Http\Controllers\Admin\ServiceWiseBookingReportController;
 use App\Http\Controllers\Admin\RepeatCustomerReportController;
 use App\Http\Controllers\Admin\TemplePerformanceReportController;
+use App\Http\Controllers\Admin\PujariAssignmentPerformanceReportController;
 
 Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
 Route::get('our-temples', [OurTemplesContoller::class, 'index'])->name('frontend.our-temples');
@@ -279,6 +280,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/temple-performance/export/pdf', [TemplePerformanceReportController::class, 'exportPdf'])->name('temple-performance.pdf');
         Route::get('/temple-performance/export/excel', [TemplePerformanceReportController::class, 'exportExcel'])->name('temple-performance.excel');
         Route::get('/temple-performance/export/csv', [TemplePerformanceReportController::class, 'exportCsv'])->name('temple-performance.csv');
+        Route::get('/pujari-assignment-performance/temple/{templeId}/pandits', [PujariAssignmentPerformanceReportController::class,'getTemplePanditsAjax'])->name('pujari-assignment-performance.pandits');
+        Route::get('/pujari-assignment-performance',[PujariAssignmentPerformanceReportController::class, 'index'])->name('pujari-assignment-performance.index');
+        Route::get('/pujari-assignment-performance/pdf',[PujariAssignmentPerformanceReportController::class, 'exportPdf'])->name('pujari-assignment-performance.pdf');
+        Route::get('/pujari-assignment-performance/excel',[PujariAssignmentPerformanceReportController::class, 'exportExcel'])->name('pujari-assignment-performance.excel');
+        Route::get('/pujari-assignment-performance/csv',[PujariAssignmentPerformanceReportController::class, 'exportCsv'])->name('pujari-assignment-performance.csv');
     });
 });
 Route::middleware('auth')->prefix('payment/razorpay')->name('razorpay.')->group(function () {
