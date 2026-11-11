@@ -240,7 +240,8 @@ class PermissionSeeder extends Seeder
             'reports.pujari-assignment-performance',
             'reports.payment-transactions',
             'reports.refund-financial-reconciliation',
-            'reports.state-wise-revenue'
+            'reports.state-wise-revenue',
+            'reports.city-wise-revenue'
         ];
         foreach ($permissions as $permission) {
             Permission::firstOrCreate([
