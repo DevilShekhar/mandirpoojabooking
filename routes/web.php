@@ -68,6 +68,7 @@ use App\Http\Controllers\Admin\RepeatCustomerReportController;
 use App\Http\Controllers\Admin\TemplePerformanceReportController;
 use App\Http\Controllers\Admin\PujariAssignmentPerformanceReportController;
 use App\Http\Controllers\Admin\PaymentTransactionReportController;
+use App\Http\Controllers\Admin\RefundFinancialReconciliationReportController;
 
 Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
 Route::get('our-temples', [OurTemplesContoller::class, 'index'])->name('frontend.our-temples');
@@ -290,6 +291,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/payment-transactions/pdf', [PaymentTransactionReportController::class, 'exportPdf'])->name('payment-transactions.pdf');
         Route::get('/payment-transactions/excel', [PaymentTransactionReportController::class, 'exportExcel'])->name('payment-transactions.excel');
         Route::get('/payment-transactions/csv', [PaymentTransactionReportController::class, 'exportCsv'])->name('payment-transactions.csv');
+        Route::get('/refund-financial-reconciliation', [RefundFinancialReconciliationReportController::class, 'index'])->name('refund-financial-reconciliation.index');
+        Route::get('/refund-financial-reconciliation/pdf', [RefundFinancialReconciliationReportController::class, 'exportPdf'])->name('refund-financial-reconciliation.pdf');
+        Route::get('/refund-financial-reconciliation/excel', [RefundFinancialReconciliationReportController::class, 'exportExcel'])->name('refund-financial-reconciliation.excel');
+        Route::get('/refund-financial-reconciliation/csv', [RefundFinancialReconciliationReportController::class, 'exportCsv'])->name('refund-financial-reconciliation.csv');
     });
 });
 Route::middleware('auth')->prefix('payment/razorpay')->name('razorpay.')->group(function () {

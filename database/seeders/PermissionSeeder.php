@@ -238,7 +238,8 @@ class PermissionSeeder extends Seeder
             'reports.repeat-customer',
             'reports.temple-performance',
             'reports.pujari-assignment-performance',
-            'reports.payment-transactions'
+            'reports.payment-transactions',
+            'reports.refund-financial-reconciliation'
         ];
         foreach ($permissions as $permission) {
             Permission::firstOrCreate([
