@@ -356,3 +356,8 @@
     });
 </script>
 @endpush
+@else
+    @php
+        abort(403);
+    @endphp
+@endcan

@@ -70,6 +70,7 @@ use App\Http\Controllers\Admin\PujariAssignmentPerformanceReportController;
 use App\Http\Controllers\Admin\PaymentTransactionReportController;
 use App\Http\Controllers\Admin\RefundFinancialReconciliationReportController;
 use App\Http\Controllers\Admin\StateWiseRevenueReportController;
+use App\Http\Controllers\Admin\CityWiseRevenueBookingReportController;
 
 Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
 Route::get('our-temples', [OurTemplesContoller::class, 'index'])->name('frontend.our-temples');
@@ -300,6 +301,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/state-wise-revenue/pdf', [StateWiseRevenueReportController::class, 'exportPdf'])->name('state-wise-revenue.pdf');
         Route::get('/state-wise-revenue/excel', [StateWiseRevenueReportController::class, 'exportExcel'])->name('state-wise-revenue.excel');
         Route::get('/state-wise-revenue/csv', [StateWiseRevenueReportController::class, 'exportCsv'])->name('state-wise-revenue.csv');
+        Route::get('/city-wise-revenue-booking',[CityWiseRevenueBookingReportController::class, 'index'])->name('city-wise-revenue-booking.index');
+        Route::get('/city-wise-revenue-booking/cities',[CityWiseRevenueBookingReportController::class, 'getCities'])->name('city-wise-revenue-booking.cities');
+        Route::get('/city-wise-revenue-booking/pdf',[CityWiseRevenueBookingReportController::class, 'exportPdf'])->name('city-wise-revenue-booking.pdf');
+        Route::get('/city-wise-revenue-booking/excel',[CityWiseRevenueBookingReportController::class, 'exportExcel'])->name('city-wise-revenue-booking.excel');
+        Route::get('/city-wise-revenue-booking/csv',[CityWiseRevenueBookingReportController::class, 'exportCsv'])->name('city-wise-revenue-booking.csv');
     });
 });
 Route::middleware('auth')->prefix('payment/razorpay')->name('razorpay.')->group(function () {

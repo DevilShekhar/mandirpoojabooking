@@ -399,6 +399,14 @@
                                         </a>
                                     </li>
                                     @endcan
+                                    @can('reports.city-wise-revenue')
+                                    <li class="{{ request()->routeIs('reports.city-wise-revenue-booking.*') ? 'active' : '' }}">
+                                        <a href="{{ route('reports.city-wise-revenue-booking.index') }}">
+                                            <i data-feather="map-pin"></i>
+                                            City-wise Revenue 
+                                        </a>
+                                    </li>
+                                    @endcan
                                 </ul>
                             </li>
                         @endcan
