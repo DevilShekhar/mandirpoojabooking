@@ -375,6 +375,14 @@
                                         </a>
                                     </li>
                                     @endcan
+                                    @can('reports.payment-transactions')
+                                    <li class="{{ request()->routeIs('reports.payment-transactions.*') ? 'active' : '' }}">
+                                        <a href="{{ route('reports.payment-transactions.index') }}">
+                                            <i data-feather="credit-card"></i>
+                                            Payment Transaction
+                                        </a>
+                                    </li>
+                                    @endcan
                                 </ul>
                             </li>
                         @endcan
