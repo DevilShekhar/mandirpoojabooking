@@ -383,6 +383,14 @@
                                         </a>
                                     </li>
                                     @endcan
+                                    @can('reports.refund-financial-reconciliation')
+                                    <li class="{{ request()->routeIs('reports.refund-financial-reconciliation.*') ? 'active' : '' }}">
+                                        <a href="{{ route('reports.refund-financial-reconciliation.index') }}">
+                                            <i data-feather="refresh-cw"></i>
+                                            Refund & Financial Reconciliation
+                                        </a>
+                                    </li>
+                                    @endcan
                                 </ul>
                             </li>
                         @endcan
