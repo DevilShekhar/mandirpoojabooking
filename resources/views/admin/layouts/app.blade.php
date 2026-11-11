@@ -367,6 +367,14 @@
                                         </a>
                                     </li>
                                     @endcan
+                                    @can('reports.pujari-assignment-performance')
+                                    <li class="{{ request()->routeIs('reports.pujari-assignment-performance.*') ? 'active' : '' }}">
+                                        <a href="{{ route('reports.pujari-assignment-performance.index') }}">
+                                            <i data-feather="user-check"></i>
+                                            Pujari Assigned
+                                        </a>
+                                    </li>
+                                    @endcan
                                 </ul>
                             </li>
                         @endcan
