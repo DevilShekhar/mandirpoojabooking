@@ -235,7 +235,8 @@ class PermissionSeeder extends Seeder
             'reports.booking-summary',
             'reports.daily-to-yearly-booking-revenue',
             'reports.service-wise-booking',
-            'reports.repeat-customer'
+            'reports.repeat-customer',
+            'reports.temple-performance'
         ];
         foreach ($permissions as $permission) {
             Permission::firstOrCreate([

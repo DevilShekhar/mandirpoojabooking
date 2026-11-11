@@ -1,3 +1,4 @@
+@can('reports.temple-performance')
 @extends('admin.layouts.app')
 @section('title', 'Temple Performance Report')
 @section('content')
@@ -379,3 +380,8 @@
     @endif
 </div>
 @endsection
+@else
+    @php
+        abort(403);
+    @endphp
+@endcan

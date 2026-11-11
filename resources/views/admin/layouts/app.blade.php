@@ -359,12 +359,14 @@
                                         </a>
                                     </li>
                                     @endcan
+                                    @can('reports.temple-performance')
                                     <li class="{{ request()->routeIs('reports.temple-performance.*') ? 'active' : '' }}">
                                         <a href="{{ route('reports.temple-performance.index') }}">
                                             <i data-feather="activity"></i>
                                             Temple Performance
                                         </a>
                                     </li>
+                                    @endcan
                                 </ul>
                             </li>
                         @endcan
