@@ -391,6 +391,14 @@
                                         </a>
                                     </li>
                                     @endcan
+                                    @can('reports.state-wise-revenue')
+                                    <li class="{{ request()->routeIs('reports.state-wise-revenue.*') ? 'active' : '' }}">
+                                        <a href="{{ route('reports.state-wise-revenue.index') }}">
+                                            <i data-feather="map"></i>
+                                            State-wise Revenue
+                                        </a>
+                                    </li>
+                                    @endcan
                                 </ul>
                             </li>
                         @endcan
