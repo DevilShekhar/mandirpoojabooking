@@ -351,6 +351,14 @@
                                         </a>
                                     </li>
                                     @endcan
+                                    @can('reports.repeat-customer')
+                                    <li class="{{ request()->routeIs('reports.repeat-customer.*') ? 'active' : '' }}">
+                                        <a href="{{ route('reports.repeat-customer.index') }}">
+                                            <i data-feather="users"></i>
+                                            Repeat Customer
+                                        </a>
+                                    </li>
+                                    @endcan
                                 </ul>
                             </li>
                         @endcan
