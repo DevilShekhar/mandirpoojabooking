@@ -71,6 +71,7 @@ use App\Http\Controllers\Admin\PaymentTransactionReportController;
 use App\Http\Controllers\Admin\RefundFinancialReconciliationReportController;
 use App\Http\Controllers\Admin\StateWiseRevenueReportController;
 use App\Http\Controllers\Admin\CityWiseRevenueBookingReportController;
+use App\Http\Controllers\Admin\OnlinePujaCategoryController;
 
 Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
 Route::get('our-temples', [OurTemplesContoller::class, 'index'])->name('frontend.our-temples');
@@ -231,6 +232,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/completed-samgri-booking/{booking}/view', [SamgriBookingController::class, 'completedShow'])->name('completed-samgri-booking.show');
     Route::post('/samgri-booking/{id}/verify-otp',[SamgriBookingController::class, 'verifyOtp'])->name('samgri-booking.verify-otp');
     Route::resource('my-news', NewsController::class)->names('my-news');
+    Route::resource('online-puja-categories',OnlinePujaCategoryController::class);
     Route::prefix('reports')->name('reports.')->group(function () {
         Route::get('/mandir-puja-pandit',[MandirPujaPanditReportController::class, 'index'])->name('mandir-puja-pandit.index');
         Route::get('/mandir-puja-pandit/pandits',[MandirPujaPanditReportController::class, 'getPandits'])->name('mandir-puja-pandit.pandits');
@@ -306,6 +308,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/city-wise-revenue-booking/pdf',[CityWiseRevenueBookingReportController::class, 'exportPdf'])->name('city-wise-revenue-booking.pdf');
         Route::get('/city-wise-revenue-booking/excel',[CityWiseRevenueBookingReportController::class, 'exportExcel'])->name('city-wise-revenue-booking.excel');
         Route::get('/city-wise-revenue-booking/csv',[CityWiseRevenueBookingReportController::class, 'exportCsv'])->name('city-wise-revenue-booking.csv');
+        
     });
 });
 Route::middleware('auth')->prefix('payment/razorpay')->name('razorpay.')->group(function () {
