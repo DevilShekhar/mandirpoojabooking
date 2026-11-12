@@ -403,17 +403,15 @@
                                         <li>
                                             <a href="{{ route('frontend.home') }}">Home</a>
                                         </li>
-                                        <li>
-                                            <a href="">About Us</a>
-                                        </li>
+                                       
                                         <li>
                                             <a href="{{ route('frontend.our-temples') }}">Our Temples</a>
-                                        </li>
-                                        <li>
-                                            <a href="">Contact</a>
-                                        </li>
+                                        </li>                                       
                                         <li>
                                             <a href="{{ route('frontend.puja') }}">Puja</a>
+                                        </li>
+                                        <li>
+                                            <a href="{{ route('frontend.online-puja.index') }}">Online Puja</a>
                                         </li>
                                         <li>
                                             <a href="{{ route('tickit-booking.tickitfillter') }}">Ticket Booking</a>

@@ -73,6 +73,7 @@ use App\Http\Controllers\Admin\StateWiseRevenueReportController;
 use App\Http\Controllers\Admin\CityWiseRevenueBookingReportController;
 use App\Http\Controllers\Admin\OnlinePujaCategoryController;
 use App\Http\Controllers\Admin\OnlinePujaController;
+use App\Http\Controllers\Frontend\FrontendOnlinePujaController;
 
 Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
 Route::get('our-temples', [OurTemplesContoller::class, 'index'])->name('frontend.our-temples');
@@ -115,6 +116,9 @@ Route::get('/tickit-booking/search', [TickitBookingfillterController::class,'sea
 Route::get('/tickit-booking/view-puja/{puja}', [TickitBookingfillterController::class,'viewPuja'])->whereNumber('puja')->name('tickit-booking.view-puja');
 Route::get('/news', [NewsFrontendController::class, 'index'])->name('frontend.news');
 Route::get('/news/{slug}', [NewsFrontendController::class, 'show'])->name('frontend.news.show');
+Route::get('/online-puja', [FrontendOnlinePujaController::class,'index'])->name('frontend.online-puja.index');
+Route::post('/online-puja/filter', [FrontendOnlinePujaController::class,'index'])->name('frontend.online-puja.filter');
+Route::get('/online-puja/{slug}', [FrontendOnlinePujaController::class,'show'])->name('frontend.online-puja.show');
 Route::middleware('auth')
     ->prefix('ticket-cart')
     ->name('frontend.ticket-cart.')
