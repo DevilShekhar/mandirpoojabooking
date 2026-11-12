@@ -241,7 +241,12 @@ class PermissionSeeder extends Seeder
             'reports.payment-transactions',
             'reports.refund-financial-reconciliation',
             'reports.state-wise-revenue',
-            'reports.city-wise-revenue'
+            'reports.city-wise-revenue',
+            'online-puja-categories.view',
+            'online-puja-categories.index',
+            'online-puja-categories.create',
+            'online-puja-categories.edit',
+            'online-puja-categories.delete'
         ];
         foreach ($permissions as $permission) {
             Permission::firstOrCreate([
