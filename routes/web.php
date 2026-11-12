@@ -72,6 +72,7 @@ use App\Http\Controllers\Admin\RefundFinancialReconciliationReportController;
 use App\Http\Controllers\Admin\StateWiseRevenueReportController;
 use App\Http\Controllers\Admin\CityWiseRevenueBookingReportController;
 use App\Http\Controllers\Admin\OnlinePujaCategoryController;
+use App\Http\Controllers\Admin\OnlinePujaController;
 
 Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
 Route::get('our-temples', [OurTemplesContoller::class, 'index'])->name('frontend.our-temples');
@@ -233,6 +234,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/samgri-booking/{id}/verify-otp',[SamgriBookingController::class, 'verifyOtp'])->name('samgri-booking.verify-otp');
     Route::resource('my-news', NewsController::class)->names('my-news');
     Route::resource('online-puja-categories',OnlinePujaCategoryController::class);
+    Route::resource('online-pujas', OnlinePujaController::class);
     Route::prefix('reports')->name('reports.')->group(function () {
         Route::get('/mandir-puja-pandit',[MandirPujaPanditReportController::class, 'index'])->name('mandir-puja-pandit.index');
         Route::get('/mandir-puja-pandit/pandits',[MandirPujaPanditReportController::class, 'getPandits'])->name('mandir-puja-pandit.pandits');
