@@ -426,24 +426,36 @@
                             </a>
                         </li>
                         @endcan
-                        @can('online-puja-categories.view')
-                        <li class="{{ request()->routeIs('online-puja-categories.*') ? 'active' : '' }}">
-                            <a href="javascript:void(0);" class="nav-link has-dropdown">
-                                <i data-feather="sun"></i>
-                                <span>Online Puja</span>
-                            </a>
-                            <ul class="dropdown-menu">
-                                @can('online-puja-categories.index')
-                                    <li class="{{ request()->routeIs('online-puja-categories.*') ? 'active' : '' }}">
-                                        <a href="{{ route('online-puja-categories.index') }}">
-                                            <i data-feather="list"></i>
-                                            Category
-                                        </a>
-                                    </li>
-                                @endcan
-                            </ul>
-                        </li>
-                        @endcan
+                        @if(auth()->user()->can('online-puja.view') || auth()->user()->can('online-puja-categories.view'))
+                            <li class="{{ request()->routeIs('online-pujas.*') || request()->routeIs('online-puja-categories.*') ? 'active' : '' }}">
+                                <a href="javascript:void(0);" class="nav-link has-dropdown">
+                                    <i data-feather="sun"></i>
+                                    <span>Online Puja</span>
+                                </a>
+
+                                <ul class="dropdown-menu">
+
+                                    @can('online-puja-categories.view')
+                                        <li class="{{ request()->routeIs('online-puja-categories.*') ? 'active' : '' }}">
+                                            <a href="{{ route('online-puja-categories.index') }}">
+                                                <i data-feather="list"></i>
+                                                Category
+                                            </a>
+                                        </li>
+                                    @endcan
+
+                                    @can('online-puja.view')
+                                        <li class="{{ request()->routeIs('online-pujas.*') ? 'active' : '' }}">
+                                            <a href="{{ route('online-pujas.index') }}">
+                                                <i data-feather="book-open"></i>
+                                                Online Puja
+                                            </a>
+                                        </li>
+                                    @endcan
+
+                                </ul>
+                            </li>
+                        @endif
                         @can('santan-event-view')
                         <li class="{{ request()->routeIs('admin.sanatan-events.*') ? 'active' : '' }}">
                             <a href="{{ route('admin.sanatan-events.index') }}" class="nav-link">
