@@ -52,7 +52,7 @@ public function index()
         $pujaQuery = OnlinePuja::query();
 
         // Restrict non-admin users to their own pujas
-        if (!in_array($user->role, ['admin', 'super_admin'])) {
+        if (!in_array($user->role, ['Admin', 'Super Admin'])) {
             $pujaQuery->where('created_by', $user->id);
         }
 
