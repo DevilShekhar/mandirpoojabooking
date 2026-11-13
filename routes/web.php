@@ -76,6 +76,7 @@ use App\Http\Controllers\Admin\OnlinePujaController;
 use App\Http\Controllers\Frontend\FrontendOnlinePujaController;
 use App\Http\Controllers\Frontend\FrontendOnlinePujaCartController;
 use App\Http\Controllers\Admin\MyOnlinePujaBookingController;
+use App\Http\Controllers\Admin\OnlinePujaReportController;
 
 Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
 Route::get('our-temples', [OurTemplesContoller::class, 'index'])->name('frontend.our-temples');
@@ -322,6 +323,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/city-wise-revenue-booking/pdf',[CityWiseRevenueBookingReportController::class, 'exportPdf'])->name('city-wise-revenue-booking.pdf');
         Route::get('/city-wise-revenue-booking/excel',[CityWiseRevenueBookingReportController::class, 'exportExcel'])->name('city-wise-revenue-booking.excel');
         Route::get('/city-wise-revenue-booking/csv',[CityWiseRevenueBookingReportController::class, 'exportCsv'])->name('city-wise-revenue-booking.csv');
+        Route::get('/online-puja-report', [OnlinePujaReportController::class, 'index'])->name('online-puja-report.index');
+        Route::get('/online-puja-report/export/pdf', [OnlinePujaReportController::class, 'exportPdf'])->name('online-puja-report.pdf');
+        Route::get('/online-puja-report/export/excel', [OnlinePujaReportController::class, 'exportExcel'])->name('online-puja-report.excel');
+        Route::get('/online-puja-report/export/csv', [OnlinePujaReportController::class, 'exportCsv'])->name('online-puja-report.csv');
         
     });
     Route::get('/my-online-pujabooking', [MyOnlinePujaBookingController::class,'index'])->name('admin.my-online-pujabooking.index');
