@@ -407,6 +407,14 @@
                                         </a>
                                     </li>
                                     @endcan
+                                    @can('reports-online-puja.index')
+                                        <li class="{{ request()->routeIs('reports.online-puja-report.*') ? 'active' : '' }}">
+                                            <a href="{{ route('reports.online-puja-report.index') }}">
+                                                <i data-feather="book-open"></i>
+                                                Online Puja Booking
+                                            </a>
+                                        </li>
+                                    @endcan
                                 </ul>
                             </li>
                         @endcan

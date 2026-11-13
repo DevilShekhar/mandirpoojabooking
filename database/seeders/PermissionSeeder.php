@@ -242,6 +242,7 @@ class PermissionSeeder extends Seeder
             'reports.refund-financial-reconciliation',
             'reports.state-wise-revenue',
             'reports.city-wise-revenue',
+            'reports-online-puja.index',
             'online-puja-categories.view',
             'online-puja-categories.index',
             'online-puja-categories.create',
