@@ -58,7 +58,8 @@
                     <form action="{{ route('online-pujas.update', $online_puja->id) }}"
                           method="POST"
                           enctype="multipart/form-data"
-                          id="onlinePujaForm">
+                          id="onlinePujaForm"
+                          accept-charset="UTF-8">
 
                         @csrf
                         @method('PUT')
@@ -1201,27 +1202,87 @@
     $(function () {
 
         /* =========================================
-           SUMMERNOTE EDITOR
+           SUMMERNOTE EDITOR + RELIABLE FORM SYNC
         ========================================== */
 
-        function initializeSummernote() {
+        const richTextFields = [
+            'puja_significance',
+            'puja_benefits',
+            'puja_procedure',
+            'what_you_will_receive'
+        ];
 
-            if (!$.fn.summernote) {
-                console.error('Summernote library is not loaded.');
-                return;
+        const $pujaForm = $('#onlinePujaForm');
+        const pujaForm = $pujaForm.get(0);
+        let pujaFormSubmitting = false;
+
+        function getSummernoteHtml($textarea, fieldName) {
+            const $editor = $textarea.next('.note-editor');
+            const codeView = $editor.find('.note-codable').first();
+            const editable = $editor.find('.note-editable').first();
+
+            // Summernote Code View edits a separate textarea. Never read the
+            // stale visual editor while Code View is active.
+            if (codeView.length) {
+                const codeElement = codeView.get(0);
+                const codeStyle = codeElement ? window.getComputedStyle(codeElement) : null;
+                const codeViewIsVisible = !!(
+                    codeStyle &&
+                    codeStyle.display !== 'none' &&
+                    codeStyle.visibility !== 'hidden' &&
+                    codeElement.getClientRects().length
+                );
+
+                if (codeViewIsVisible) {
+                    return {
+                        html: codeView.val() || '',
+                        source: 'Summernote Code View'
+                    };
+                }
+            }
+
+            // In normal visual mode, read the editable DOM first. This avoids
+            // stale API/textarea values when the user has just typed content.
+            if (editable.length) {
+                return {
+                    html: editable.html() || '',
+                    source: 'Summernote editable area'
+                };
+            }
+
+            if (typeof $.fn.summernote === 'function' && $textarea.data('summernote')) {
+                try {
+                    return {
+                        html: $textarea.summernote('code') || '',
+                        source: 'Summernote API fallback'
+                    };
+                } catch (error) {
+                    console.error('[Online Puja] Summernote API read failed:', fieldName, error);
+                }
+            }
+
+            return {
+                html: $textarea.val() || '',
+                source: 'original textarea fallback'
+            };
+        }
+
+        function initializeSummernote() {
+            if (typeof $.fn.summernote !== 'function') {
+                console.error('[Online Puja] Summernote library is not loaded. Check script loading order in admin.layouts.app.');
+                return false;
             }
 
             $('.summernote').each(function () {
+                const $textarea = $(this);
 
-                if (!$(this).next('.note-editor').length) {
-
-                    $(this).summernote({
+                if (!$textarea.next('.note-editor').length) {
+                    $textarea.summernote({
                         height: 250,
                         minHeight: 200,
                         maxHeight: 500,
                         placeholder: 'Enter details here...',
                         dialogsInBody: true,
-
                         toolbar: [
                             ['style', ['style']],
                             ['font', ['bold', 'italic', 'underline', 'clear']],
@@ -1232,30 +1293,104 @@
                             ['height', ['height']],
                             ['insert', ['link', 'picture', 'video', 'table']],
                             ['view', ['fullscreen', 'codeview', 'help']]
-                        ]
+                        ],
+                        callbacks: {
+                            onInit: function () {
+                                console.log('[Online Puja] Editor ready:', this.name || $textarea.attr('name'));
+                            },
+                            onChange: function (contents) {
+                                // Keep the underlying named textarea synchronized.
+                                // The final submit handler reads the live editor again.
+                                const $codeView = $textarea.next('.note-editor').find('.note-codable');
+                                const codeViewVisible = $codeView.length &&
+                                    window.getComputedStyle($codeView.get(0)).display !== 'none' &&
+                                    $codeView.get(0).getClientRects().length;
 
+                                if (!codeViewVisible) {
+                                    $textarea.val(contents == null ? '' : contents);
+                                }
+                            },
+                            onBlur: function () {
+                                syncSummernoteField($textarea);
+                            },
+                            onKeyup: function () {
+                                syncSummernoteField($textarea);
+                            },
+                            onPaste: function () {
+                                window.setTimeout(function () {
+                                    syncSummernoteField($textarea);
+                                }, 0);
+                            }
+                        }
                     });
-
                 }
-
             });
 
+            // Code View has its own textarea. Keep the source textarea updated
+            // whenever a user types/pastes HTML into Code View.
+            $(document)
+                .off('input.onlinePujaCodeView change.onlinePujaCodeView', '.note-codable')
+                .on('input.onlinePujaCodeView change.onlinePujaCodeView', '.note-codable', function () {
+                    const $editor = $(this).closest('.note-editor');
+                    const $source = $editor.prev('textarea.summernote');
+                    if ($source.length) {
+                        $source.val($(this).val() || '').trigger('input');
+                        console.log('[Online Puja] Code View input:', {
+                            field: $source.attr('name'),
+                            valueLength: String($(this).val() || '').length
+                        });
+                    }
+                });
+
+            return true;
         }
 
-        initializeSummernote();
+        function syncSummernoteField($textarea) {
+            const fieldName = $textarea.attr('name') || 'unknown';
+            const result = getSummernoteHtml($textarea, fieldName);
+            const html = result.html == null ? '' : String(result.html);
 
+            $textarea.prop('disabled', false).val(html);
+            return {
+                field: fieldName,
+                source: result.source,
+                valueLength: html.length,
+                preview: html.substring(0, 180)
+            };
+        }
 
         function syncSummernote() {
+            const results = [];
 
-            $('.summernote').each(function () {
+            richTextFields.forEach(function (fieldName) {
+                const textarea = pujaForm
+                    ? pujaForm.querySelector('textarea[name="' + fieldName + '"]')
+                    : null;
 
-                if ($(this).next('.note-editor').length) {
-                    $(this).val($(this).summernote('code'));
+                if (!textarea) {
+                    console.error('[Online Puja] Missing textarea:', fieldName);
+                    results.push({ field: fieldName, error: 'textarea not found' });
+                    return;
                 }
 
+                const result = syncSummernoteField($(textarea));
+                results.push(result);
+                $(textarea).trigger('input').trigger('change');
             });
 
+            console.log('[Online Puja] Synced field results:', results);
+            return results;
         }
+
+        const summernoteReady = initializeSummernote();
+
+        console.log('[Online Puja] Summernote initialization:', {
+            ready: summernoteReady,
+            editorsFound: $('.summernote').length,
+            editorsInitialized: $('.summernote').filter(function () {
+                return !!$(this).next('.note-editor').length;
+            }).length
+        });
 
 
         /* =========================================
@@ -1839,15 +1974,58 @@
            FORM SUBMISSION
         ========================================== */
 
-        $('#onlinePujaForm').on('submit', function () {
+        // Capture phase runs before other submit handlers and before browser serialization.
+        if (pujaForm) {
+            pujaForm.addEventListener('submit', function () {
+                syncSummernote();
 
+                if (!$('#slug').val()) {
+                    updateSlug();
+                }
+
+                console.log('[Online Puja] Final textarea values before submit:',
+                    richTextFields.map(function (name) {
+                        const field = pujaForm.querySelector('[name="' + name + '"]');
+                        return {
+                            name: name,
+                            valueLength: field ? field.value.length : -1,
+                            value: field ? field.value.substring(0, 120) : null
+                        };
+                    })
+                );
+            }, true);
+
+            // formdata fires after the browser builds the request payload.
+            pujaForm.addEventListener('formdata', function (event) {
+                syncSummernote();
+
+                richTextFields.forEach(function (fieldName) {
+                    const field = pujaForm.querySelector('[name="' + fieldName + '"]');
+                    if (field) {
+                        field.disabled = false;
+                        event.formData.set(fieldName, field.value == null ? '' : field.value);
+                    }
+                });
+
+                console.log('[Online Puja] FormData payload lengths:',
+                    richTextFields.map(function (name) {
+                        const value = event.formData.get(name);
+                        return {
+                            name: name,
+                            valueLength: value == null ? -1 : String(value).length
+                        };
+                    })
+                );
+            });
+        }
+
+        // jQuery fallback for other code paths that trigger a normal submit.
+        $pujaForm.off('submit.onlinePuja').on('submit.onlinePuja', function () {
             syncSummernote();
 
-            // Ensure slug is generated before submitting.
             if (!$('#slug').val()) {
                 updateSlug();
             }
-
         });
 
 
@@ -1912,9 +2090,24 @@
 
 
                 onFinished: function () {
+                    if (!pujaForm || pujaFormSubmitting) {
+                        return;
+                    }
 
-                    $('#onlinePujaForm').trigger('submit');
+                    // Sync before asking the browser to perform the real PUT/multipart submit.
+                    syncSummernote();
+                    if (!$('#slug').val()) {
+                        updateSlug();
+                    }
 
+                    pujaFormSubmitting = true;
+
+                    if (typeof pujaForm.requestSubmit === 'function') {
+                        pujaForm.requestSubmit();
+                    } else {
+                        // Legacy browser fallback; fields have already been synchronized.
+                        HTMLFormElement.prototype.submit.call(pujaForm);
+                    }
                 }
 
             });

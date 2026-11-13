@@ -14,19 +14,23 @@ class OnlinePuja extends Model
         'slug',
         'status',
         'short_description',
+
         'banner_image',
         'thumbnail_image',
         'gallery_images',
+
         'puja_significance',
         'puja_benefits',
         'puja_procedure',
         'what_you_will_receive',
-        'temple_description',
+
         'temple_name',
         'temple_location',
         'temple_city',
         'temple_state',
         'temple_address',
+        'temple_description',
+
         'puja_datetime',
         'puja_day',
         'tithi',
@@ -34,17 +38,22 @@ class OnlinePuja extends Model
         'muhurat_end_at',
         'booking_start_at',
         'booking_end_at',
+
         'total_seat',
         'booked_seat',
+
         'video_delivery_hours',
         'whatsapp_delivery_enabled',
         'video_url',
+
         'is_featured',
         'is_popular',
         'sort_order',
+
         'meta_title',
         'meta_description',
         'meta_keywords',
+
         'created_by',
         'updated_by',
     ];
@@ -55,6 +64,7 @@ class OnlinePuja extends Model
         'is_featured' => 'boolean',
         'is_popular' => 'boolean',
         'whatsapp_delivery_enabled' => 'boolean',
+
         'puja_datetime' => 'datetime',
         'muhurat_end_at' => 'datetime',
         'booking_start_at' => 'datetime',
@@ -64,18 +74,25 @@ class OnlinePuja extends Model
     public function category()
     {
         return $this->belongsTo(
-            OnlinePujaCategory::class,'online_puja_category_id'
+            OnlinePujaCategory::class,
+            'online_puja_category_id'
         );
     }
 
     public function faqs()
     {
-        return $this->hasMany(OnlinePujaFaq::class);
+        return $this->hasMany(
+            OnlinePujaFaq::class,
+            'online_puja_id'
+        );
     }
 
     public function packages()
     {
-        return $this->hasMany(OnlinePujaPackage::class);
+        return $this->hasMany(
+            OnlinePujaPackage::class,
+            'online_puja_id'
+        );
     }
 
     public function creator()
