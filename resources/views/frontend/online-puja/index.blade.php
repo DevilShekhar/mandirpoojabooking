@@ -90,8 +90,10 @@
 
                     $totalSeats = (int) ($puja->total_seat ?? 0);
                     $bookedSeats = (int) ($puja->booked_seat ?? 0);
-
-                    $availableSeats = max(0, $totalSeats - $bookedSeats);
+                    $hasSeatLimit = $totalSeats > 0;
+                    $availableSeats = $hasSeatLimit
+                        ? max(0, $totalSeats - $bookedSeats)
+                        : null;
 
                     $detailUrl = route('frontend.online-puja.show', [
                         'slug' => $puja->slug
@@ -190,11 +192,18 @@
                                     </span>
 
                                     <div class="puja-info-text">
-                                        <small>Available Seats</small>
+                                        <small>Available / Total Seats</small>
 
-                                        <strong class="{{ $availableSeats > 0 ? 'seats-available' : 'seats-full' }}">
-                                            {{ $availableSeats }} / {{ $totalSeats }}
+                                        <strong class="{{ !$hasSeatLimit || $availableSeats > 0 ? 'seats-available' : 'seats-full' }}">
+                                            @if($hasSeatLimit)
+                                                {{ number_format($availableSeats) }} / {{ number_format($totalSeats) }}
+                                            @else
+                                                Unlimited
+                                            @endif
                                         </strong>
+                                        @if($hasSeatLimit)
+                                            <small>{{ number_format($bookedSeats) }} already booked</small>
+                                        @endif
                                     </div>
 
                                 </div>
@@ -881,12 +890,24 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const detailUrl = detailBaseUrl + '/' + encodeURIComponent(puja.slug);
 
-        const availableSeats = Number(puja.available_seats || 0);
         const totalSeats = Number(puja.total_seat || 0);
+        const bookedSeats = Number(puja.booked_seat || 0);
+        const hasSeatLimit = totalSeats > 0;
+        const availableSeats = hasSeatLimit
+            ? Math.max(0, Number(puja.available_seats ?? (totalSeats - bookedSeats)))
+            : null;
 
-        const seatClass = availableSeats > 0
+        const seatClass = !hasSeatLimit || availableSeats > 0
             ? 'seats-available'
             : 'seats-full';
+
+        const seatDisplay = hasSeatLimit
+            ? `${availableSeats.toLocaleString('en-IN')} / ${totalSeats.toLocaleString('en-IN')}`
+            : 'Unlimited';
+
+        const bookedDisplay = hasSeatLimit
+            ? `<small>${bookedSeats.toLocaleString('en-IN')} already booked</small>`
+            : '';
 
         return `
             <div class="col-lg-4 col-md-6 col-sm-12 mb-4 puja-grid-item">
@@ -947,10 +968,11 @@ document.addEventListener('DOMContentLoaded', function () {
                                 </span>
 
                                 <div class="puja-info-text">
-                                    <small>Available Seats</small>
+                                    <small>Available / Total Seats</small>
                                     <strong class="${seatClass}">
-                                        ${availableSeats} / ${totalSeats}
+                                        ${seatDisplay}
                                     </strong>
+                                    ${bookedDisplay}
                                 </div>
                             </div>
 

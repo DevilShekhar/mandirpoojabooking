@@ -42,17 +42,21 @@
         ->where('status', 1)
         ->sortBy('sort_order')
         ->values();
-    $firstPackage = $packages->first();
+    $totalSeats = (int) ($onlinePuja->total_seat ?? 0);
+    $bookedSeats = (int) ($onlinePuja->booked_seat ?? 0);
+    $hasSeatLimit = $totalSeats > 0;
+    $availableSeats = $hasSeatLimit
+        ? max(0, $totalSeats - $bookedSeats)
+        : null;
+    $firstPackage = $packages->first(function ($package) use ($hasSeatLimit, $availableSeats) {
+        return !$hasSeatLimit || (int) $package->devotees_count <= $availableSeats;
+    });
     $faqs = $onlinePuja->faqs
         ->where('status', 1)
         ->values();
     $pujaDate = $onlinePuja->puja_datetime
         ? \Carbon\Carbon::parse($onlinePuja->puja_datetime)
         : null;
-    $availableSeats = max(
-        0,
-        (int) $onlinePuja->total_seat - (int) $onlinePuja->booked_seat
-    );
 @endphp
 <section class="puja-breadcrumb">
     <div class="container">
@@ -153,7 +157,7 @@
                     @if($onlinePuja->temple_name)
                         <div class="quick-detail-item">
                             <div class="quick-detail-icon">
-                                <i class="fa fa-place-of-worship"></i>
+                                <i class="fa fa-building-o" aria-hidden="true"></i>
                             </div>
                             <div>
                                 <span class="quick-detail-label">Temple</span>
@@ -164,7 +168,7 @@
                     @if($pujaDate)
                         <div class="quick-detail-item">
                             <div class="quick-detail-icon">
-                                <i class="far fa-calendar-alt"></i>
+                                <i class="fa fa-calendar" aria-hidden="true"></i>
                             </div>
                             <div>
                                 <span class="quick-detail-label">Puja Date</span>
@@ -175,7 +179,7 @@
                     @if($onlinePuja->day)
                         <div class="quick-detail-item">
                             <div class="quick-detail-icon">
-                                <i class="far fa-sun"></i>
+                                <i class="far fa-sun" aria-hidden="true"></i>
                             </div>
                             <div>
                                 <span class="quick-detail-label">Day</span>
@@ -186,7 +190,7 @@
                     @if($onlinePuja->tithi)
                         <div class="quick-detail-item">
                             <div class="quick-detail-icon">
-                                <i class="fa fa-moon"></i>
+                                <i class="fa fa-moon-o" aria-hidden="true"></i>
                             </div>
                             <div>
                                 <span class="quick-detail-label">Tithi</span>
@@ -197,7 +201,7 @@
                     @if($onlinePuja->muhurat)
                         <div class="quick-detail-item">
                             <div class="quick-detail-icon">
-                                <i class="far fa-clock"></i>
+                               <i class="fa fa-clock-o" aria-hidden="true"></i>
                             </div>
                             <div>
                                 <span class="quick-detail-label">Muhurat</span>
@@ -208,7 +212,7 @@
                     @if($onlinePuja->temple_city || $onlinePuja->temple_state)
                         <div class="quick-detail-item">
                             <div class="quick-detail-icon">
-                                <i class="fa fa-map-marker-alt"></i>
+                                <i class="fa fa-map-marker" aria-hidden="true"></i>
                             </div>
                             <div>
                                 <span class="quick-detail-label">Location</span>
@@ -222,23 +226,39 @@
                         </div>
                     @endif
                 </div>
-                @if($onlinePuja->total_seat)
+                @if($hasSeatLimit)
+                    @php
+                        $seatPercentage = min(
+                            100,
+                            ($bookedSeats / max(1, $totalSeats)) * 100
+                        );
+                    @endphp
                     <div class="puja-seat-status">
                         <div class="seat-status-top">
                             <span>
                                 <i class="fa fa-users"></i>
                                 Participation Availability
                             </span>
-                            <strong>{{ $availableSeats }} Seats Left</strong>
+                            <strong>
+                                {{ number_format($availableSeats) }} / {{ number_format($totalSeats) }} Seats Available
+                            </strong>
                         </div>
-                        @php
-                            $seatPercentage = min(
-                                100,
-                                ($onlinePuja->booked_seat / max(1, $onlinePuja->total_seat)) * 100
-                            );
-                        @endphp
                         <div class="seat-progress">
                             <span style="width: {{ $seatPercentage }}%"></span>
+                        </div>
+                        <div class="seat-status-bottom">
+                            <span>{{ number_format($bookedSeats) }} booked</span>
+                            <span>{{ number_format($totalSeats) }} total seats</span>
+                        </div>
+                    </div>
+                @else
+                    <div class="puja-seat-status">
+                        <div class="seat-status-top">
+                            <span>
+                                <i class="fa fa-users"></i>
+                                Participation Availability
+                            </span>
+                            <strong>Unlimited Seats</strong>
                         </div>
                     </div>
                 @endif
@@ -264,7 +284,7 @@
         <div class="trust-strip-grid">
             <div class="trust-item">
                 <div class="trust-icon">
-                    <i class="fa fa-praying-hands"></i>
+                    <i class="fa fa-asterisk" aria-hidden="true"></i>
                 </div>
                 <div>
                     <strong>Authentic Rituals</strong>
@@ -273,7 +293,7 @@
             </div>
             <div class="trust-item">
                 <div class="trust-icon">
-                    <i class="fa fa-user-check"></i>
+                    <i class="fa fa-check-circle-o" aria-hidden="true"></i>
                 </div>
                 <div>
                     <strong>Experienced Priests</strong>
@@ -282,7 +302,7 @@
             </div>
             <div class="trust-item">
                 <div class="trust-icon">
-                    <i class="fa fa-video"></i>
+                    <i class="fa fa-video-camera" aria-hidden="true"></i>
                 </div>
                 <div>
                     <strong>Online Participation</strong>
@@ -397,7 +417,7 @@
                         </div>
                         <div class="temple-information-card">
                             <div class="temple-information-icon">
-                                <i class="fa fa-place-of-worship"></i>
+                                <i class="fa fa-building-o" aria-hidden="true"></i>
                             </div>
                             <div class="temple-information-content">
                                 <h3>{{ $onlinePuja->temple_name }}</h3>
@@ -589,7 +609,12 @@
             @if($packages->isNotEmpty())
                 <div class="package-options-list" id="packageOptionsList">
                     @foreach($packages as $index => $package)
-                        <label class="package-option-card {{ $index === 0 ? 'recommended-package' : '' }}"
+                        @php
+                            $packageSeatUnavailable = $hasSeatLimit &&
+                                (int) $package->devotees_count > $availableSeats;
+                            $packageSelected = $firstPackage && $firstPackage->id === $package->id;
+                        @endphp
+                        <label class="package-option-card {{ $packageSelected ? 'recommended-package' : '' }} {{ $packageSeatUnavailable ? 'package-unavailable' : '' }}"
                                data-package-card="{{ $package->id }}">
                             <input type="radio"
                                    class="package-radio"
@@ -598,7 +623,8 @@
                                    data-price="{{ $package->price }}"
                                    data-name="{{ $package->package_name }}"
                                    data-devotees="{{ $package->devotees_count }}"
-                                   {{ $index === 0 ? 'checked' : '' }}>
+                                   {{ $packageSelected ? 'checked' : '' }}
+                                   {{ $packageSeatUnavailable ? 'disabled' : '' }}>
                             <span class="custom-radio-indicator">
                                <i class="fa fa-check"></i>
                             </span>
@@ -618,7 +644,12 @@
                                     </span>
                                 @endif
                                 <span class="package-meta">
-                                    @if($package->devotees_count)
+                                    @if($packageSeatUnavailable)
+                                        <span class="package-seat-unavailable">
+                                            <i class="fa fa-exclamation-circle"></i>
+                                            Not enough seats available
+                                        </span>
+                                    @elseif($package->devotees_count)
                                         <span>
                                             <i class="fa fa-users"></i>
                                             {{ $package->devotees_count }}
@@ -1082,6 +1113,15 @@
     font-size: 12px;
 }
 
+.seat-status-bottom {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 8px;
+    color: var(--puja-muted);
+    font-size: 11px;
+}
+
 .seat-progress {
     height: 6px;
     background: #eee8dd;
@@ -1352,8 +1392,8 @@
 .section-eyebrow {
     display: block;
     color: #b27a3b;
-    font-size: 10px;
-    font-weight: 800;
+    font-size: 12px;
+    font-weight: 600;
     letter-spacing: 1.7px;
     margin-bottom: 10px;
 }
@@ -2633,7 +2673,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (continueButton) {
         continueButton.addEventListener('click', function () {
             const selected = document.querySelector('.package-radio:checked');
-            if (!selected) {
+            if (!selected || selected.disabled) {
                 if (selectionError) selectionError.classList.add('show');
                 return;
             }
