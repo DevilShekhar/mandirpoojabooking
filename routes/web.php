@@ -74,6 +74,7 @@ use App\Http\Controllers\Admin\CityWiseRevenueBookingReportController;
 use App\Http\Controllers\Admin\OnlinePujaCategoryController;
 use App\Http\Controllers\Admin\OnlinePujaController;
 use App\Http\Controllers\Frontend\FrontendOnlinePujaController;
+use App\Http\Controllers\Frontend\FrontendOnlinePujaCartController;
 
 Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
 Route::get('our-temples', [OurTemplesContoller::class, 'index'])->name('frontend.our-temples');
@@ -118,6 +119,11 @@ Route::get('/news', [NewsFrontendController::class, 'index'])->name('frontend.ne
 Route::get('/news/{slug}', [NewsFrontendController::class, 'show'])->name('frontend.news.show');
 Route::get('/online-puja', [FrontendOnlinePujaController::class,'index'])->name('frontend.online-puja.index');
 Route::post('/online-puja/filter', [FrontendOnlinePujaController::class,'index'])->name('frontend.online-puja.filter');
+Route::post('/online-puja/select-package', [FrontendOnlinePujaCartController::class, 'selectPackage'])->name('frontend.online-puja.select-package');
+Route::get('/online-puja/cart', [FrontendOnlinePujaCartController::class, 'cart'])->middleware('auth')->name('frontend.online-puja.cart');
+Route::post('/online-puja/cart/remove', [FrontendOnlinePujaCartController::class, 'remove'])->middleware('auth')->name('frontend.online-puja.cart.remove');
+Route::post('/online-puja/cart/checkout', [FrontendOnlinePujaCartController::class, 'checkout'])->middleware('auth')->name('frontend.online-puja.cart.checkout');
+Route::post('/online-puja/payment/verify', [FrontendOnlinePujaCartController::class, 'verifyPayment'])->middleware('auth')->name('frontend.online-puja.payment.verify');
 Route::get('/online-puja/{slug}', [FrontendOnlinePujaController::class,'show'])->name('frontend.online-puja.show');
 Route::middleware('auth')
     ->prefix('ticket-cart')
