@@ -1,110 +1,59 @@
-
 @extends('frontend.layouts.app')
-
 @section('title', $onlinePuja->title . ' | Online Puja')
-
 @section('content')
-
 @php
     use Illuminate\Support\Facades\Storage;
     use Illuminate\Support\Str;
-
-    /*
-    |--------------------------------------------------------------------------
-    | Image URL Helper
-    |--------------------------------------------------------------------------
-    */
     $getImageUrl = function ($image) {
         if (empty($image)) {
             return null;
         }
-
         if (is_array($image)) {
             $image = $image['image'] ?? $image['path'] ?? $image['url'] ?? null;
         }
-
         if (!$image) {
             return null;
         }
-
         if (Str::startsWith($image, ['http://', 'https://'])) {
             return $image;
         }
-
         return asset('storage/' . ltrim($image, '/'));
     };
-
-    /*
-    |--------------------------------------------------------------------------
-    | Gallery Images
-    |--------------------------------------------------------------------------
-    */
     $galleryImages = $onlinePuja->gallery_images ?? [];
-
     if (is_string($galleryImages)) {
         $galleryImages = json_decode($galleryImages, true) ?? [];
     }
-
     if (!is_array($galleryImages)) {
         $galleryImages = [];
     }
-
     $galleryImages = collect($galleryImages)
         ->map(fn($image) => $getImageUrl($image))
         ->filter()
         ->values();
-
     if ($galleryImages->isEmpty()) {
         $fallbackImage = $getImageUrl(
             $onlinePuja->banner_image ?: $onlinePuja->thumbnail_image
         );
-
         if ($fallbackImage) {
             $galleryImages->push($fallbackImage);
         }
     }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Packages
-    |--------------------------------------------------------------------------
-    */
     $packages = $onlinePuja->packages
         ->where('status', 1)
         ->sortBy('sort_order')
         ->values();
-
     $firstPackage = $packages->first();
-
-    /*
-    |--------------------------------------------------------------------------
-    | FAQ
-    |--------------------------------------------------------------------------
-    */
     $faqs = $onlinePuja->faqs
         ->where('status', 1)
         ->values();
-
-    /*
-    |--------------------------------------------------------------------------
-    | Date
-    |--------------------------------------------------------------------------
-    */
     $pujaDate = $onlinePuja->puja_datetime
         ? \Carbon\Carbon::parse($onlinePuja->puja_datetime)
         : null;
-
     $availableSeats = max(
         0,
         (int) $onlinePuja->total_seat - (int) $onlinePuja->booked_seat
     );
 @endphp
-
-
-{{-- =========================================================
-    PAGE BREADCRUMB
-========================================================= --}}
-
 <section class="puja-breadcrumb">
     <div class="container">
         <div class="puja-breadcrumb-inner">
@@ -116,76 +65,52 @@
         </div>
     </div>
 </section>
-
-
-{{-- =========================================================
-    HERO SECTION
-========================================================= --}}
-
 <section class="puja-detail-hero">
     <div class="container">
-
         <div class="puja-hero-grid">
-
-            {{-- LEFT: GALLERY SLIDER --}}
             <div class="puja-gallery-column">
-
                 <div class="puja-gallery-card">
-
                     <div class="puja-gallery-main">
-
                         @if($galleryImages->isNotEmpty())
-
                             @foreach($galleryImages as $index => $image)
                                 <div class="puja-gallery-slide {{ $index === 0 ? 'active' : '' }}"
                                      data-slide="{{ $index }}">
-
                                     <img src="{{ $image }}"
                                          alt="{{ $onlinePuja->title }} - Gallery {{ $index + 1 }}"
                                          loading="{{ $index === 0 ? 'eager' : 'lazy' }}">
                                 </div>
                             @endforeach
-
                         @else
-
                             <div class="puja-gallery-empty">
                                 <i class="fa fa-place-of-worship"></i>
                                 <span>Puja Image</span>
                             </div>
-
                         @endif
-
                         @if($onlinePuja->is_featured)
                             <div class="puja-featured-label">
                                 <i class="fa fa-star"></i>
                                 Featured Puja
                             </div>
                         @endif
-
                         @if($galleryImages->count() > 1)
                             <button type="button"
                                     class="gallery-arrow gallery-prev"
                                     aria-label="Previous image">
                                 <i class="fa fa-chevron-left"></i>
                             </button>
-
                             <button type="button"
                                     class="gallery-arrow gallery-next"
                                     aria-label="Next image">
                                 <i class="fa fa-chevron-right"></i>
                             </button>
                         @endif
-
                         <div class="gallery-counter">
                             <i class="far fa-images"></i>
                             <span id="galleryCurrent">1</span>
                             /
                             <span>{{ max(1, $galleryImages->count()) }}</span>
                         </div>
-
                     </div>
-
-                    {{-- THUMBNAILS --}}
                     @if($galleryImages->count() > 1)
                         <div class="puja-gallery-thumbnails">
                             @foreach($galleryImages as $index => $image)
@@ -193,7 +118,6 @@
                                         class="gallery-thumb {{ $index === 0 ? 'active' : '' }}"
                                         data-thumb="{{ $index }}"
                                         aria-label="View image {{ $index + 1 }}">
-
                                     <img src="{{ $image }}"
                                          alt="Gallery thumbnail {{ $index + 1 }}"
                                          loading="lazy">
@@ -201,47 +125,31 @@
                             @endforeach
                         </div>
                     @endif
-
                 </div>
-
                 <div class="gallery-caption">
                     <span class="gallery-caption-line"></span>
                     <span>Divine moments, sacred rituals</span>
                 </div>
-
             </div>
-
-
-            {{-- RIGHT: PUJA INFORMATION --}}
             <div class="puja-info-column">
-
                 <div class="puja-info-top">
-
                     <div class="puja-category-label">
                         <span class="category-dot"></span>
                         {{ $onlinePuja->category->name ?? 'Sacred Ritual' }}
                     </div>
-
                     <h1>{{ $onlinePuja->title }}</h1>
-
                     <div class="puja-title-decoration">
                         <span></span>
                         <i class="fa fa-om"></i>
                         <span></span>
                     </div>
-
                     @if($onlinePuja->short_description)
                         <p class="puja-short-description">
                             {{ $onlinePuja->short_description }}
                         </p>
                     @endif
-
                 </div>
-
-
-                {{-- PUJA DETAILS --}}
                 <div class="puja-quick-details">
-
                     @if($onlinePuja->temple_name)
                         <div class="quick-detail-item">
                             <div class="quick-detail-icon">
@@ -253,7 +161,6 @@
                             </div>
                         </div>
                     @endif
-
                     @if($pujaDate)
                         <div class="quick-detail-item">
                             <div class="quick-detail-icon">
@@ -265,7 +172,6 @@
                             </div>
                         </div>
                     @endif
-
                     @if($onlinePuja->day)
                         <div class="quick-detail-item">
                             <div class="quick-detail-icon">
@@ -277,7 +183,6 @@
                             </div>
                         </div>
                     @endif
-
                     @if($onlinePuja->tithi)
                         <div class="quick-detail-item">
                             <div class="quick-detail-icon">
@@ -289,7 +194,6 @@
                             </div>
                         </div>
                     @endif
-
                     @if($onlinePuja->muhurat)
                         <div class="quick-detail-item">
                             <div class="quick-detail-icon">
@@ -301,7 +205,6 @@
                             </div>
                         </div>
                     @endif
-
                     @if($onlinePuja->temple_city || $onlinePuja->temple_state)
                         <div class="quick-detail-item">
                             <div class="quick-detail-icon">
@@ -318,11 +221,7 @@
                             </div>
                         </div>
                     @endif
-
                 </div>
-
-
-                {{-- SEAT AVAILABILITY --}}
                 @if($onlinePuja->total_seat)
                     <div class="puja-seat-status">
                         <div class="seat-status-top">
@@ -330,60 +229,39 @@
                                 <i class="fa fa-users"></i>
                                 Participation Availability
                             </span>
-
                             <strong>{{ $availableSeats }} Seats Left</strong>
                         </div>
-
                         @php
                             $seatPercentage = min(
                                 100,
                                 ($onlinePuja->booked_seat / max(1, $onlinePuja->total_seat)) * 100
                             );
                         @endphp
-
                         <div class="seat-progress">
                             <span style="width: {{ $seatPercentage }}%"></span>
                         </div>
                     </div>
                 @endif
-
-
-                {{-- PRICE AND PARTICIPATE --}}
-                <div class="puja-booking-card">
-
-                   
+                <div class="puja-booking-card">               
                     <button type="button"
                             class="participate-main-btn"
                             id="openPackageModal"
                             {{ $packages->isEmpty() || $availableSeats <= 0 && $onlinePuja->total_seat ? 'disabled' : '' }}>
-
                         <span>Participate in This Puja</span>
                         <i class="fa fa-arrow-right"></i>
-
                     </button>
-
                     <div class="booking-trust-note">
                         <i class="fa fa-check-circle"></i>
                         Choose your preferred participation package
                     </div>
-
                 </div>
-
             </div>
-
         </div>
     </div>
 </section>
-
-
-{{-- =========================================================
-    TRUST STRIP
-========================================================= --}}
-
 <section class="puja-trust-strip">
     <div class="container">
         <div class="trust-strip-grid">
-
             <div class="trust-item">
                 <div class="trust-icon">
                     <i class="fa fa-praying-hands"></i>
@@ -393,7 +271,6 @@
                     <span>Traditional Vedic Practices</span>
                 </div>
             </div>
-
             <div class="trust-item">
                 <div class="trust-icon">
                     <i class="fa fa-user-check"></i>
@@ -403,7 +280,6 @@
                     <span>Performed with Devotion</span>
                 </div>
             </div>
-
             <div class="trust-item">
                 <div class="trust-icon">
                     <i class="fa fa-video"></i>
@@ -413,7 +289,6 @@
                     <span>From Your Home</span>
                 </div>
             </div>
-
             <div class="trust-item">
                 <div class="trust-icon">
                     <i class="fa fa-heart"></i>
@@ -423,160 +298,109 @@
                     <span>Peace, Positivity and Prosperity</span>
                 </div>
             </div>
-
         </div>
     </div>
 </section>
-
-
-
-
 <div class="puja-section-navigation" id="pujaSectionNavigation">
     <div class="container">
         <div class="puja-section-nav-inner">
-
             @if($onlinePuja->puja_significance)
                 <a href="#significance" class="puja-nav-link active">
                     Significance
                 </a>
             @endif
-
             @if($onlinePuja->puja_benefits)
                 <a href="#benefits" class="puja-nav-link">
                     Benefits
                 </a>
             @endif
-
             @if($onlinePuja->puja_procedure)
                 <a href="#procedure" class="puja-nav-link">
                     Procedure
                 </a>
             @endif
-
             @if($onlinePuja->what_you_will_receive)
                 <a href="#receive" class="puja-nav-link">
                     What You Receive
                 </a>
             @endif
-
             @if($onlinePuja->temple_name)
                 <a href="#temple" class="puja-nav-link">
                     Temple
                 </a>
             @endif
-
             @if($faqs->isNotEmpty())
                 <a href="#faqs" class="puja-nav-link">
                     FAQs
                 </a>
             @endif
-
         </div>
     </div>
 </div>
-
-
-{{-- =========================================================
-    MAIN CONTENT
-========================================================= --}}
-
 <section class="puja-content-section">
     <div class="container">
-
         <div class="puja-content-layout">
-
             <div class="puja-content-main">
-
-                {{-- SIGNIFICANCE --}}
                 @if($onlinePuja->puja_significance)
                     <section class="puja-content-block" id="significance">
-
                         <div class="section-heading">
                             <span class="section-eyebrow">UNDERSTANDING THE RITUAL</span>
                             <h2>Puja Significance</h2>
                             <p>Discover the spiritual meaning behind this sacred ceremony.</p>
                         </div>
-
                         <div class="puja-rich-content">
                             {!! $onlinePuja->puja_significance !!}
                         </div>
-
                     </section>
                 @endif
-
-
-                {{-- BENEFITS --}}
                 @if($onlinePuja->puja_benefits)
                     <section class="puja-content-block" id="benefits">
-
                         <div class="section-heading">
                             <span class="section-eyebrow">DIVINE POSSIBILITIES</span>
                             <h2>Benefits of This Puja</h2>
                             <p>Understand the traditional spiritual benefits of performing this puja.</p>
                         </div>
-
                         <div class="puja-rich-content">
                             {!! $onlinePuja->puja_benefits !!}
                         </div>
-
                     </section>
                 @endif
-
-
-                {{-- PROCEDURE --}}
                 @if($onlinePuja->puja_procedure)
                     <section class="puja-content-block" id="procedure">
-
                         <div class="section-heading">
                             <span class="section-eyebrow">THE SACRED PROCESS</span>
                             <h2>Puja Procedure</h2>
                             <p>Learn how the ceremony is traditionally performed.</p>
                         </div>
-
                         <div class="puja-rich-content">
                             {!! $onlinePuja->puja_procedure !!}
                         </div>
-
                     </section>
                 @endif
-
-
-                {{-- WHAT YOU RECEIVE --}}
                 @if($onlinePuja->what_you_will_receive)
                     <section class="puja-content-block" id="receive">
-
                         <div class="section-heading">
                             <span class="section-eyebrow">YOUR PARTICIPATION</span>
                             <h2>What You Will Receive</h2>
                             <p>Know what is included when you participate in this puja.</p>
                         </div>
-
                         <div class="puja-rich-content">
                             {!! $onlinePuja->what_you_will_receive !!}
                         </div>
-
                     </section>
                 @endif
-
-
-                {{-- TEMPLE --}}
                 @if($onlinePuja->temple_name)
                     <section class="puja-content-block" id="temple">
-
                         <div class="section-heading">
                             <span class="section-eyebrow">SACRED DESTINATION</span>
                             <h2>About the Temple</h2>
                         </div>
-
                         <div class="temple-information-card">
-
                             <div class="temple-information-icon">
                                 <i class="fa fa-place-of-worship"></i>
                             </div>
-
                             <div class="temple-information-content">
                                 <h3>{{ $onlinePuja->temple_name }}</h3>
-
                                 @if($onlinePuja->temple_location || $onlinePuja->temple_city || $onlinePuja->temple_state)
                                     <p class="temple-location">
                                         <i class="fa fa-map-marker-alt"></i>
@@ -587,66 +411,45 @@
                                         ])->filter()->implode(', ') }}
                                     </p>
                                 @endif
-
                                 @if($onlinePuja->temple_description)
                                     <div class="puja-rich-content">
                                         {!! $onlinePuja->temple_description !!}
                                     </div>
                                 @endif
-
                                 @if($onlinePuja->temple_address)
                                     <p>{{ $onlinePuja->temple_address }}</p>
                                 @endif
                             </div>
-
                         </div>
-
                     </section>
                 @endif
-
-
-                {{-- FAQ --}}
                 @if($faqs->isNotEmpty())
                     <section class="puja-content-block" id="faqs">
-
                         <div class="section-heading">
                             <span class="section-eyebrow">NEED MORE INFORMATION?</span>
                             <h2>Frequently Asked Questions</h2>
                             <p>Find answers to common questions about this puja.</p>
                         </div>
-
                         <div class="puja-faq-list">
-
                             @foreach($faqs as $index => $faq)
                                 <div class="puja-faq-item {{ $index === 0 ? 'open' : '' }}">
-
                                     <button type="button" class="puja-faq-question">
                                         <span>{{ $faq->question }}</span>
                                         <i class="fa fa-plus"></i>
                                     </button>
-
                                     <div class="puja-faq-answer">
                                         <div>
                                             {!! $faq->answer !!}
                                         </div>
                                     </div>
-
                                 </div>
                             @endforeach
-
                         </div>
-
                     </section>
                 @endif
-
             </div>
-
-
-            {{-- CONTENT SIDEBAR --}}
             <aside class="puja-content-sidebar">
-
                 <div class="sidebar-booking-card">
-
                     <div class="sidebar-card-top">
                         <span class="sidebar-eyebrow">YOUR DIVINE JOURNEY</span>
                         <h3>Be a Part of This Sacred Puja</h3>
@@ -659,55 +462,37 @@
                         Choose Your Package
                         <i class="fa fa-arrow-right"></i>
                     </button>
-
                     <div class="sidebar-assurance">
                         <i class="fa fa-lock"></i>
                         Safe and Secure Participation
                     </div>
-
                 </div>
-
-
                 <div class="sidebar-highlights-card">
                     <h4>Participation Highlights</h4>
-
                     <div class="sidebar-highlight">
                         <i class="fa fa-check-circle"></i>
                         <span>Traditional Vedic rituals</span>
                     </div>
-
                     <div class="sidebar-highlight">
                         <i class="fa fa-check-circle"></i>
                         <span>Experienced priests</span>
                     </div>
-
                     <div class="sidebar-highlight">
                         <i class="fa fa-check-circle"></i>
                         <span>Online participation</span>
                     </div>
-
                     <div class="sidebar-highlight">
                         <i class="fa fa-check-circle"></i>
                         <span>Participation confirmation</span>
                     </div>
                 </div>
-
             </aside>
-
         </div>
     </div>
 </section>
-
-
-{{-- =========================================================
-    RELATED PUJAS
-========================================================= --}}
-
 @if(isset($relatedPujas) && $relatedPujas->isNotEmpty())
-
 <section class="related-pujas-section">
     <div class="container">
-
         <div class="related-section-heading">
             <div>
                 <span class="section-eyebrow">EXPLORE MORE</span>
@@ -715,25 +500,19 @@
                 <p>Discover more sacred ceremonies and spiritual experiences.</p>
             </div>
         </div>
-
         <div class="related-puja-grid">
-
             @foreach($relatedPujas as $relatedPuja)
-
                 @php
                     $relatedImage = $getImageUrl(
                         $relatedPuja->thumbnail_image ?: $relatedPuja->banner_image
                     );
-
                     $relatedPackage = $relatedPuja->packages
                         ->where('status', 1)
                         ->sortBy('sort_order')
                         ->first();
                 @endphp
-
                 <a href="{{ route('frontend.online-puja.show', $relatedPuja->slug) }}"
                    class="related-puja-card">
-
                     <div class="related-puja-image">
                         @if($relatedImage)
                             <img src="{{ $relatedImage }}"
@@ -744,23 +523,18 @@
                                 <i class="fa fa-place-of-worship"></i>
                             </div>
                         @endif
-
                         <span class="related-image-arrow">
                             <i class="fa fa-arrow-up"></i>
                         </span>
                     </div>
-
                     <div class="related-puja-body">
                         <span class="related-category">
                             {{ $relatedPuja->category->name ?? 'Sacred Puja' }}
                         </span>
-
                         <h3>{{ $relatedPuja->title }}</h3>
-
                         @if($relatedPuja->short_description)
                             <p>{{ Str::limit($relatedPuja->short_description, 90) }}</p>
                         @endif
-
                         <div class="related-puja-footer">
                             <span>
                                 @if($relatedPackage)
@@ -769,84 +543,54 @@
                                     Explore Puja
                                 @endif
                             </span>
-
                             <i class="fa fa-arrow-right"></i>
                         </div>
                     </div>
-
                 </a>
-
             @endforeach
-
         </div>
-
     </div>
 </section>
-
 @endif
-
-
-{{-- =========================================================
-    PACKAGE SELECTION MODAL
-========================================================= --}}
-
 <div class="package-modal-overlay" id="packageModal" aria-hidden="true">
-
     <div class="package-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="packageModalTitle">
-
         <div class="package-modal-header">
-
             <div>
                 <span class="modal-eyebrow">PERSONALISE YOUR PARTICIPATION</span>
                 <h2 id="packageModalTitle">Choose Your Package</h2>
                 <p>Select the participation option that suits you best.</p>
             </div>
-
             <button type="button"
                     class="package-modal-close"
                     id="closePackageModal"
                     aria-label="Close package selection">
                 <i class="fa fa-times"></i>
             </button>
-
         </div>
-
-
         <div class="package-modal-puja-info">
             <div class="modal-puja-icon">
                 <i class="fa fa-om"></i>
             </div>
-
             <div>
                 <span>Selected Puja</span>
                 <strong>{{ $onlinePuja->title }}</strong>
             </div>
         </div>
-
-
         <div class="package-modal-body">
-
             <div class="package-selection-heading">
                 <div>
                     <h3>Available Packages</h3>
                     <span>{{ $packages->count() }} participation options</span>
                 </div>
-
                 <span class="package-select-hint">
                     Select one package
                 </span>
             </div>
-
-
             @if($packages->isNotEmpty())
-
                 <div class="package-options-list" id="packageOptionsList">
-
                     @foreach($packages as $index => $package)
-
                         <label class="package-option-card {{ $index === 0 ? 'recommended-package' : '' }}"
                                data-package-card="{{ $package->id }}">
-
                             <input type="radio"
                                    class="package-radio"
                                    name="selected_package"
@@ -855,16 +599,12 @@
                                    data-name="{{ $package->package_name }}"
                                    data-devotees="{{ $package->devotees_count }}"
                                    {{ $index === 0 ? 'checked' : '' }}>
-
                             <span class="custom-radio-indicator">
-                                <i class="fa fa-check"></i>
+                               <i class="fa fa-check"></i>
                             </span>
-
                             <span class="package-option-content">
-
                                 <span class="package-option-top">
                                     <strong>{{ $package->package_name }}</strong>
-
                                     @if($package->is_recommended)
                                         <span class="recommended-badge">
                                             <i class="fa fa-star"></i>
@@ -872,13 +612,11 @@
                                         </span>
                                     @endif
                                 </span>
-
                                 @if($package->description)
                                     <span class="package-description">
                                         {{ $package->description }}
                                     </span>
                                 @endif
-
                                 <span class="package-meta">
                                     @if($package->devotees_count)
                                         <span>
@@ -887,95 +625,68 @@
                                             {{ (int) $package->devotees_count === 1 ? 'Devotee' : 'Devotees' }}
                                         </span>
                                     @endif
-
                                     <span>
                                         <i class="fa fa-check-circle"></i>
                                         Puja Participation
                                     </span>
                                 </span>
-
                             </span>
-
                             <span class="package-option-price">
                                 <small>Amount</small>
                                 <strong>₹{{ number_format($package->price, 0) }}</strong>
                             </span>
-
                         </label>
-
                     @endforeach
-
                 </div>
-
-
                 <div class="package-selection-error" id="packageSelectionError">
                     Please select a package to continue.
                 </div>
-
-
-                {{-- SELECTED PACKAGE SUMMARY --}}
                 <div class="selected-package-summary" id="selectedPackageSummary">
-
                     <div class="selected-summary-info">
                         <span>Selected Package</span>
                         <strong id="selectedPackageName">
                             {{ $firstPackage->package_name ?? '' }}
                         </strong>
                     </div>
-
                     <div class="selected-summary-price">
                         <span>Total Amount</span>
                         <strong id="selectedPackagePrice">
                             ₹{{ number_format($firstPackage->price ?? 0, 0) }}
                         </strong>
                     </div>
-
                 </div>
-
             @else
-
                 <div class="no-packages-message">
                     <i class="fa fa-box-open"></i>
                     <h3>No Packages Available</h3>
                     <p>Participation packages are not available at the moment.</p>
                 </div>
-
             @endif
-
         </div>
-
-
+        <form id="onlinePujaPackageForm" method="POST" action="{{ route('frontend.online-puja.select-package') }}">
+            @csrf
+            <input type="hidden" name="puja_id" value="{{ $onlinePuja->id }}">
+            <input type="hidden" name="package_id" id="selectedPackageId">
+        </form>
         <div class="package-modal-footer">
-
             <button type="button"
                     class="modal-cancel-btn"
                     id="cancelPackageSelection">
                 Cancel
             </button>
-
             <button type="button"
                     class="modal-continue-btn"
                     id="continuePackageSelection"
                     {{ $packages->isEmpty() ? 'disabled' : '' }}>
-
                 <span>Continue</span>
                 <i class="fa fa-arrow-right"></i>
-
             </button>
-
         </div>
-
     </div>
-
 </div>
-
-
 @endsection
-
-
 @push('styles')
 <style>
-
 :root {
     --puja-primary: #a84e20;
     --puja-primary-dark: #783514;
@@ -2687,20 +2398,8 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
 
-    /*
-    |--------------------------------------------------------------------------
-    | 1. DETECT MAIN WEBSITE STICKY HEADER
-    |--------------------------------------------------------------------------
-    */
-
     const navigation = document.getElementById('pujaSectionNavigation');
-
     function updateHeaderOffset() {
-
-        /*
-         * Add your actual website header selector first if needed.
-         * These selectors cover common Laravel website layouts.
-         */
         const headerSelectors = [
             '#header',
             '#site-header',
@@ -2711,24 +2410,17 @@ document.addEventListener('DOMContentLoaded', function () {
             '.navbar',
             'header'
         ];
-
         let header = null;
-
         for (const selector of headerSelectors) {
-
             const elements = document.querySelectorAll(selector);
-
             for (const element of elements) {
-
                 if (
                     element === navigation ||
                     navigation?.contains(element)
                 ) {
                     continue;
                 }
-
                 const style = window.getComputedStyle(element);
-
                 if (
                     style.position === 'fixed' ||
                     style.position === 'sticky'
@@ -2737,21 +2429,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     break;
                 }
             }
-
             if (header) break;
         }
-
         let headerHeight = 0;
-
         if (header) {
-
             const rect = header.getBoundingClientRect();
             const style = window.getComputedStyle(header);
-
-            /*
-             * Only account for headers currently occupying
-             * the top of the viewport.
-             */
             if (
                 rect.height > 0 &&
                 rect.bottom > 0 &&
@@ -2761,697 +2444,346 @@ document.addEventListener('DOMContentLoaded', function () {
                 headerHeight = rect.bottom;
             }
         }
-
         document.documentElement.style.setProperty(
             '--puja-header-height',
             headerHeight + 'px'
         );
     }
-
     updateHeaderOffset();
-
     window.addEventListener('resize', updateHeaderOffset);
-
     window.addEventListener('scroll', updateHeaderOffset, {
         passive: true
     });
-
     if ('ResizeObserver' in window) {
-
         const headerElement = document.querySelector(
             '#header, #site-header, .site-header, .main-header, .header-area, .main-navbar, .navbar, header'
         );
-
         if (headerElement) {
-
             const headerObserver = new ResizeObserver(function () {
                 updateHeaderOffset();
             });
-
             headerObserver.observe(headerElement);
         }
     }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | 2. GALLERY SLIDER
-    |--------------------------------------------------------------------------
-    */
-
     const slides = document.querySelectorAll('.puja-gallery-slide');
-
     const thumbnails = document.querySelectorAll('.gallery-thumb');
-
     const previousButton = document.querySelector('.gallery-prev');
-
     const nextButton = document.querySelector('.gallery-next');
-
     const galleryCurrent = document.getElementById('galleryCurrent');
-
     const galleryMain = document.querySelector('.puja-gallery-main');
-
     let currentSlide = 0;
-
     let galleryTimer = null;
-
     function showGallerySlide(index) {
-
         if (!slides.length) return;
-
         currentSlide = (index + slides.length) % slides.length;
-
         slides.forEach((slide, i) => {
-
             slide.classList.toggle(
                 'active',
                 i === currentSlide
             );
-
         });
-
         thumbnails.forEach((thumb, i) => {
-
             thumb.classList.toggle(
                 'active',
                 i === currentSlide
             );
-
         });
-
         if (galleryCurrent) {
             galleryCurrent.textContent = currentSlide + 1;
         }
     }
-
     function startGalleryAutoplay() {
-
         if (slides.length <= 1) return;
-
         clearInterval(galleryTimer);
-
         galleryTimer = setInterval(function () {
-
             showGallerySlide(currentSlide + 1);
-
         }, 5000);
     }
-
     function stopGalleryAutoplay() {
-
         clearInterval(galleryTimer);
-
     }
-
     if (previousButton) {
-
         previousButton.addEventListener('click', function () {
-
             showGallerySlide(currentSlide - 1);
-
             startGalleryAutoplay();
-
         });
-
     }
-
     if (nextButton) {
-
         nextButton.addEventListener('click', function () {
-
             showGallerySlide(currentSlide + 1);
-
             startGalleryAutoplay();
-
         });
-
     }
-
     thumbnails.forEach((thumb, index) => {
-
         thumb.addEventListener('click', function () {
-
             showGallerySlide(index);
-
             startGalleryAutoplay();
-
         });
-
     });
-
     if (galleryMain) {
-
         galleryMain.addEventListener('mouseenter', stopGalleryAutoplay);
-
         galleryMain.addEventListener('mouseleave', startGalleryAutoplay);
-
     }
-
     startGalleryAutoplay();
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | 3. PACKAGE MODAL
-    |--------------------------------------------------------------------------
-    */
-
     const packageModal = document.getElementById('packageModal');
-
     const openModalButtons = [
-
         document.getElementById('openPackageModal'),
-
         document.getElementById('sidebarParticipateBtn')
-
     ];
-
     const closeModalButton = document.getElementById('closePackageModal');
-
     const cancelModalButton = document.getElementById('cancelPackageSelection');
-
     const packageCards = document.querySelectorAll('.package-option-card');
-
     const packageRadios = document.querySelectorAll('.package-radio');
-
     const selectedPackageName = document.getElementById('selectedPackageName');
-
     const selectedPackagePrice = document.getElementById('selectedPackagePrice');
-
     const selectionError = document.getElementById('packageSelectionError');
-
     const continueButton = document.getElementById('continuePackageSelection');
-
-
     function openPackageModal() {
-
         if (!packageModal) return;
-
         packageModal.classList.add('show');
-
         packageModal.setAttribute('aria-hidden', 'false');
-
         document.body.style.overflow = 'hidden';
-
         const selected = packageModal.querySelector('.package-radio:checked');
-
         if (selected) {
             selected.focus();
         }
     }
-
     function closePackageModal() {
-
         if (!packageModal) return;
-
         packageModal.classList.remove('show');
-
         packageModal.setAttribute('aria-hidden', 'true');
-
         document.body.style.overflow = '';
-
     }
-
     openModalButtons.forEach(button => {
-
         if (button && !button.disabled) {
-
             button.addEventListener('click', openPackageModal);
-
         }
-
     });
-
     if (closeModalButton) {
-
         closeModalButton.addEventListener('click', closePackageModal);
-
     }
-
     if (cancelModalButton) {
-
         cancelModalButton.addEventListener('click', closePackageModal);
-
     }
-
     if (packageModal) {
-
         packageModal.addEventListener('click', function (event) {
-
             if (event.target === packageModal) {
-
                 closePackageModal();
-
             }
-
         });
-
     }
-
     document.addEventListener('keydown', function (event) {
-
         if (
             event.key === 'Escape' &&
             packageModal?.classList.contains('show')
         ) {
-
             closePackageModal();
-
         }
-
     });
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | 4. PACKAGE SELECTION
-    |--------------------------------------------------------------------------
-    */
-
     function updatePackageSelection() {
-
         packageCards.forEach(card => {
-
             const radio = card.querySelector('.package-radio');
-
             card.classList.toggle(
                 'selected',
                 radio && radio.checked
             );
-
         });
-
         const selectedPackage = document.querySelector(
             '.package-radio:checked'
         );
-
         if (selectedPackage) {
-
             const price = Number(selectedPackage.dataset.price || 0);
-
             const name = selectedPackage.dataset.name || 'Selected Package';
-
             if (selectedPackageName) {
-
                 selectedPackageName.textContent = name;
-
             }
-
             if (selectedPackagePrice) {
-
-                selectedPackagePrice.textContent =
-                    '₹' + price.toLocaleString('en-IN');
-
+                selectedPackagePrice.textContent = '₹' + price.toLocaleString('en-IN');
             }
-
             if (selectionError) {
-
                 selectionError.classList.remove('show');
-
             }
-
         } else {
-
             if (selectedPackageName) {
-
                 selectedPackageName.textContent = 'No package selected';
-
             }
-
             if (selectedPackagePrice) {
-
                 selectedPackagePrice.textContent = '₹0';
-
             }
-
         }
-
     }
-
     packageRadios.forEach(radio => {
-
         radio.addEventListener('change', function () {
-
             updatePackageSelection();
-
         });
-
     });
-
     packageCards.forEach(card => {
-
         card.addEventListener('click', function (event) {
-
             if (event.target.closest('input')) return;
-
             const radio = card.querySelector('.package-radio');
-
             if (!radio) return;
-
             radio.checked = true;
-
             radio.dispatchEvent(new Event('change', {
                 bubbles: true
             }));
-
         });
-
     });
-
     updatePackageSelection();
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | 5. CONTINUE WITH SELECTED PACKAGE
-    |--------------------------------------------------------------------------
-    */
-
     if (continueButton) {
-
         continueButton.addEventListener('click', function () {
-
-            const selected = document.querySelector(
-                '.package-radio:checked'
-            );
-
+            const selected = document.querySelector('.package-radio:checked');
             if (!selected) {
-
-                if (selectionError) {
-
-                    selectionError.classList.add('show');
-
-                }
-
+                if (selectionError) selectionError.classList.add('show');
                 return;
-
             }
-
-            const packageDetails = {
-
-                pujaId: @json($onlinePuja->id),
-
-                pujaTitle: @json($onlinePuja->title),
-
-                packageId: selected.value,
-
-                packageName: selected.dataset.name,
-
-                packagePrice: selected.dataset.price
-
-            };
-
-            window.dispatchEvent(
-                new CustomEvent('puja:package-selected', {
-                    detail: packageDetails
-                })
-            );
-
-            closePackageModal();
-
-            console.log('Selected package:', packageDetails);
-
-            /*
-             * Connect your checkout/booking route here.
-             */
-
+            const packageForm = document.getElementById('onlinePujaPackageForm');
+            const packageIdInput = document.getElementById('selectedPackageId');
+            if (!packageForm || !packageIdInput) {
+                console.error('Package selection form not found.');
+                return;
+            }
+            packageIdInput.value = selected.value;
+            continueButton.disabled = true;
+            const continueText = continueButton.querySelector('span');
+            if (continueText) continueText.textContent = 'Please wait...';
+            packageForm.submit();
         });
-
     }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | 6. FAQ ACCORDION
-    |--------------------------------------------------------------------------
-    */
-
+ 
     document.querySelectorAll('.puja-faq-question').forEach(button => {
-
         button.addEventListener('click', function () {
-
             const currentItem = this.closest('.puja-faq-item');
-
             if (!currentItem) return;
-
             document.querySelectorAll('.puja-faq-item').forEach(item => {
-
                 if (item !== currentItem) {
-
                     item.classList.remove('open');
-
                 }
-
             });
-
             currentItem.classList.toggle('open');
-
         });
-
     });
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | 7. STICKY NAVIGATION ACTIVE STATE
-    |--------------------------------------------------------------------------
-    */
-
     const navLinks = document.querySelectorAll('.puja-nav-link');
-
     const sections = Array.from(navLinks)
-
         .map(link => {
-
             const id = link.getAttribute('href');
-
             return document.querySelector(id);
-
         })
-
         .filter(Boolean);
-
-
     function setActiveNavigation(sectionId) {
-
         navLinks.forEach(link => {
-
             const isActive =
                 link.getAttribute('href') === '#' + sectionId;
-
             link.classList.toggle('active', isActive);
-
             if (isActive) {
-
-                /*
-                 * Keep the active tab visible on mobile.
-                 */
                 link.scrollIntoView({
                     behavior: 'smooth',
                     block: 'nearest',
                     inline: 'nearest'
                 });
-
             }
-
         });
-
     }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | 8. INTERSECTION OBSERVER
-    |--------------------------------------------------------------------------
-    */
-
     if ('IntersectionObserver' in window && sections.length) {
-
         let observer;
-
         function createSectionObserver() {
-
             if (observer) {
-
                 observer.disconnect();
-
             }
-
             const headerHeight = parseFloat(
                 getComputedStyle(document.documentElement)
                     .getPropertyValue('--puja-header-height')
             ) || 0;
-
             const navHeight = navigation
                 ? navigation.offsetHeight
                 : 58;
-
             const topOffset = Math.round(
                 headerHeight + navHeight + 35
             );
-
             observer = new IntersectionObserver(function (entries) {
-
                 const visibleSections = entries
-
                     .filter(entry => entry.isIntersecting)
-
                     .sort((a, b) => {
-
                         return a.boundingClientRect.top -
-                               b.boundingClientRect.top;
-
+                              b.boundingClientRect.top;
                     });
-
                 if (visibleSections.length) {
-
                     setActiveNavigation(
-                        visibleSections[0].target.id
+                       visibleSections[0].target.id
                     );
-
                 }
-
             }, {
-
                 root: null,
-
                 rootMargin:
-                    '-' + topOffset + 'px 0px -60% 0px',
-
+                   '-' + topOffset + 'px 0px -60% 0px',
                 threshold: 0
-
             });
-
             sections.forEach(section => {
-
                 observer.observe(section);
-
             });
-
         }
-
         createSectionObserver();
-
         window.addEventListener('resize', createSectionObserver);
-
     }
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | 9. SMOOTH SCROLL NAVIGATION
-    |--------------------------------------------------------------------------
-    */
-
     navLinks.forEach(link => {
-
         link.addEventListener('click', function (event) {
-
             const targetId = this.getAttribute('href');
-
             const target = document.querySelector(targetId);
-
             if (!target) return;
-
             event.preventDefault();
-
             const headerHeight = parseFloat(
-                getComputedStyle(document.documentElement)
-                    .getPropertyValue('--puja-header-height')
+               getComputedStyle(document.documentElement)
+                   .getPropertyValue('--puja-header-height')
             ) || 0;
-
             const navHeight = navigation
                 ? navigation.offsetHeight
                 : 58;
-
             const gap = window.innerWidth <= 767 ? 7 : 12;
-
             const extraSpace = 25;
-
             const totalOffset =
                 headerHeight +
                 gap +
                 navHeight +
                 extraSpace;
-
             const targetPosition =
                 target.getBoundingClientRect().top +
                 window.scrollY -
                 totalOffset;
-
-            /*
-             * Immediately update active navigation.
-             */
             navLinks.forEach(item => {
-
                 item.classList.remove('active');
-
             });
-
             this.classList.add('active');
-
-            /*
-             * Smooth scroll to the correct section.
-             */
             window.scrollTo({
-
                 top: Math.max(0, targetPosition),
-
                 behavior: 'smooth'
-
             });
-
-            /*
-             * Update URL hash without jumping.
-             */
             history.replaceState(
                 null,
                 '',
                 targetId
             );
-
         });
-
     });
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | 10. STICKY NAVIGATION SHADOW
-    |--------------------------------------------------------------------------
-    */
-
     function updateStickyNavigation() {
-
         if (!navigation) return;
-
         const rect = navigation.getBoundingClientRect();
-
         const headerHeight = parseFloat(
             getComputedStyle(document.documentElement)
                 .getPropertyValue('--puja-header-height')
         ) || 0;
-
         if (rect.top <= headerHeight + 15) {
-
             navigation.classList.add('is-sticky');
-
         } else {
-
             navigation.classList.remove('is-sticky');
-
         }
-
     }
-
     window.addEventListener(
         'scroll',
         updateStickyNavigation,
         { passive: true }
     );
-
     updateStickyNavigation();
-
 });
 </script>
 @endpush
