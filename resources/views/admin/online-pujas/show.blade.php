@@ -1,4 +1,4 @@
-@can('online-puja.show')
+@can('online-puja.view')
 @extends('admin.layouts.app')
 
 @section('title', 'View Online Puja')

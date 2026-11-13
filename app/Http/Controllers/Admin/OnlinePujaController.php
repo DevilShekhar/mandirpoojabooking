@@ -5,6 +5,7 @@ use App\Models\OnlinePuja;
 use App\Models\OnlinePujaCategory;
 use App\Models\OnlinePujaPackage;
 use App\Models\OnlinePujaFaq;
+use App\Models\OnlinePujaOrder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -15,15 +16,58 @@ class OnlinePujaController extends Controller
 
 {
 
-    public function index()
+    
+public function index()
+{
+    $user = Auth::user();
+
+    $query = OnlinePuja::with([
+        'category',
+        'creator',
+        'updater'
+    ]);
+
+    if ($user->hasRole('Pandit')) {
+
+        // Pandit: Only show records created by logged-in user
+        $query->where('created_by', $user->id);
+
+    } elseif ($user->hasRole('Admin') || $user->hasRole('Super Admin')) {
+
+        // Admin and Super Admin: Show all records
+        // No filter required
+
+    }
+
+    $pujas = $query->latest()->get();
+
+    return view('admin.online-pujas.index', compact('pujas'));
+}
+
+    public function bookings($id)
     {
         $user = Auth::user();
-        $query = OnlinePuja::with(['category', 'creator', 'updater']);
+
+        // Find selected puja
+        $pujaQuery = OnlinePuja::query();
+
+        // Restrict non-admin users to their own pujas
         if (!in_array($user->role, ['admin', 'super_admin'])) {
-            $query->where('created_by', $user->id);
+            $pujaQuery->where('created_by', $user->id);
         }
-        $pujas = $query->latest()->get();
-        return view('admin.online-pujas.index', compact('pujas'));
+
+        $puja = $pujaQuery->findOrFail($id);
+
+        // Get bookings for this particular puja
+        $bookings = OnlinePujaOrder::with(['package'])
+            ->where('online_puja_id', $puja->id)
+            ->latest()
+            ->get();
+
+        return view(
+            'admin.online-pujas.bookings',
+            compact('puja', 'bookings')
+        );
     }
     public function create()
     {

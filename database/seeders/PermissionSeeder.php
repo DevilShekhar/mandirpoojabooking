@@ -251,7 +251,10 @@ class PermissionSeeder extends Seeder
             'online-puja.index',
             'online-puja.create',
             'online-puja.edit',
-            'online-puja.delete'
+            'online-puja.delete',
+            'my-online-pujabooking.index',
+            'my-online-pujabooking.view',
+            'my-online-pujabooking.show'
         ];
         foreach ($permissions as $permission) {
             Permission::firstOrCreate([
