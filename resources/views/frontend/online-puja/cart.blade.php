@@ -283,7 +283,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             allowEscapeKey: false
                         });
 
-                        window.location.href = verifyData.redirect_url;
+                        window.location.href = @json(route('frontend.online-puja.index'));
                     } catch (error) {
                         await Swal.fire({
                             icon: 'error',

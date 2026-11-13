@@ -31,16 +31,17 @@ class FrontendOnlinePujaCartController extends Controller
         if ($puja->total_seat && $availableSeats <= 0) {
             return back()->with('error', 'No seats available.');
         }
-        if ($puja->total_seat && (int) $package->devotees_count > $availableSeats) {
-            return back()->with('error', 'Not enough seats available for this package.');
+        if ($puja->total_seat && (int) $package->devotees_count > $availableSeats
+        ) {
+            return back()->with('error', 'Not enough seats available for this package.'
+            );
         }
         session()->put('online_puja_cart', [
             'puja_id' => $puja->id,
             'package_id' => $package->id,
             'created_at' => now()->timestamp,
         ]);
-        if (!Auth::check()) {
-            session()->put('url.intended', route('frontend.online-puja.cart'));
+        if (!Auth::check()) {session()->put('url.intended', route('frontend.online-puja.cart')            );
             return redirect()->route('login');
         }
         return redirect()->route('frontend.online-puja.cart');
@@ -50,7 +51,9 @@ class FrontendOnlinePujaCartController extends Controller
     {
         $cart = session('online_puja_cart');
         if (!$cart) {
-            return redirect()->route('frontend.puja')->with('error', 'Please select a puja package first.');
+            return redirect()
+                ->route('frontend.puja')
+                ->with('error', 'Please select a puja package first.');
         }
         $puja = OnlinePuja::with(['category', 'packages'])
             ->where('id', $cart['puja_id'])
@@ -58,7 +61,9 @@ class FrontendOnlinePujaCartController extends Controller
             ->first();
         if (!$puja) {
             session()->forget('online_puja_cart');
-            return redirect()->route('frontend.puja')->with('error', 'Selected puja is no longer available.');
+            return redirect()
+                ->route('frontend.puja')
+                ->with('error', 'Selected puja is no longer available.');
         }
         $package = $puja->packages()
             ->where('id', $cart['package_id'])
@@ -66,14 +71,30 @@ class FrontendOnlinePujaCartController extends Controller
             ->first();
         if (!$package) {
             session()->forget('online_puja_cart');
-            return redirect()->route('frontend.online-puja.show', $puja->slug)->with('error', 'Selected package is no longer available.');
+            return redirect()
+                ->route('frontend.online-puja.show', $puja->slug)
+                ->with('error', 'Selected package is no longer available.');
         }
-        $availableSeats = max(0, (int) $puja->total_seat - (int) $puja->booked_seat);
-        if ($puja->total_seat && ($availableSeats <= 0 || (int) $package->devotees_count > $availableSeats)) {
+        $availableSeats = max(
+            0,
+            (int) $puja->total_seat - (int) $puja->booked_seat
+        );
+        if (
+            $puja->total_seat &&
+            (
+                $availableSeats <= 0 ||
+                (int) $package->devotees_count > $availableSeats
+            )
+        ) {
             session()->forget('online_puja_cart');
-            return redirect()->route('frontend.online-puja.show', $puja->slug)->with('error', 'Required seats are no longer available.');
+            return redirect()
+                ->route('frontend.online-puja.show', $puja->slug)
+                ->with('error', 'Required seats are no longer available.');
         }
-        return view('frontend.online-puja.cart', compact('puja', 'package'));
+        return view('frontend.online-puja.cart', compact(
+            'puja',
+            'package'
+        ));
     }
 
     public function checkout()
@@ -109,8 +130,17 @@ class FrontendOnlinePujaCartController extends Controller
                 'message' => 'This package is no longer available.',
             ], 422);
         }
-        $availableSeats = max(0, (int) $puja->total_seat - (int) $puja->booked_seat);
-        if ($puja->total_seat && ($availableSeats <= 0 || (int) $package->devotees_count > $availableSeats)) {
+        $availableSeats = max(
+            0,
+            (int) $puja->total_seat - (int) $puja->booked_seat
+        );
+        if (
+            $puja->total_seat &&
+            (
+                $availableSeats <= 0 ||
+                (int) $package->devotees_count > $availableSeats
+            )
+        ) {
             return response()->json([
                 'success' => false,
                 'message' => 'Required seats are no longer available.',
@@ -150,9 +180,10 @@ class FrontendOnlinePujaCartController extends Controller
                 'customer_id' => $user->id,
                 'customer_name' => $user->getAttribute('name') ?: 'Customer',
                 'customer_email' => $user->getAttribute('email'),
-                'customer_phone' => $user->getAttribute('phone') ?: $user->getAttribute('mobile'),
+                'customer_phone' => $user->getAttribute('phone')
+                    ?: $user->getAttribute('mobile'),
                 'online_puja_id' => $puja->id,
-                'online_puja_cat_id' => $puja->category_id,
+                'online_puja_cat_id' => $puja->online_puja_category_id,
                 'package_id' => $package->id,
                 'package_name' => $package->package_name,
                 'amount' => $amount,
@@ -173,7 +204,8 @@ class FrontendOnlinePujaCartController extends Controller
                 'key' => $key,
                 'customer_name' => $user->getAttribute('name'),
                 'customer_email' => $user->getAttribute('email'),
-                'customer_phone' => $user->getAttribute('phone') ?: $user->getAttribute('mobile'),
+                'customer_phone' => $user->getAttribute('phone')
+                    ?: $user->getAttribute('mobile'),
                 'puja_title' => $puja->title,
                 'package_name' => $package->package_name,
             ]);
@@ -198,12 +230,17 @@ class FrontendOnlinePujaCartController extends Controller
             ->where('order_number', $validated['order_number'])
             ->where('customer_id', Auth::id())
             ->first();
-        if (!$order || $order->razorpay_order_id !== $validated['razorpay_order_id']) {
+
+        if (
+            !$order ||
+            $order->razorpay_order_id !== $validated['razorpay_order_id']
+        ) {
             return response()->json([
                 'success' => false,
                 'message' => 'Invalid order details.',
             ], 422);
         }
+
         if ($order->payment_status === 'paid') {
             return response()->json([
                 'success' => true,
@@ -211,70 +248,164 @@ class FrontendOnlinePujaCartController extends Controller
                 'redirect_url' => route('frontend.online-puja.index'),
             ]);
         }
+
         $secret = config('services.razorpay.secret');
+
         if (!$secret) {
             return response()->json([
                 'success' => false,
                 'message' => 'Payment verification is not configured.',
             ], 500);
         }
+
         $expectedSignature = hash_hmac(
             'sha256',
-            $validated['razorpay_order_id'] . '|' . $validated['razorpay_payment_id'],
+            $validated['razorpay_order_id'] . '|' .
+                $validated['razorpay_payment_id'],
             $secret
         );
+
         if (!hash_equals($expectedSignature, $validated['razorpay_signature'])) {
             return response()->json([
                 'success' => false,
                 'message' => 'Payment signature verification failed.',
             ], 422);
         }
+
         try {
             $api = new Api(config('services.razorpay.key'), $secret);
-            $payment = $api->payment->fetch($validated['razorpay_payment_id']);
+            $payment = $api->payment->fetch(
+                $validated['razorpay_payment_id']
+            );
+
             if ($payment['order_id'] !== $validated['razorpay_order_id']) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Payment does not match this order.',
                 ], 422);
             }
+
             if ($payment['status'] !== 'captured') {
                 return response()->json([
                     'success' => false,
                     'message' => 'Payment has not been captured yet. Please contact support if money was deducted.',
                 ], 422);
             }
-            if ((int) $payment['amount'] !== (int) round((float) $order->amount * 100)) {
+
+            if (
+                (int) $payment['amount'] !==
+                (int) round((float) $order->amount * 100)
+            ) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Payment amount does not match the booking amount.',
                 ], 422);
             }
-            DB::transaction(function () use ($order, $validated) {
+
+            $bookingResult = DB::transaction(function () use (
+                $order,
+                $validated
+            ) {
                 $lockedOrder = DB::table('online_puja_orders')
                     ->where('id', $order->id)
                     ->lockForUpdate()
                     ->first();
-                if ($lockedOrder->payment_status !== 'paid') {
+
+                if ($lockedOrder->payment_status === 'paid') {
+                    return 'already_paid';
+                }
+
+                $puja = OnlinePuja::where('id', $lockedOrder->online_puja_id)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (!$puja) {
                     DB::table('online_puja_orders')
-                        ->where('id', $order->id)
+                        ->where('id', $lockedOrder->id)
                         ->update([
                             'razorpay_payment_id' => $validated['razorpay_payment_id'],
                             'razorpay_signature' => $validated['razorpay_signature'],
                             'payment_status' => 'paid',
-                            'booking_status' => 'confirmed',
+                            'booking_status' => 'pending_review',
                             'updated_at' => now(),
                         ]);
+
+                    return 'pending_review';
                 }
+
+                $package = $puja->packages()
+                    ->where('id', $lockedOrder->package_id)
+                    ->first();
+
+                if (!$package) {
+                    DB::table('online_puja_orders')
+                        ->where('id', $lockedOrder->id)
+                        ->update([
+                            'razorpay_payment_id' => $validated['razorpay_payment_id'],
+                            'razorpay_signature' => $validated['razorpay_signature'],
+                            'payment_status' => 'paid',
+                            'booking_status' => 'pending_review',
+                            'updated_at' => now(),
+                        ]);
+
+                    return 'pending_review';
+                }
+
+                $requiredSeats = max(1, (int) $package->devotees_count);
+                $totalSeats = (int) ($puja->total_seat ?? 0);
+                $bookedSeats = (int) ($puja->booked_seat ?? 0);
+                $availableSeats = max(0, $totalSeats - $bookedSeats);
+
+                if ($totalSeats > 0 && $requiredSeats > $availableSeats) {
+                    DB::table('online_puja_orders')
+                        ->where('id', $lockedOrder->id)
+                        ->update([
+                            'razorpay_payment_id' => $validated['razorpay_payment_id'],
+                            'razorpay_signature' => $validated['razorpay_signature'],
+                            'payment_status' => 'paid',
+                            'booking_status' => 'pending_review',
+                            'updated_at' => now(),
+                        ]);
+
+                    return 'pending_review';
+                }
+
+                $puja->booked_seat = $bookedSeats + $requiredSeats;
+                $puja->save();
+
+                DB::table('online_puja_orders')
+                    ->where('id', $lockedOrder->id)
+                    ->update([
+                        'razorpay_payment_id' => $validated['razorpay_payment_id'],
+                        'razorpay_signature' => $validated['razorpay_signature'],
+                        'payment_status' => 'paid',
+                        'booking_status' => 'confirmed',
+                        'updated_at' => now(),
+                    ]);
+
+                return 'confirmed';
             });
+
             session()->forget('online_puja_cart');
+
+            if ($bookingResult === 'pending_review') {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Payment received successfully, but seat availability needs verification. Our team will contact you shortly.',
+                    'redirect_url' => route('frontend.online-puja.index'),
+                ]);
+            }
+
             return response()->json([
                 'success' => true,
-                'message' => 'Payment successful. Your puja booking is confirmed.',
+                'message' => $bookingResult === 'already_paid'
+                    ? 'Payment already verified.'
+                    : 'Payment successful. Your puja booking is confirmed.',
                 'redirect_url' => route('frontend.online-puja.index'),
             ]);
         } catch (Throwable $e) {
             report($e);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Unable to verify payment at the moment. Please contact support before attempting another payment.',
@@ -285,8 +416,9 @@ class FrontendOnlinePujaCartController extends Controller
     public function remove()
     {
         session()->forget('online_puja_cart');
+
         return redirect()
-            ->route('frontend.puja')
+            ->route('frontend.online-puja.index')
             ->with('success', 'Package removed from cart.');
     }
 }
