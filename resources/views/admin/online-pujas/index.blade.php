@@ -1,3 +1,4 @@
+
 @can('online-puja.index')
 @extends('admin.layouts.app')
 
@@ -72,7 +73,7 @@
                                         <th>Seats</th>
                                         <th>Status</th>
                                         <th>Created By</th>
-                                        <th width="15%">Action</th>
+                                        <th width="20%">Action</th>
                                     </tr>
                                 </thead>
 
@@ -141,6 +142,13 @@
                                             {{-- Actions --}}
                                             <td>
                                                 <div class="d-flex align-items-center">
+
+                                                    {{-- Customer Bookings Button --}}
+                                                    <a href="{{ route('online-pujas.bookings', $puja->id) }}"
+                                                       class="btn btn-sm btn-success mr-2"
+                                                       title="Customer Bookings">
+                                                        <i class="fas fa-calendar-check"></i>
+                                                    </a>
 
                                                     {{-- View Button --}}
                                                     <a href="{{ route('online-pujas.show', $puja->id) }}"
@@ -256,9 +264,7 @@
             }).then((result) => {
 
                 if (result.isConfirmed) {
-
                     form.submit();
-
                 }
 
             });

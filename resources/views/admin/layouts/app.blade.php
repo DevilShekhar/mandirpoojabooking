@@ -768,6 +768,15 @@
                                 </ul>
                             </li>
                         @endcan
+                        @can('my-online-pujabooking.view')
+                            <li class="{{ request()->routeIs('admin.my-online-pujabooking.*') ? 'active' : '' }}">
+                                <a class="nav-link"
+                                href="{{ route('admin.my-online-pujabooking.index') }}">
+                                    <i data-feather="calendar"></i>
+                                    <span>Online Puja Booking</span>
+                                </a>
+                            </li>
+                        @endcan
                         @can('view-event-bookings')
                             <li class="{{ request()->routeIs('customer.sanatan-event-bookings.*') ? 'active' : '' }}">
                                 <a href="javascript:void(0);" class="nav-link has-dropdown">

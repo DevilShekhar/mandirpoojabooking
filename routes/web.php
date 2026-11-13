@@ -75,6 +75,7 @@ use App\Http\Controllers\Admin\OnlinePujaCategoryController;
 use App\Http\Controllers\Admin\OnlinePujaController;
 use App\Http\Controllers\Frontend\FrontendOnlinePujaController;
 use App\Http\Controllers\Frontend\FrontendOnlinePujaCartController;
+use App\Http\Controllers\Admin\MyOnlinePujaBookingController;
 
 Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
 Route::get('our-temples', [OurTemplesContoller::class, 'index'])->name('frontend.our-temples');
@@ -244,6 +245,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/samgri-booking/{id}/verify-otp',[SamgriBookingController::class, 'verifyOtp'])->name('samgri-booking.verify-otp');
     Route::resource('my-news', NewsController::class)->names('my-news');
     Route::resource('online-puja-categories',OnlinePujaCategoryController::class);
+    Route::get('online-pujas/{id}/bookings', [OnlinePujaController::class, 'bookings'])->name('online-pujas.bookings');
     Route::resource('online-pujas', OnlinePujaController::class);
     Route::prefix('reports')->name('reports.')->group(function () {
         Route::get('/mandir-puja-pandit',[MandirPujaPanditReportController::class, 'index'])->name('mandir-puja-pandit.index');
@@ -322,6 +324,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/city-wise-revenue-booking/csv',[CityWiseRevenueBookingReportController::class, 'exportCsv'])->name('city-wise-revenue-booking.csv');
         
     });
+    Route::get('/my-online-pujabooking', [MyOnlinePujaBookingController::class,'index'])->name('admin.my-online-pujabooking.index');
+    Route::get('/my-online-pujabooking/{id}', [MyOnlinePujaBookingController::class,'show'])->name('admin.my-online-pujabooking.show');
 });
 Route::middleware('auth')->prefix('payment/razorpay')->name('razorpay.')->group(function () {
     Route::post('/create-order', [RazorpayPaymentController::class, 'createOrder'])->name('create-order');
