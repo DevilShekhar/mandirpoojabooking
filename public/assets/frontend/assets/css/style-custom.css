@@ -1860,6 +1860,7 @@ textarea:focus {
 }
 .hb-menu > nav > ul {
     position: relative;
+    background: #ea0505;
 }
 .hb-menu nav > ul > li {
     display: inline-block;
