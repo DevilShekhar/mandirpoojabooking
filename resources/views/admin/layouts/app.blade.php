@@ -415,6 +415,14 @@
                                             </a>
                                         </li>
                                     @endcan
+                                    @can('reports.online-puja-details')
+                                        <li class="{{ request()->routeIs('reports.online-puja-detailed.*') ? 'active' : '' }}">
+                                            <a class="nav-link" href="{{ route('reports.online-puja-detailed.index') }}">
+                                                <i data-feather="file-text"></i>
+                                                <span>Online Puja Details</span>
+                                            </a>
+                                        </li>
+                                    @endcan
                                 </ul>
                             </li>
                         @endcan
@@ -802,6 +810,7 @@
                                 </a>
                             </li>
                         @endcan
+                        
                         @can('view-event-bookings')
                             <li class="{{ request()->routeIs('customer.sanatan-event-bookings.*') ? 'active' : '' }}">
                                 <a href="javascript:void(0);" class="nav-link has-dropdown">
