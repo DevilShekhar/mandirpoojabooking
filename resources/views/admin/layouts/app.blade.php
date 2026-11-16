@@ -453,7 +453,7 @@
                                     @endcan
 
                                     @can('online-puja.view')
-                                        <li class="{{ request()->routeIs('online-pujas.*') ? 'active' : '' }}">
+                                        <li class="{{ request()->routeIs('online-pujas.index') || request()->routeIs('online-pujas.show') ? 'active' : '' }}">
                                             <a href="{{ route('online-pujas.index') }}">
                                                 <i data-feather="book-open"></i>
                                                 Online Puja
@@ -461,6 +461,15 @@
                                         </li>
                                     @endcan
 
+                                    {{-- Added Cancelled Bookings Sub-menu Link --}}
+                                    @can('online-puja.cancelbooking')
+                                        <li class="{{ request()->routeIs('online-pujas.cancelled-bookings') ? 'active' : '' }}">
+                                            <a href="{{ route('online-pujas.cancelled-bookings') }}">
+                                                <i data-feather="x-circle"></i>
+                                                Cancelled Bookings
+                                            </a>
+                                        </li>
+                                    @endcan
                                 </ul>
                             </li>
                         @endif

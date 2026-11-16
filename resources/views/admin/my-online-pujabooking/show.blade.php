@@ -25,6 +25,7 @@
         ? 'success'
         : (in_array($bookingKey, ['cancelled', 'rejected']) ? 'danger' : 'info');
 
+    $isCancelled = in_array($bookingKey, ['cancelled', 'rejected']);
     $pujaDateTime = $puja && $puja->puja_datetime
         ? \Carbon\Carbon::parse($puja->puja_datetime)
         : null;
@@ -186,6 +187,13 @@
     .theme-pink .section-icon {
         color: #d94d81;
         background: #fff0f5;
+    }
+    .theme-red {
+        border-top: 4px solid #dd665b;
+    }
+    .theme-red .section-icon {
+        color: #dd665b;
+        background: #fff0ee;
     }
 
     /* Information Boxes */
@@ -457,59 +465,144 @@
 </style>
 
 <div class="container-fluid booking-page">
-
-    {{-- PAGE HEADER --}}
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert" style="border-radius: 10px;">
+            <i class="fa fa-check-circle mr-1"></i> {{ session('success') }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    @endif
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 10px;">
+            <i class="fa fa-exclamation-circle mr-1"></i> {{ session('error') }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    @endif
+    @if($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 10px;">
+            <ul class="mb-0 pl-3">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    @endif
     <div class="booking-hero">
         <div class="row align-items-center">
-
-            <div class="col-md-8">
+            <div class="col-md-7">
                 <h4>
                     <i class="fa fa-om mr-2"></i>
                     Online Puja Booking Details
                 </h4>
-
                 <p>
                     Complete information about your online puja booking.
                 </p>
-
                 <div class="booking-reference">
                     <i class="fa fa-hashtag mr-1"></i>
                     Booking Reference:
                     <strong>{{ $booking->order_number ?? $booking->id }}</strong>
                 </div>
             </div>
-
-            <div class="col-md-4 text-md-right header-actions">
+            <div class="col-md-5 text-md-right header-actions">
+                @if(!$isCancelled)
+                    <button type="button" class="btn btn-danger mr-2 mb-1" data-toggle="modal" data-target="#cancelBookingModal">
+                        <i class="fa fa-times mr-1"></i> Cancel Booking
+                    </button>
+                @endif
                 <a href="{{ route('admin.my-online-pujabooking.index') }}"
-                   class="btn btn-light">
+                   class="btn btn-light mb-1">
                     <i class="fa fa-arrow-left mr-1"></i>
                     Back to Bookings
                 </a>
             </div>
-
         </div>
     </div>
-
-
-    {{-- 1. BOOKING SUMMARY --}}
+    @if($isCancelled)
+        <div class="booking-section theme-red">
+            <div class="booking-section-header">
+                <div class="section-heading">
+                    <div class="section-icon">
+                        <i class="fa fa-comments" aria-hidden="true"></i>
+                    </div>
+                    <div>
+                        <h5>Cancellation & Refund Information</h5>
+                        <p>Details regarding cancellation reason, fees, and gateway refunds</p>
+                    </div>
+                </div>
+            </div>
+            <div class="booking-section-body">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="info-box">
+                            <div class="info-icon icon-red">
+                                <i class="fa fa-comments" aria-hidden="true"></i>
+                            </div>
+                            <div class="info-content">
+                                <span class="info-label">Cancellation Reason</span>
+                                <p class="info-value small-value text-danger">
+                                    {{ $booking->cancellation_reason ?? 'N/A' }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="info-box">
+                            <div class="info-icon icon-orange">
+                                <i class="fa fa-percent"></i>
+                            </div>
+                            <div class="info-content">
+                                <span class="info-label">Cancellation Fee</span>
+                                <p class="info-value">
+                                    {{ $booking->cancellation_fee_percentage ?? 0 }}% 
+                                    <span class="text-muted small">({{ $currency }} {{ number_format(($bookingAmount * ($booking->cancellation_fee_percentage ?? 0)) / 100, 2) }})</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="info-box">
+                            <div class="info-icon icon-green">
+                                <i class="fa fa-shield mr-1"></i>
+                            </div>
+                            <div class="info-content">
+                                <span class="info-label">Refund Amount & Status</span>
+                                <p class="info-value text-success">
+                                    {{ $currency }} {{ number_format($booking->refund_amount ?? 0, 2) }}
+                                    <br>
+                                    <span class="badge badge-info mt-1" style="font-size: 10px;">
+                                        Status: {{ ucfirst(str_replace('_', ' ', $booking->refund_status ?? 'N/A')) }}
+                                    </span>
+                                </p>
+                                @if(!empty($booking->razorpay_refund_id))
+                                    <small class="text-muted d-block mt-1">Ref ID: {{ $booking->razorpay_refund_id }}</small>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
     <div class="booking-section theme-purple">
-
         <div class="booking-section-header">
             <div class="section-heading">
                 <div class="section-icon">
                     <i class="fa fa-clipboard"></i>
                 </div>
-
                 <div>
                     <h5>Booking Summary</h5>
                     <p>Booking reference and current booking status</p>
                 </div>
             </div>
         </div>
-
         <div class="booking-section-body">
             <div class="row">
-
                 <div class="col-lg-4 col-md-6 mb-3">
                     <div class="info-box">
                         <div class="info-icon icon-purple">
@@ -523,7 +616,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="col-lg-4 col-md-6 mb-3">
                     <div class="info-box">
                         <div class="info-icon icon-green">
@@ -539,7 +631,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="col-lg-4 col-md-6 mb-3">
                     <div class="info-box">
                         <div class="info-icon icon-blue">
@@ -555,7 +646,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="col-lg-4 col-md-6 mb-3">
                     <div class="info-box">
                         <div class="info-icon icon-orange">
@@ -571,34 +661,24 @@
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
-
-
-    {{-- 2. PUJA DETAILS --}}
     <div class="booking-section theme-blue">
-
         <div class="booking-section-header">
             <div class="section-heading">
                 <div class="section-icon">
                     <i class="fa fa-om"></i>
                 </div>
-
                 <div>
                     <h5>Puja Details</h5>
                     <p>Information about the selected puja</p>
                 </div>
             </div>
         </div>
-
         <div class="booking-section-body">
-
             @if($puja)
-
                 <div class="row">
-
                     <div class="col-lg-6 col-md-12 mb-3">
                         <div class="info-box">
                             <div class="info-icon icon-blue">
@@ -612,7 +692,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="col-lg-3 col-md-6 mb-3">
                         <div class="info-box">
                             <div class="info-icon icon-purple">
@@ -628,7 +707,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="col-lg-3 col-md-6 mb-3">
                         <div class="info-box">
                             <div class="info-icon icon-orange">
@@ -644,7 +722,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="col-lg-4 col-md-6 mb-3">
                         <div class="info-box">
                             <div class="info-icon icon-green">
@@ -658,7 +735,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="col-lg-4 col-md-6 mb-3">
                         <div class="info-box">
                             <div class="info-icon icon-pink">
@@ -672,7 +748,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="col-lg-4 col-md-6 mb-3">
                         <div class="info-box">
                             <div class="info-icon icon-orange">
@@ -686,35 +761,26 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
-
             @else
                 <div class="empty-state">
                     <i class="fa fa-info-circle mr-1"></i>
                     Puja details are not available.
                 </div>
             @endif
-
         </div>
     </div>
-
-
-    {{-- 3. PACKAGE DETAILS --}}
     <div class="booking-section theme-orange">
-
         <div class="booking-section-header">
             <div class="section-heading">
                 <div class="section-icon">
                     <i class="fa fa-cubes"></i>
                 </div>
-
                 <div>
                     <h5>Package Details</h5>
                     <p>Selected package, price and devotee information</p>
                 </div>
             </div>
-
             @if($package && $package->is_recommended)
                 <span class="recommended-label">
                     <i class="fa fa-star mr-1"></i>
@@ -722,11 +788,8 @@
                 </span>
             @endif
         </div>
-
         <div class="booking-section-body">
-
             <div class="row">
-
                 <div class="col-lg-4 col-md-6 mb-3">
                     <div class="info-box package-highlight">
                         <div class="info-icon icon-orange">
@@ -740,7 +803,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="col-lg-4 col-md-6 mb-3">
                     <div class="info-box package-highlight">
                         <div class="info-icon icon-blue">
@@ -759,7 +821,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="col-lg-4 col-md-6 mb-3">
                     <div class="info-box package-highlight">
                         <div class="info-icon icon-green">
@@ -777,7 +838,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="col-lg-6 col-md-6 mb-3">
                     <div class="info-box">
                         <div class="info-icon icon-green">
@@ -799,7 +859,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="col-lg-6 col-md-6 mb-3">
                     <div class="info-box">
                         <div class="info-icon icon-orange">
@@ -817,13 +876,11 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="col-md-12 mt-2">
                     <span class="info-label">
                         <i class="fa fa-align-left mr-1"></i>
                         Package Description
                     </span>
-
                     @if($package && $package->description)
                         <div class="package-description-box">
                             {{ $package->description }}
@@ -834,34 +891,24 @@
                         </div>
                     @endif
                 </div>
-
             </div>
         </div>
     </div>
-
-
-    {{-- 4. TEMPLE DETAILS --}}
     <div class="booking-section theme-green">
-
         <div class="booking-section-header">
             <div class="section-heading">
                 <div class="section-icon">
                     <i class="fa fa-university"></i>
                 </div>
-
                 <div>
                     <h5>Temple Details</h5>
                     <p>Temple location and address information</p>
                 </div>
             </div>
         </div>
-
         <div class="booking-section-body">
-
             @if($puja)
-
                 <div class="row">
-
                     <div class="col-lg-6 col-md-12 mb-3">
                         <div class="info-box">
                             <div class="info-icon icon-green">
@@ -875,7 +922,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="col-lg-3 col-md-6 mb-3">
                         <div class="info-box">
                             <div class="info-icon icon-blue">
@@ -889,7 +935,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="col-lg-3 col-md-6 mb-3">
                         <div class="info-box">
                             <div class="info-icon icon-orange">
@@ -903,13 +948,11 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="col-md-12 mt-2">
                         <div class="temple-address-box">
                             <div class="address-icon">
                                 <i class="fa fa-map-marker"></i>
                             </div>
-
                             <div>
                                 <span class="info-label">Temple Full Address</span>
                                 <p>
@@ -918,60 +961,46 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
-
             @else
                 <div class="empty-state">
                     <i class="fa fa-info-circle mr-1"></i>
                     Temple details are not available.
                 </div>
             @endif
-
         </div>
     </div>
-
-
-    {{-- 5. PAYMENT DETAILS --}}
     <div class="booking-section theme-pink">
-
         <div class="booking-section-header">
             <div class="section-heading">
                 <div class="section-icon">
                     <i class="fa fa-credit-card"></i>
                 </div>
-
                 <div>
                     <h5>Payment Details</h5>
                     <p>Booking amount and payment status</p>
                 </div>
             </div>
         </div>
-
         <div class="booking-section-body">
-
             <div class="row">
-
                 <div class="col-md-6 mb-3">
                     <div class="payment-highlight">
                         <p class="payment-label">
                             <i class="fa fa-money mr-1"></i>
                             Total Booking Amount
                         </p>
-
                         <h3 class="payment-amount">
                             {{ $currency }} {{ number_format($bookingAmount, 2) }}
                         </h3>
                     </div>
                 </div>
-
                 <div class="col-md-6 mb-3">
                     <div class="payment-status-box">
                         <p class="payment-label">
                             <i class="fa fa-shield mr-1"></i>
                             Payment Status
                         </p>
-
                         <h5 class="mb-0">
                             <span class="status-badge badge-{{ $paymentBadge }}">
                                 <i class="fa fa-check-circle mr-1"></i>
@@ -980,14 +1009,56 @@
                         </h5>
                     </div>
                 </div>
-
             </div>
-
         </div>
     </div>
-
 </div>
-
+<div class="modal fade" id="cancelBookingModal" tabindex="-1" role="dialog" aria-labelledby="cancelBookingModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content" style="border-radius: 13px; border: none; overflow: hidden;">
+            <form action="{{ route('admin.my-online-pujabooking.cancel', $booking->id) }}" method="POST">
+                @csrf
+                @method('PUT')
+                <div class="modal-header bg-danger text-white" style="border-bottom: none; padding: 18px 22px;">
+                    <h5 class="modal-title" id="cancelBookingModalLabel" style="font-size: 17px; font-weight: 700;">
+                        <i class="fa fa-exclamation-triangle mr-2"></i> Cancel Puja Booking
+                    </h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close" style="opacity: 1;">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="padding: 22px;">
+                    <p class="text-muted mb-3" style="font-size: 13px; line-height: 1.6;">
+                        Are you sure you want to cancel booking <strong>#{{ $booking->order_number ?? $booking->id }}</strong>? Please provide a reason below. 
+                        <br><strong class="text-danger">Note:</strong> Refund will be calculated automatically based on elapsed time since booking creation.
+                    </p>
+                    <div class="form-group mb-0">
+                        <label for="cancellation_reason" class="font-weight-bold text-dark" style="font-size: 13px;">
+                            Cancellation Reason <span class="text-danger">*</span>
+                        </label>
+                        <textarea 
+                            name="cancellation_reason" 
+                            id="cancellation_reason" 
+                            rows="4" 
+                            class="form-control" 
+                            placeholder="Write your reason for cancellation here..." 
+                            required 
+                            style="border-radius: 8px; resize: none; font-size: 13px;"
+                        >{{ old('cancellation_reason') }}</textarea>
+                    </div>
+                </div>
+                <div class="modal-footer" style="background: #f8f9fc; border-top: 1px solid #edf0f5; padding: 14px 22px;">
+                    <button type="button" class="btn btn-light" data-dismiss="modal" style="border-radius: 8px; font-weight: 600;">
+                        Close
+                    </button>
+                    <button type="submit" class="btn btn-danger" style="border-radius: 8px; font-weight: 600;">
+                        <i class="fa fa-check mr-1"></i> Confirm Cancel & Refund
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 @endsection
 @else
     @php
