@@ -448,6 +448,9 @@
                                                     <li>
                                                         <a href="{{ url('/booking-puja-order') }}">Puja Bookings</a>
                                                     </li>
+                                                     <li>
+                                                        <a href="{{ url('/my-online-pujabooking') }}">Online Puja Bookings</a>
+                                                    </li>
                                                 </ul>
                                             </li>
                                         @endauth
