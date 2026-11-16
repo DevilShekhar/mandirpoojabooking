@@ -6,6 +6,7 @@ use App\Models\OnlinePujaCategory;
 use App\Models\OnlinePujaPackage;
 use App\Models\OnlinePujaFaq;
 use App\Models\OnlinePujaOrder;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -15,58 +16,60 @@ use Illuminate\Support\Str;
 class OnlinePujaController extends Controller
 
 {
-
-    
-public function index()
-{
-    $user = Auth::user();
-
-    $query = OnlinePuja::with([
-        'category',
-        'creator',
-        'updater'
-    ]);
-
-    if ($user->hasRole('Pandit')) {
-
-        // Pandit: Only show records created by logged-in user
-        $query->where('created_by', $user->id);
-
-    } elseif ($user->hasRole('Admin') || $user->hasRole('Super Admin')) {
-
-        // Admin and Super Admin: Show all records
-        // No filter required
-
+  
+    public function index()
+    {
+        $user = Auth::user();
+        $query = OnlinePuja::with([
+            'category',
+            'creator',
+            'updater'
+        ])->withCount([
+            'bookings as confirmed_bookings_count' => function ($q) {
+                $q->where('booking_status', 'confirmed'); // Adjust status value if your DB uses something else (e.g., 'completed', 'active')
+            }
+        ]);
+        if ($user->hasRole('Pandit')) {
+            // Pandit: Only show records created by logged-in user
+            $query->where('created_by', $user->id);
+        } elseif ($user->hasRole('Admin') || $user->hasRole('Super Admin')) {
+            // Admin and Super Admin: Show all records
+        }
+        $pujas = $query->latest()->get();
+        return view('admin.online-pujas.index', compact('pujas'));
     }
-
-    $pujas = $query->latest()->get();
-
-    return view('admin.online-pujas.index', compact('pujas'));
-}
 
     public function bookings($id)
     {
-        $user = Auth::user();
-
-        // Find selected puja
+        $user = Auth::user();        
         $pujaQuery = OnlinePuja::query();
-
-        // Restrict non-admin users to their own pujas
-        if (!in_array($user->role, ['Admin', 'Super Admin'])) {
+        if (!$user->hasAnyRole(['Admin', 'Super Admin'])) {
             $pujaQuery->where('created_by', $user->id);
         }
-
         $puja = $pujaQuery->findOrFail($id);
-
-        // Get bookings for this particular puja
         $bookings = OnlinePujaOrder::with(['package'])
             ->where('online_puja_id', $puja->id)
+            ->whereNotIn('booking_status', ['cancelled', 'rejected'])
+            ->latest()
+            ->get();
+        return view('admin.online-pujas.bookings',compact('puja', 'bookings'));
+    }
+    public function cancelledBookings()
+    {
+       
+        // Query cancelled bookings, loading puja, package, and cancelledBy relationships
+        $cancelledBookings = OnlinePujaOrder::with(['puja', 'package', 'cancelledBy'])
+            ->where('booking_status', 'cancelled')
             ->latest()
             ->get();
 
+        // Calculate totals across the list
+        $totalCancelledAmount = $cancelledBookings->sum('amount');
+        $totalRefundAmount = $cancelledBookings->sum('refund_amount');
+
         return view(
-            'admin.online-pujas.bookings',
-            compact('puja', 'bookings')
+            'admin.online-pujas.cancelled-bookings', 
+            compact('cancelledBookings', 'totalCancelledAmount', 'totalRefundAmount')
         );
     }
     public function create()

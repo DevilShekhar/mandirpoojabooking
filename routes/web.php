@@ -246,6 +246,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/samgri-booking/{id}/verify-otp',[SamgriBookingController::class, 'verifyOtp'])->name('samgri-booking.verify-otp');
     Route::resource('my-news', NewsController::class)->names('my-news');
     Route::resource('online-puja-categories',OnlinePujaCategoryController::class);
+    Route::get('online-pujas/cancelled-bookings', [OnlinePujaController::class, 'cancelledBookings'])->name('online-pujas.cancelled-bookings');
     Route::get('online-pujas/{id}/bookings', [OnlinePujaController::class, 'bookings'])->name('online-pujas.bookings');
     Route::resource('online-pujas', OnlinePujaController::class);
     Route::prefix('reports')->name('reports.')->group(function () {
@@ -331,6 +332,7 @@ Route::middleware('auth')->group(function () {
     });
     Route::get('/my-online-pujabooking', [MyOnlinePujaBookingController::class,'index'])->name('admin.my-online-pujabooking.index');
     Route::get('/my-online-pujabooking/{id}', [MyOnlinePujaBookingController::class,'show'])->name('admin.my-online-pujabooking.show');
+    Route::put('/my-online-pujabooking/{id}/cancel', [MyOnlinePujaBookingController::class, 'cancel'])->name('admin.my-online-pujabooking.cancel');
 });
 Route::middleware('auth')->prefix('payment/razorpay')->name('razorpay.')->group(function () {
     Route::post('/create-order', [RazorpayPaymentController::class, 'createOrder'])->name('create-order');

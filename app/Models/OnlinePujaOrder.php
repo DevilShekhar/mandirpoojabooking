@@ -28,6 +28,13 @@ class OnlinePujaOrder extends Model
         'razorpay_payment_id',
         'razorpay_signature',
         'booking_status',
+        'cancellation_reason',
+        'cancelled_at',
+        'cancelled_by',
+        'cancellation_fee_percentage',
+        'refund_amount',
+        'razorpay_refund_id',
+        'refund_status',
         'created_by',
     ];
 
@@ -69,5 +76,9 @@ class OnlinePujaOrder extends Model
             'created_by',
             'id'
         );
+    }
+    public function cancelledBy()
+    {
+        return $this->belongsTo(User::class, 'cancelled_by');
     }
 }
