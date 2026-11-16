@@ -470,6 +470,14 @@
                                             </a>
                                         </li>
                                     @endcan
+                                    @can('online-puja.completed')
+                                        <li class="{{ request()->routeIs('online-pujas.completed') ? 'active' : '' }}">
+                                            <a href="{{ route('online-pujas.completed') }}">
+                                                <i data-feather="check-circle"></i>
+                                                Completed Pujas
+                                            </a>
+                                        </li>
+                                    @endcan
                                 </ul>
                             </li>
                         @endif

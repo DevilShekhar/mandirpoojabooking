@@ -58,6 +58,8 @@
                             <h6 class="mb-0 mt-1">
                                 @if($puja->status == 1)
                                     <span class="badge badge-success">Active</span>
+                                @elseif($puja->status == 2)
+                                <span class="badge badge-info px-3 py-2">Completed</span>
                                 @else
                                     <span class="badge badge-danger">Inactive</span>
                                 @endif
