@@ -247,7 +247,9 @@ Route::middleware('auth')->group(function () {
     Route::resource('my-news', NewsController::class)->names('my-news');
     Route::resource('online-puja-categories',OnlinePujaCategoryController::class);
     Route::get('online-pujas/cancelled-bookings', [OnlinePujaController::class, 'cancelledBookings'])->name('online-pujas.cancelled-bookings');
+    Route::get('online-pujas/completed', [OnlinePujaController::class, 'completedPujas'])->name('online-pujas.completed');
     Route::get('online-pujas/{id}/bookings', [OnlinePujaController::class, 'bookings'])->name('online-pujas.bookings');
+    Route::patch('online-pujas/{online_puja}/update-status', [OnlinePujaController::class, 'updateStatus'])->name('online-pujas.update-status');
     Route::resource('online-pujas', OnlinePujaController::class);
     Route::prefix('reports')->name('reports.')->group(function () {
         Route::get('/mandir-puja-pandit',[MandirPujaPanditReportController::class, 'index'])->name('mandir-puja-pandit.index');

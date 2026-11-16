@@ -26,9 +26,10 @@ class OnlinePujaController extends Controller
             'updater'
         ])->withCount([
             'bookings as confirmed_bookings_count' => function ($q) {
-                $q->where('booking_status', 'confirmed'); // Adjust status value if your DB uses something else (e.g., 'completed', 'active')
+                $q->where('booking_status', 'confirmed'); 
             }
-        ]);
+        ])->where('status', 1); // <-- Only fetches active pujas (status = 1)
+
         if ($user->hasRole('Pandit')) {
             // Pandit: Only show records created by logged-in user
             $query->where('created_by', $user->id);
@@ -38,7 +39,6 @@ class OnlinePujaController extends Controller
         $pujas = $query->latest()->get();
         return view('admin.online-pujas.index', compact('pujas'));
     }
-
     public function bookings($id)
     {
         $user = Auth::user();        
@@ -71,6 +71,14 @@ class OnlinePujaController extends Controller
             'admin.online-pujas.cancelled-bookings', 
             compact('cancelledBookings', 'totalCancelledAmount', 'totalRefundAmount')
         );
+    }
+    public function completedPujas(Request $request)
+    {
+        $onlinePujas = OnlinePuja::with(['category', 'creator'])
+            ->where('status', 2)
+            ->latest()
+            ->paginate(10);
+        return view('admin.online-pujas.completed', compact('onlinePujas'));
     }
     public function create()
     {
@@ -179,8 +187,7 @@ class OnlinePujaController extends Controller
         }
     }
     public function show(OnlinePuja $online_puja)
-    {
-        $this->authorizePujaAccess($online_puja);
+    {       
         $online_puja->load([
             'category',
             'creator',
@@ -192,8 +199,7 @@ class OnlinePujaController extends Controller
     }
 
     public function edit(OnlinePuja $online_puja)
-    {
-        $this->authorizePujaAccess($online_puja);
+    { 
         $categories = OnlinePujaCategory::where('status', 1)
             ->orderBy('name')
             ->get();
@@ -206,7 +212,6 @@ class OnlinePujaController extends Controller
 
     public function update(Request $request, OnlinePuja $online_puja)
     {
-        $this->authorizePujaAccess($online_puja);
         $pujaId = $online_puja->id;
         $connection = DB::connection($online_puja->getConnectionName());
         $contentFields = [
@@ -556,5 +561,23 @@ class OnlinePujaController extends Controller
             $count++;
         }
         return $slug;
+    }
+    public function updateStatus(Request $request, OnlinePuja $online_puja)
+    {
+        if (method_exists($this, 'authorizePujaAccess')) {
+            $this->authorizePujaAccess($online_puja);
+        }
+        $online_puja->update([
+            'status' => 2,
+            'updated_by' => auth()->id(),
+        ]);
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Puja status updated successfully.',
+                'data' => $online_puja,
+            ]);
+        }
+        return redirect()->back()->with('success', 'Puja status updated successfully.');
     }
 }

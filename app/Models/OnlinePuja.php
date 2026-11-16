@@ -60,7 +60,6 @@ class OnlinePuja extends Model
 
     protected $casts = [
         'gallery_images' => 'array',
-        'status' => 'boolean',
         'is_featured' => 'boolean',
         'is_popular' => 'boolean',
         'whatsapp_delivery_enabled' => 'boolean',
