@@ -58,6 +58,7 @@ use App\Http\Controllers\Frontend\AboutusFrontendController;
 use App\Http\Controllers\Frontend\PrivacyPolicyFrontendController;
 use App\Http\Controllers\Frontend\TermsandConditionFrontendController;
 use App\Http\Controllers\Frontend\DisclaimerConditionFrontendController;
+use App\Http\Controllers\Frontend\SitemapController;
 use App\Http\Controllers\Admin\MandirPujaPanditReportController;
 use App\Http\Controllers\Admin\EventBookingCompletedReportController;
 use App\Http\Controllers\Admin\StoreManagerCompletedReportController;
@@ -136,6 +137,7 @@ Route::post('/online-puja/cart/remove', [FrontendOnlinePujaCartController::class
 Route::post('/online-puja/cart/checkout', [FrontendOnlinePujaCartController::class, 'checkout'])->middleware('auth')->name('frontend.online-puja.cart.checkout');
 Route::post('/online-puja/payment/verify', [FrontendOnlinePujaCartController::class, 'verifyPayment'])->middleware('auth')->name('frontend.online-puja.payment.verify');
 Route::get('/online-puja/{slug}', [FrontendOnlinePujaController::class,'show'])->name('frontend.online-puja.show');
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 Route::middleware('auth')
     ->prefix('ticket-cart')
     ->name('frontend.ticket-cart.')
