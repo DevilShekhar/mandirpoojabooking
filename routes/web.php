@@ -54,6 +54,7 @@ use App\Http\Controllers\Admin\TempleProductController;
 use App\Http\Controllers\Admin\SamgriBookingController;
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Frontend\NewsFrontendController;
+use App\Http\Controllers\Frontend\AboutusFrontendController;
 use App\Http\Controllers\Admin\MandirPujaPanditReportController;
 use App\Http\Controllers\Admin\EventBookingCompletedReportController;
 use App\Http\Controllers\Admin\StoreManagerCompletedReportController;
@@ -119,6 +120,7 @@ Route::get('/tickit-booking', [TickitBookingfillterController::class,'tickitbook
 Route::get('/tickit-booking/search', [TickitBookingfillterController::class,'search'])->name('tickit-booking.search');
 Route::get('/tickit-booking/view-puja/{puja}', [TickitBookingfillterController::class,'viewPuja'])->whereNumber('puja')->name('tickit-booking.view-puja');
 Route::get('/news', [NewsFrontendController::class, 'index'])->name('frontend.news');
+Route::get('/about-us', [AboutusFrontendController::class, 'index'])->name('frontend.about-us');
 Route::get('/news/{slug}', [NewsFrontendController::class, 'show'])->name('frontend.news.show');
 Route::get('/online-puja', [FrontendOnlinePujaController::class,'index'])->name('frontend.online-puja.index');
 Route::post('/online-puja/filter', [FrontendOnlinePujaController::class,'index'])->name('frontend.online-puja.filter');
