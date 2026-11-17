@@ -591,19 +591,22 @@
                                             <a href="{{ route('frontend.about-us') }}">About Us</a>
                                         </li>
                                         <li>
-                                            <a href="">Our Brand</a>
+                                            <a href="{{ route('frontend.puja') }}">Puja</a>
                                         </li>
                                         <li>
-                                            <a href="">Our Products</a>
+                                            <a href="{{ route('frontend.online-puja.index') }}">Online Puja</a>
                                         </li>
                                         <li>
-                                            <a href="">Discounted Products</a>
+                                            <a href="{{ route('frontend.our-temples') }}">Temples</a>
                                         </li>
                                         <li>
-                                            <a href="">PC Builder</a>
+                                            <a href="{{ route('frontend.sanatanevents') }}">Sanatan Events</a>
                                         </li>
                                         <li>
-                                            <a href="">Contact Us</a>
+                                            <a href="{{ route('tickit-booking.tickitfillter') }}">Ticket Booking</a>
+                                        </li>
+                                        <li>
+                                            <a href="{{ route('frontend.news') }}">News</a>
                                         </li>
                                     </ul>
                                 </div>
@@ -692,7 +695,7 @@
                                         <a href="{{ route('frontend.disclaimer') }}">Disclaimer</a>
                                     </li>
                                     <li>
-                                        <a href="">Sitemap</a>
+                                        <a href="{{ route('sitemap') }}">Sitemap</a>
                                     </li>
                                 </ul>
                             </div>
