@@ -585,10 +585,10 @@
                                     <h3 class="footer-block-title">Quick Links</h3>
                                     <ul>
                                         <li>
-                                            <a href="">Home</a>
+                                            <a href="{{ route('frontend.home') }}">Home</a>
                                         </li>
                                         <li>
-                                            <a href="">About Us</a>
+                                            <a href="{{ route('frontend.about-us') }}">About Us</a>
                                         </li>
                                         <li>
                                             <a href="">Our Brand</a>
@@ -683,13 +683,13 @@
                             <div class="vh-footer-policy-content">
                                 <ul>
                                     <li>
-                                        <a href="">Privacy Policy</a>
+                                        <a href="{{ route('frontend.privacy-policy') }}">Privacy Policy</a>
                                     </li>
                                     <li>
-                                        <a href="">Terms of Use</a>
+                                        <a href="{{ route('frontend.about-us') }}">Terms of Use</a>
                                     </li>
                                     <li>
-                                        <a href="">Disclaimer</a>
+                                        <a href="{{ route('frontend.about-us') }}">Disclaimer</a>
                                     </li>
                                     <li>
                                         <a href="">Sitemap</a>
