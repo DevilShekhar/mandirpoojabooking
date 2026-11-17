@@ -129,34 +129,37 @@ class FrontendOnlinePujaController extends Controller
     public function show($slug)
     {
         $onlinePuja = OnlinePuja::with([
-                'category',
-                'creator',
-                'packages',
-                'faqs',
-            ])
-            ->where('slug', $slug)
-            ->where('status', 1)
-            ->firstOrFail();
+            'category',
+            'creator',
+            'packages',
+            'faqs',
+        ])
+        ->where('slug', $slug)
+        ->where('status', 1)
+        ->firstOrFail();
 
+        $faqs = $onlinePuja->faqs->values();
         $relatedPujas = OnlinePuja::with([
-                'category',
-                'creator',
-            ])
-            ->where('status', 1)
-            ->whereNotNull('puja_datetime')
-            ->where('puja_datetime', '>=', now())
-            ->where('id', '!=', $onlinePuja->id)
-            ->where(
-                'online_puja_category_id',
-                $onlinePuja->online_puja_category_id
-            )
-            ->orderBy('puja_datetime', 'asc')
-            ->take(4)
-            ->get();
+            'category',
+            'creator',
+            'packages',
+        ])
+        ->where('status', 1)
+        ->whereNotNull('puja_datetime')
+        ->where('puja_datetime', '>=', now())
+        ->where('id', '!=', $onlinePuja->id)
+        ->where(
+            'online_puja_category_id',
+            $onlinePuja->online_puja_category_id
+        )
+        ->orderBy('puja_datetime', 'asc')
+        ->take(4)
+        ->get();
 
         return view('frontend.online-puja.show', compact(
             'onlinePuja',
-            'relatedPujas'
+            'relatedPujas',
+            'faqs'
         ));
     }
 }
