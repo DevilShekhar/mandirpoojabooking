@@ -51,9 +51,7 @@
     $firstPackage = $packages->first(function ($package) use ($hasSeatLimit, $availableSeats) {
         return !$hasSeatLimit || (int) $package->devotees_count <= $availableSeats;
     });
-    $faqs = $onlinePuja->faqs
-        ->where('status', 1)
-        ->values();
+    $faqs = $onlinePuja->faqs->values();
     $pujaDate = $onlinePuja->puja_datetime
         ? \Carbon\Carbon::parse($onlinePuja->puja_datetime)
         : null;
@@ -443,28 +441,20 @@
                         </div>
                     </section>
                 @endif
-                @if($faqs->isNotEmpty())
+                @if($faqs->count() > 0)
                     <section class="puja-content-block" id="faqs">
-                        <div class="section-heading">
-                            <span class="section-eyebrow">NEED MORE INFORMATION?</span>
-                            <h2>Frequently Asked Questions</h2>
-                            <p>Find answers to common questions about this puja.</p>
-                        </div>
-                        <div class="puja-faq-list">
-                            @foreach($faqs as $index => $faq)
-                                <div class="puja-faq-item {{ $index === 0 ? 'open' : '' }}">
-                                    <button type="button" class="puja-faq-question">
-                                        <span>{{ $faq->question }}</span>
-                                        <i class="fa fa-plus"></i>
-                                    </button>
-                                    <div class="puja-faq-answer">
-                                        <div>
-                                            {!! $faq->answer !!}
-                                        </div>
-                                    </div>
+                        <h2>Frequently Asked Questions</h2>
+                        @foreach($faqs as $index => $faq)
+                            <div class="puja-faq-item {{ $index == 0 ? 'open' : '' }}">
+                                <button type="button" class="puja-faq-question">
+                                    <span>{{ $faq->question }}</span>
+                                    <i class="fa fa-plus"></i>
+                                </button>
+                                <div class="puja-faq-answer">
+                                    <div>{{ $faq->answer }}</div>
                                 </div>
-                            @endforeach
-                        </div>
+                            </div>
+                        @endforeach
                     </section>
                 @endif
             </div>
