@@ -686,10 +686,10 @@
                                         <a href="{{ route('frontend.privacy-policy') }}">Privacy Policy</a>
                                     </li>
                                     <li>
-                                        <a href="{{ route('frontend.about-us') }}">Terms of Use</a>
+                                        <a href="{{ route('frontend.terms-and-conditions') }}">Terms of Use</a>
                                     </li>
                                     <li>
-                                        <a href="{{ route('frontend.about-us') }}">Disclaimer</a>
+                                        <a href="{{ route('frontend.disclaimer') }}">Disclaimer</a>
                                     </li>
                                     <li>
                                         <a href="">Sitemap</a>
