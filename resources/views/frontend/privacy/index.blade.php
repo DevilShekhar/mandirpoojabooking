@@ -14,7 +14,6 @@
                 <div class="card shadow-sm border-0 mb-4">
                     <div class="card-body p-4">
                         <p class="mb-2">We respect your privacy and are committed to safeguarding your personal and spiritual details. This Privacy Policy explains how we collect, use, protect, and handle your information when you visit our platform, book a mandir puja, create a puja event, or participate in online Vedic rituals.</p>
-                        <p class="mb-0 text-muted"><strong>Last Updated:</strong> November 17, 2026</p>
                     </div>
                 </div>
             </div>

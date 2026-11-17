@@ -57,6 +57,7 @@ use App\Http\Controllers\Frontend\NewsFrontendController;
 use App\Http\Controllers\Frontend\AboutusFrontendController;
 use App\Http\Controllers\Frontend\PrivacyPolicyFrontendController;
 use App\Http\Controllers\Frontend\TermsandConditionFrontendController;
+use App\Http\Controllers\Frontend\DisclaimerConditionFrontendController;
 use App\Http\Controllers\Admin\MandirPujaPanditReportController;
 use App\Http\Controllers\Admin\EventBookingCompletedReportController;
 use App\Http\Controllers\Admin\StoreManagerCompletedReportController;
@@ -125,6 +126,7 @@ Route::get('/news', [NewsFrontendController::class, 'index'])->name('frontend.ne
 Route::get('/about-us', [AboutusFrontendController::class, 'index'])->name('frontend.about-us');
 Route::get('/privacy-policy', [PrivacyPolicyFrontendController::class, 'index'])->name('frontend.privacy-policy');
 Route::get('/terms-and-conditions', [TermsandConditionFrontendController::class, 'index'])->name('frontend.terms-and-conditions');
+Route::get('/disclaimer', [DisclaimerConditionFrontendController::class, 'index'])->name('frontend.disclaimer');
 Route::get('/news/{slug}', [NewsFrontendController::class, 'show'])->name('frontend.news.show');
 Route::get('/online-puja', [FrontendOnlinePujaController::class,'index'])->name('frontend.online-puja.index');
 Route::post('/online-puja/filter', [FrontendOnlinePujaController::class,'index'])->name('frontend.online-puja.filter');
