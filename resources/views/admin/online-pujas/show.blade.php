@@ -29,37 +29,33 @@
         {{-- Top Actions --}}
         <div class="row mb-3">
             <div class="col-12 d-flex justify-content-between align-items-center">
-                
                 <a href="{{ route('online-pujas.index') }}" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i> Back to List
                 </a>
-
-                <div>
-                    {{-- Status Update Button with SweetAlert2 Confirmation --}}
+                <div>                    
                     @can('online-puja.edit')
-                        <form id="statusUpdateForm" action="{{ route('online-pujas.update-status', $online_puja->id) }}" method="POST" class="d-inline">
-                            @csrf
-                            @method('PATCH')
-                            <button type="button" onclick="confirmStatusUpdate()" class="btn btn-warning mr-2">
-                                <i class="fas fa-sync-alt"></i> Mark Completed
-                            </button>
-                        </form>
+                        @if($online_puja->status == 1)
+                            <form id="statusUpdateForm" action="{{ route('online-pujas.update-status', $online_puja->id) }}" method="POST" class="d-inline">
+                                @csrf
+                                @method('PATCH')
+                                <button type="button" onclick="confirmStatusUpdate()" class="btn btn-warning mr-2">                                        
+                                    <i class="fas fa-sync-alt"></i> Mark Completed
+                                </button>
+                            </form>
+                        @elseif($online_puja->status == 2)
+                            <!-- Optional: Show something else or text when status is 2, or leave empty -->
+                            <span class="badge badge-success">Completed Puja</span>
+                        @endif
                     @endcan
-
                     <a href="{{ route('online-pujas.edit', $online_puja->id) }}" class="btn btn-primary">
                         <i class="fas fa-edit"></i> Edit Puja
-                    </a>
+                    </a>                  
                 </div>
-
             </div>
         </div>
-
-        {{-- Basic Information --}}
         <div class="row">
-
             <div class="col-12">
                 <div class="card shadow-sm">
-
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h4>
                             <i class="fas fa-om text-primary mr-2"></i>
