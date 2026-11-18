@@ -1,5 +1,7 @@
 @extends('frontend.layouts.app')
-@section('title', $onlinePuja->title . ' | Online Puja')
+@section('title', $onlinePuja->meta_title ?: $onlinePuja->title . ' | Online Puja')
+@section('meta_description', $onlinePuja->meta_description)
+@section('meta_keywords', $onlinePuja->meta_keywords)
 @section('content')
 @php
     use Illuminate\Support\Facades\Storage;

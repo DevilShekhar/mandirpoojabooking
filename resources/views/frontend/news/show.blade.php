@@ -1,7 +1,7 @@
 @extends('frontend.layouts.app')
 
 @section('title', $news->title)
-@section('meta_keyword', $news->title . ', Sri Mandir News, Temple News')
+@section('meta_keywords', $news->title . ', Sri Mandir News, Temple News')
 @section('meta_description', $news->short_description ?: \Illuminate\Support\Str::limit(strip_tags($news->description ?? ''), 160))
 
 @section('content')
