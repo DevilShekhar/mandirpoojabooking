@@ -274,6 +274,56 @@
                     </div>
                 </div>
             </div>
+            {{-- PUJA COUNTDOWN --}}
+            @if($pujaDate && $pujaDate->isFuture())
+                <div class="puja-countdown-section">
+                    <div class="countdown-heading">
+                        <span class="countdown-icon">
+                            <i class="fa fa-hourglass-half"></i>
+                        </span>
+                        <div>
+                            <h3>Puja Begins In</h3>
+                            <p>Time remaining for this sacred ceremony</p>
+                        </div>
+                    </div>
+
+                    <div class="puja-countdown-timer"
+                        id="pujaCountdown"
+                        data-date="{{ $pujaDate->toIso8601String() }}">
+
+                        <div class="countdown-box">
+                            <strong id="countdownDays">00</strong>
+                            <span>Days</span>
+                        </div>
+
+                        <div class="countdown-separator">:</div>
+
+                        <div class="countdown-box">
+                            <strong id="countdownHours">00</strong>
+                            <span>Hours</span>
+                        </div>
+
+                        <div class="countdown-separator">:</div>
+
+                        <div class="countdown-box">
+                            <strong id="countdownMinutes">00</strong>
+                            <span>Minutes</span>
+                        </div>
+
+                        <div class="countdown-separator">:</div>
+
+                        <div class="countdown-box">
+                            <strong id="countdownSeconds">00</strong>
+                            <span>Seconds</span>
+                        </div>
+                    </div>
+
+                    <div class="countdown-footer">
+                        <i class="fa fa-calendar"></i>
+                        {{ $pujaDate->format('d M Y, h:i A') }}
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
 </section>
@@ -2419,7 +2469,136 @@
         transition: none;
     }
 }
+/* PUJA COUNTDOWN */
 
+.puja-countdown-section {
+    margin-top: 22px;
+    padding: 20px;
+    background: linear-gradient(135deg, #fff8eb, #fff1d9);
+    border: 1px solid #ecd8b5;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(107, 73, 31, .06);
+}
+
+.countdown-heading {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.countdown-icon {
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #a84e20;
+    color: #fff;
+    border-radius: 12px;
+    font-size: 17px;
+}
+
+.countdown-heading h3 {
+    color: #56351f;
+    font-size: 16px;
+    font-weight: 800;
+    margin: 0 0 4px;
+}
+
+.countdown-heading p {
+    color: #927c63;
+    font-size: 11px;
+    margin: 0;
+}
+
+.puja-countdown-timer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 7px;
+}
+
+.countdown-box {
+    flex: 1;
+    min-width: 0;
+    padding: 13px 5px;
+    text-align: center;
+    background: #fff;
+    border: 1px solid #ead9bd;
+    border-radius: 10px;
+}
+
+.countdown-box strong {
+    display: block;
+    color: #a84e20;
+    font-size: 27px;
+    font-weight: 800;
+    line-height: 1.2;
+    font-variant-numeric: tabular-nums;
+}
+
+.countdown-box span {
+    display: block;
+    color: #897967;
+    font-size: 10px;
+    font-weight: 700;
+    margin-top: 5px;
+    text-transform: uppercase;
+}
+
+.countdown-separator {
+    color: #a84e20;
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.countdown-footer {
+    margin-top: 15px;
+    padding-top: 12px;
+    border-top: 1px solid #ead9bd;
+    text-align: center;
+    color: #92734d;
+    font-size: 11px;
+}
+
+.countdown-footer i {
+    margin-right: 5px;
+}
+
+.countdown-completed {
+    text-align: center;
+    padding: 16px;
+    color: #38835c;
+    background: #edf8f0;
+    border: 1px solid #cce8d3;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 800;
+}
+
+@media(max-width: 480px) {
+    .puja-countdown-section {
+        padding: 15px 12px;
+    }
+
+    .countdown-box {
+        padding: 11px 3px;
+    }
+
+    .countdown-box strong {
+        font-size: 21px;
+    }
+
+    .countdown-box span {
+        font-size: 8px;
+    }
+
+    .countdown-separator {
+        font-size: 15px;
+    }
+}
 </style>
 @endpush
 
@@ -2427,7 +2606,53 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-
+    const countdownElement = document.getElementById('pujaCountdown');
+    if (countdownElement) {
+        const targetDate = new Date(
+            countdownElement.dataset.date
+        ).getTime();
+        function updatePujaCountdown() {
+            const now = Date.now();
+            const distance = targetDate - now;
+            if (distance <= 0) {
+                clearInterval(countdownInterval);
+                countdownElement.innerHTML = `
+                    <div class="countdown-completed">
+                        <i class="fa fa-check-circle"></i>
+                        Puja Has Started!
+                    </div>
+                `;
+                return;
+            }
+            const days = Math.floor(
+                distance / (1000 * 60 * 60 * 24)
+            );
+            const hours = Math.floor(
+                (distance % (1000 * 60 * 60 * 24)) /
+                (1000 * 60 * 60)
+            );
+            const minutes = Math.floor(
+                (distance % (1000 * 60 * 60)) /
+                (1000 * 60)
+            );
+            const seconds = Math.floor(
+                (distance % (1000 * 60)) / 1000
+            );
+            document.getElementById('countdownDays').textContent =
+                String(days).padStart(2, '0');
+            document.getElementById('countdownHours').textContent =
+                String(hours).padStart(2, '0');
+            document.getElementById('countdownMinutes').textContent =
+                String(minutes).padStart(2, '0');
+            document.getElementById('countdownSeconds').textContent =
+                String(seconds).padStart(2, '0');
+        }
+        updatePujaCountdown();
+        const countdownInterval = setInterval(
+            updatePujaCountdown,
+            1000
+        );
+    }
     const navigation = document.getElementById('pujaSectionNavigation');
     function updateHeaderOffset() {
         const headerSelectors = [

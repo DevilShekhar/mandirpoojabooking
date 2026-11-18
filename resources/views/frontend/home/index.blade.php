@@ -246,6 +246,284 @@
 
     </div>
 </section>
+<!-- ================= ONLINE PUJA SECTION ================= -->
+
+<section class="special-puja-area pt-60 pb-60 bg-light">
+
+    <div class="container">
+
+        <!-- Heading -->
+        <div class="row">
+            <div class="col-12">
+                <div class="special-puja-heading text-center mb-30">
+
+                    <span class="badge bg-danger text-white px-3 py-2 rounded-pill mb-3">
+                        DIVINE EXPERIENCES
+                    </span>
+
+                    <h2 class="fw-bold text-dark">
+                        <span class="text-danger">Online</span> Special Pujas
+                    </h2>
+
+                    <p class="text-muted">
+                        Participate in sacred Vedic rituals from anywhere.
+                        Book online pujas performed by experienced priests
+                        at India's holy temples and receive divine blessings.
+                    </p>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Online Puja Slider -->
+        <div class="row">
+            <div class="col-12">
+
+                <div class="special-puja-slider owl-carousel">
+
+                    @forelse($onlinePujas as $onlinePuja)
+
+                        <div class="col-lg-4">
+
+                            <div class="special-puja-card bg-white shadow rounded-4 border-0 overflow-hidden mb-4">
+
+                                <!-- Image -->
+                                <div class="puja-image position-relative overflow-hidden">
+
+                                    @if($onlinePuja->thumbnail_image)
+
+                                        <img src="{{ asset('storage/' . $onlinePuja->thumbnail_image) }}"
+                                             alt="{{ $onlinePuja->title }}"
+                                             class="w-100">
+
+                                    @elseif($onlinePuja->banner_image)
+
+                                        <img src="{{ asset('storage/' . $onlinePuja->banner_image) }}"
+                                             alt="{{ $onlinePuja->title }}"
+                                             class="w-100">
+
+                                    @else
+
+                                        <img src="{{ asset('assets/frontend/assets/images/puja/puja-1.jpg') }}"
+                                             alt="{{ $onlinePuja->title }}"
+                                             class="w-100">
+
+                                    @endif
+
+                                    <!-- Featured Badge -->
+                                    @if($onlinePuja->is_featured)
+                                        <span class="badge bg-danger position-absolute top-0 start-0 m-3 px-3 py-2 rounded-pill">
+                                            Featured
+                                        </span>
+                                    @endif
+
+                                    @if($onlinePuja->is_popular)
+                                        <span class="badge bg-warning text-dark position-absolute top-0 end-0 m-3 px-3 py-2 rounded-pill">
+                                            Popular
+                                        </span>
+                                    @endif
+
+                                </div>
+
+                                <!-- Content -->
+                                <div class="puja-content p-4">
+
+                                    <!-- Category -->
+                                    <div class="puja-category badge bg-danger text-white rounded-pill px-3 py-2 mb-3">
+
+                                        {{ $onlinePuja->category->name ?? 'ONLINE PUJA' }}
+
+                                    </div>
+
+                                    <!-- Title -->
+                                    <h3 class="fw-bold text-dark mb-3">
+
+                                        {{ $onlinePuja->title }}
+
+                                    </h3>
+
+                                    <!-- Description -->
+                                    @if($onlinePuja->short_description)
+
+                                        <p class="puja-description text-muted mb-3">
+
+                                            {{ \Illuminate\Support\Str::limit(strip_tags($onlinePuja->short_description), 120) }}
+
+                                        </p>
+
+                                    @endif
+
+                                    <!-- Details -->
+                                    <div class="puja-info border-top border-bottom py-3 mb-3">
+
+                                        <!-- Temple -->
+                                        @if($onlinePuja->temple_name)
+
+                                            <div class="d-flex align-items-start mb-3">
+
+                                                <i class="fa fa-map-marker text-danger me-3 mt-1"></i>
+
+                                                <span class="text-muted">
+
+                                                    {{ $onlinePuja->temple_name }}
+
+                                                    @if($onlinePuja->temple_city)
+                                                        , {{ $onlinePuja->temple_city }}
+                                                    @endif
+
+                                                    @if($onlinePuja->temple_state)
+                                                        , {{ $onlinePuja->temple_state }}
+                                                    @endif
+
+                                                </span>
+
+                                            </div>
+
+                                        @elseif($onlinePuja->temple_location)
+
+                                            <div class="d-flex align-items-start mb-3">
+
+                                                <i class="fa fa-map-marker text-danger me-3 mt-1"></i>
+
+                                                <span class="text-muted">
+                                                    {{ $onlinePuja->temple_location }}
+                                                </span>
+
+                                            </div>
+
+                                        @endif
+
+                                        <!-- Puja Date -->
+                                        @if($onlinePuja->puja_datetime)
+
+                                            <div class="d-flex align-items-center mb-3">
+
+                                                <i class="fa fa-calendar text-danger me-3"></i>
+
+                                                <span class="text-muted">
+                                                    {{ $onlinePuja->puja_datetime->format('d M Y, h:i A') }}
+                                                </span>
+
+                                            </div>
+
+                                        @endif
+
+                                        <!-- Puja Day -->
+                                        @if($onlinePuja->puja_day)
+
+                                            <div class="d-flex align-items-center mb-3">
+
+                                                <i class="fa fa-calendar-check-o text-danger me-3"></i>
+
+                                                <span class="text-muted">
+                                                    {{ $onlinePuja->puja_day }}
+                                                </span>
+
+                                            </div>
+
+                                        @endif
+
+                                        <!-- Tithi -->
+                                        @if($onlinePuja->tithi)
+
+                                            <div class="d-flex align-items-center mb-3">
+
+                                                <i class="fa fa-star text-danger me-3"></i>
+
+                                                <span class="text-muted">
+                                                    {{ $onlinePuja->tithi }}
+                                                </span>
+
+                                            </div>
+
+                                        @endif
+
+                                        <!-- Booking Seats -->
+                                        @if($onlinePuja->total_seat)
+
+                                            <div class="d-flex align-items-center">
+
+                                                <i class="fa fa-users text-danger me-3"></i>
+
+                                                <span class="text-muted">
+
+                                                    {{ max(0, $onlinePuja->total_seat - $onlinePuja->booked_seat) }}
+                                                    Seats Available
+
+                                                </span>
+
+                                            </div>
+
+                                        @endif
+
+                                    </div>
+
+                                    <!-- Participate Button -->
+                                    <a href="{{ route('frontend.online-puja.show', ['slug' => $onlinePuja->slug]) }}"
+                                       class="puja-btn btn btn-danger w-100 rounded-pill py-3 fw-semibold">
+
+                                        PARTICIPATE NOW
+
+                                        <i class="fa fa-arrow-right ms-2"></i>
+
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    @empty
+
+                        <div class="col-12 text-center">
+
+                            <div class="bg-white shadow-sm rounded-4 p-5">
+
+                                <i class="fa fa-om fa-3x text-danger mb-3"></i>
+
+                                <h4 class="fw-bold">
+                                    No Online Pujas Available
+                                </h4>
+
+                                <p class="text-muted mb-0">
+                                    New online pujas will be available soon.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    @endforelse
+
+                </div>
+
+            </div>
+        </div>
+
+        <!-- View All -->
+        <div class="row">
+
+            <div class="col-12 text-center mt-25">
+
+                <a href="{{ route('frontend.online-puja.index') }}"
+                   class="view-all-pujas btn btn-outline-danger rounded-pill px-4 py-3 fw-semibold">
+
+                    View All Online Pujas
+
+                    <i class="fa fa-arrow-right ms-2"></i>
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ================= END ONLINE PUJA SECTION ================= -->
 
 <section class="why-buy-section">
     <div class="container">
