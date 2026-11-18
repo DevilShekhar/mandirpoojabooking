@@ -1,7 +1,5 @@
 @extends('frontend.layouts.app')
-
 @section('title', 'Sanatan Events')
-
 @section('content')
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
 <style>
@@ -35,7 +33,7 @@
     .sanatan-languages{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;margin-bottom:15px}
     .sanatan-language-badge{background:#f0f2f5;color:#555;font-size:11px;padding:5px 8px;border-radius:5px}
     .sanatan-price{color:#e85d04;font-size:20px;font-weight:700;margin-bottom:15px}
-    .sanatan-view-btn{display:block;text-align:center;background:#e85d04;color:#fff;text-decoration:none;padding:11px 15px;border-radius:7px;font-size:14px;font-weight:600;transition:.3s}
+    .sanatan-view-btn{display:block;text-align:center;background:#e85d04;color:#fff;text-decoration:none;padding:11px 15px;border-radius:7px;font-size:12px;font-weight:600;transition:.3s}
     .sanatan-view-btn:hover{background:#c94d00;color:#fff}
     .sanatan-pagination{width:100%;display:flex;justify-content:center;margin-top:30px}
     .sanatan-pagination nav{width:100%;display:flex;justify-content:center}
@@ -55,6 +53,92 @@
     .sanatan-filter-card .select2-results__option{padding:9px 12px;font-size:14px}
     @media(max-width:991px){.sanatan-filter-card{position:static;margin-bottom:25px}.sanatan-page{padding:35px 0}}
     @media(max-width:575px){.sanatan-heading h2{font-size:25px}.sanatan-card-image{height:200px}}
+    /* Sanatan Custom Pagination */
+.sanatan-pagination {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 35px;
+}
+
+.sanatan-pagination nav {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.sanatan-pagination .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.sanatan-pagination .page-item {
+    margin: 0;
+}
+
+.sanatan-pagination .page-link {
+    min-width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 13px;
+    border: 1px solid #e5e7eb;
+    border-radius: 7px !important;
+    background: #fff;
+    color: #444;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: none;
+    transition: all .25s ease;
+}
+
+.sanatan-pagination .page-link:hover {
+    background: #fff0e6;
+    color: #e85d04;
+    border-color: #e85d04;
+}
+
+.sanatan-pagination .page-item.active .page-link {
+    background: #e85d04;
+    border-color: #e85d04;
+    color: #fff;
+    box-shadow: 0 3px 8px rgba(232, 93, 4, .2);
+}
+
+.sanatan-pagination .page-item.disabled .page-link {
+    background: #f5f5f5;
+    color: #aaa;
+    border-color: #eee;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.sanatan-pagination .page-link:focus {
+    box-shadow: none;
+    outline: none;
+}
+
+@media(max-width:575px) {
+    .sanatan-pagination .pagination {
+        gap: 5px;
+    }
+
+    .sanatan-pagination .page-link {
+        min-width: 35px;
+        height: 36px;
+        padding: 6px 10px;
+        font-size: 13px;
+    }
+}
 </style>
 
 <section class="sanatan-page">
@@ -63,7 +147,6 @@
             <h2>Sanatan Events</h2>
             <p>Explore spiritual programs, devotional gatherings and traditional religious events.</p>
         </div>
-
         <div class="row">
             <div class="col-lg-3">
                 <div class="sanatan-filter-card">
@@ -78,7 +161,6 @@
                                 @endforeach
                             </select>
                         </div>
-
                         <div class="sanatan-filter-group">
                             <label for="created_by">Created By</label>
                             <select name="created_by" id="created_by">
@@ -88,22 +170,19 @@
                                 @endforeach
                             </select>
                         </div>
-
                         <button type="button" id="resetSanatanFilters" class="sanatan-reset-btn">Reset Filters</button>
                     </form>
                 </div>
             </div>
-
             <div class="col-lg-9">
                 <div class="sanatan-results-header">
                     <h4>Explore Events</h4>
                     <span class="sanatan-results-count" id="sanatanResultsCount">Showing {{ $sanatans->firstItem() ?? 0 }}–{{ $sanatans->lastItem() ?? 0 }} of {{ $sanatans->total() }} events</span>
                 </div>
-
                 <div id="sanatanResults">
-                    <div class="row g-4" id="sanatanCards">
+                    <div class="row g-4 " id="sanatanCards">
                         @forelse($sanatans as $sanatan)
-                            <div class="col-md-6 col-xl-4">
+                            <div class="col-md-6 col-xl-4 mb-4">
                                 <div class="sanatan-card">
                                     <div class="sanatan-card-image">
                                         @if($sanatan->banner_image || $sanatan->image)
@@ -113,51 +192,43 @@
                                         @endif
                                     </div>
                                     <div class="sanatan-card-body">
-    @if($sanatan->program_type)
-        <span class="sanatan-event-type">{{ $sanatan->program_type }}</span>
-    @endif
-
-    <h5>{{ $sanatan->name }}</h5>
-
-    <p class="sanatan-card-description">
-        {{ $sanatan->short_description ?: \Illuminate\Support\Str::limit(strip_tags($sanatan->description ?? ''), 130) }}
-    </p>
-
-    <div class="sanatan-meta">
-        @if($sanatan->duration)
-            <p><i class="far fa-clock me-1"></i> {{ $sanatan->duration }}</p>
-        @endif
-
-        <p>
-            <i class="far fa-user me-1"></i>
-            Created by: {{ $sanatan->creator_name ?? 'N/A' }}
-        </p>
-
-        @if(!empty($sanatan->languages))
-            <div class="sanatan-languages">
-                @foreach($sanatan->languages as $language)
-                    <span class="sanatan-language-badge">{{ $language }}</span>
-                @endforeach
-            </div>
-        @endif
-    </div>
-
-    <div class="sanatan-price">
-        ₹{{ number_format((float) $sanatan->price, 2) }}
-    </div>
-
-    <div class="d-flex gap-2 mt-auto">
-        <a href="{{ route('frontend.sanatanevents.buy', $sanatan->slug) }}"
-           class="sanatan-view-btn flex-fill">
-            <i class="fas fa-shopping-cart me-1"></i> Add to Cart
-        </a>
-
-        <a href="{{ route('frontend.sanatanevents.show', $sanatan->slug) }}"
-           class="sanatan-view-btn flex-fill">
-            View Details
-        </a>
-    </div>
-</div>
+                                        @if($sanatan->program_type)
+                                            <span class="sanatan-event-type">{{ $sanatan->program_type }}</span>
+                                        @endif
+                                        <h5>{{ $sanatan->name }}</h5>
+                                        <p class="sanatan-card-description">
+                                            {{ $sanatan->short_description ?: \Illuminate\Support\Str::limit(strip_tags($sanatan->description ?? ''), 130) }}
+                                        </p>
+                                        <div class="sanatan-meta">
+                                            @if($sanatan->duration)
+                                                <p><i class="far fa-clock me-1"></i> {{ $sanatan->duration }}</p>
+                                            @endif
+                                            <p>
+                                                <i class="fa fa-user me-1"></i>
+                                                Created by: {{ $sanatan->creator_name ?? 'N/A' }}
+                                            </p>
+                                            @if(!empty($sanatan->languages))
+                                                <div class="sanatan-languages">
+                                                    @foreach($sanatan->languages as $language)
+                                                        <span class="sanatan-language-badge">{{ $language }}</span>
+                                                    @endforeach
+                                                </div>
+                                            @endif
+                                        </div>
+                                        <div class="sanatan-price">
+                                            ₹{{ number_format((float) $sanatan->price, 2) }}
+                                        </div>
+                                        <div class="sanatan-results-header">
+                                            <a href="{{ route('frontend.sanatanevents.buy', $sanatan->slug) }}"
+                                            class="sanatan-view-btn flex-fill">
+                                                <i class="fa fa-shopping-cart me-1"></i> Add to Cart
+                                            </a>
+                                            <a href="{{ route('frontend.sanatanevents.show', $sanatan->slug) }}"
+                                            class="sanatan-view-btn flex-fill">
+                                                View Details
+                                            </a>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         @empty
@@ -169,25 +240,77 @@
                             </div>
                         @endforelse
                     </div>
+                   <div class="sanatan-pagination" id="sanatanPagination">
+                        @if($sanatans->lastPage() > 1)
+                            <nav aria-label="Sanatan Events Pagination">
+                                <ul class="pagination">
 
-                    <div class="sanatan-pagination" id="sanatanPagination">{{ $sanatans->links() }}</div>
+                                    {{-- Previous --}}
+                                    <li class="page-item {{ $sanatans->onFirstPage() ? 'disabled' : '' }}">
+                                        <a class="page-link"
+                                        href="#"
+                                        data-page="{{ $sanatans->currentPage() - 1 }}">
+                                            &laquo;
+                                        </a>
+                                    </li>
+
+                                    {{-- Page Numbers --}}
+                                    @for($page = 1; $page <= $sanatans->lastPage(); $page++)
+
+                                        @if(
+                                            $page == 1 ||
+                                            $page == $sanatans->lastPage() ||
+                                            abs($page - $sanatans->currentPage()) <= 2
+                                        )
+
+                                            <li class="page-item {{ $page == $sanatans->currentPage() ? 'active' : '' }}">
+                                                <a class="page-link"
+                                                href="#"
+                                                data-page="{{ $page }}">
+                                                    {{ $page }}
+                                                </a>
+                                            </li>
+
+                                        @elseif(
+                                            $page == $sanatans->currentPage() - 3 ||
+                                            $page == $sanatans->currentPage() + 3
+                                        )
+
+                                            <li class="page-item disabled">
+                                                <span class="page-link">...</span>
+                                            </li>
+
+                                        @endif
+
+                                    @endfor
+
+                                    {{-- Next --}}
+                                    <li class="page-item {{ !$sanatans->hasMorePages() ? 'disabled' : '' }}">
+                                        <a class="page-link"
+                                        href="#"
+                                        data-page="{{ $sanatans->currentPage() + 1 }}">
+                                            &raquo;
+                                        </a>
+                                    </li>
+
+                                </ul>
+                            </nav>
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
 @endsection
-
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
 <script>
 $(document).ready(function () {
     const listingUrl = @json(route('frontend.sanatanevents'));
     const detailsBaseUrl = @json(url('/sanatanevents'));
     let currentRequest = null;
     let requestId = 0;
-
     // Initialize Select2 filters
     $('#created_by').select2({
         width: '100%',
@@ -195,19 +318,16 @@ $(document).ready(function () {
         allowClear: true,
         minimumResultsForSearch: 0
     });
-
     $('#program_type').select2({
         width: '100%',
         placeholder: 'All Event Types',
         allowClear: true,
         minimumResultsForSearch: 0
     });
-
     // Escape HTML to safely render dynamic values
     function escapeHtml(value) {
         return $('<div>').text(value ?? '').html();
     }
-
     // Format event price
     function formatPrice(value) {
         return Number(value || 0).toLocaleString('en-IN', {
@@ -215,13 +335,11 @@ $(document).ready(function () {
             maximumFractionDigits: 2
         });
     }
-
     // Render event languages
     function renderLanguages(languages) {
         if (!Array.isArray(languages) || languages.length === 0) {
             return '';
         }
-
         return `
             <div class="sanatan-languages">
                 ${languages.map(language => `
@@ -232,7 +350,6 @@ $(document).ready(function () {
             </div>
         `;
     }
-
     // Render event cards
     function renderEvents(events) {
         if (!events || events.length === 0) {
@@ -245,21 +362,14 @@ $(document).ready(function () {
                 </div>
             `;
         }
-
         return events.map(event => {
             const image = event.image
-                ? `
-                    <img
-                        src="${escapeHtml(event.image)}"
-                        alt="${escapeHtml(event.name)}"
-                    >
-                `
+                ? `<img src="${escapeHtml(event.image)}" alt="${escapeHtml(event.name)}">`
                 : `
                     <div class="sanatan-card-placeholder">
                         <i class="fas fa-om"></i>
                     </div>
                 `;
-
             const eventType = event.program_type
                 ? `
                     <span class="sanatan-event-type">
@@ -267,7 +377,6 @@ $(document).ready(function () {
                     </span>
                 `
                 : '';
-
             const duration = event.duration
                 ? `
                     <p>
@@ -276,113 +385,75 @@ $(document).ready(function () {
                     </p>
                 `
                 : '';
-
-            const detailUrl = event.detail_url
-                || `${detailsBaseUrl}/${encodeURIComponent(event.slug)}`;
-
-            // Controller can return the exact Add to Cart URL.
-            const buyUrl = event.buy_url
-                || `${detailsBaseUrl}/${encodeURIComponent(event.slug)}/buy`;
-
+            const detailUrl = event.detail_url || `${detailsBaseUrl}/${encodeURIComponent(event.slug)}`;
+            const buyUrl = event.buy_url || `${detailsBaseUrl}/${encodeURIComponent(event.slug)}/buy`;
             return `
                 <div class="col-md-6 col-xl-4">
                     <div class="sanatan-card">
-
                         <div class="sanatan-card-image">
                             ${image}
                         </div>
-
                         <div class="sanatan-card-body">
-
                             ${eventType}
-
                             <h5>${escapeHtml(event.name)}</h5>
-
                             <p class="sanatan-card-description">
                                 ${escapeHtml(event.short_description || '')}
                             </p>
-
                             <div class="sanatan-meta">
-
                                 ${duration}
-
                                 <p>
-                                    <i class="far fa-user me-1"></i>
+                                    <i class="fa fa-user me-1"></i>
                                     Created by:
                                     ${escapeHtml(event.creator_name || 'N/A')}
                                 </p>
-
                                 ${renderLanguages(event.languages)}
-
                             </div>
-
                             <div class="sanatan-price">
                                 ₹${formatPrice(event.price)}
                             </div>
-
-                            <div class="d-flex gap-2 mt-auto">
-
-                                <a
-                                    href="${escapeHtml(buyUrl)}"
-                                    class="sanatan-view-btn flex-fill text-center"
-                                >
-                                    <i class="fas fa-shopping-cart me-1"></i>
+                            <div class="sanatan-results-header">
+                                <a href="${escapeHtml(buyUrl)}" class="sanatan-view-btn flex-fill text-center">
+                                    <i class="fa fa-shopping-cart me-1"></i>
                                     Add to Cart
                                 </a>
-
-                                <a
-                                    href="${escapeHtml(detailUrl)}"
-                                    class="sanatan-view-btn flex-fill text-center"
-                                >
+                                <a href="${escapeHtml(detailUrl)}" class="sanatan-view-btn flex-fill text-center">
                                     View Details
                                 </a>
-
                             </div>
-
                         </div>
                     </div>
                 </div>
             `;
         }).join('');
     }
-
     // Render pagination
     function renderPagination(pagination) {
         if (!pagination || pagination.last_page <= 1) {
             $('#sanatanPagination').html('');
             return;
         }
-
         let html = `
-            <nav aria-label="Sanatan events pagination">
+            <nav aria-label="Sanatan Events Pagination">
                 <ul class="pagination">
-        `;
-
-        if (pagination.current_page > 1) {
-            html += `
-                <li class="page-item">
-                    <a
-                        class="page-link"
+                    <li class="page-item ${pagination.current_page <= 1 ? 'disabled' : ''}">
+                        <a class="page-link"
                         href="#"
-                        data-page="${pagination.current_page - 1}"
-                    >&laquo;</a>
-                </li>
-            `;
-        }
-
+                        data-page="${pagination.current_page - 1}">
+                            &laquo;
+                        </a>
+                    </li>
+        `;
         for (let page = 1; page <= pagination.last_page; page++) {
-            if (
-                page === 1 ||
-                page === pagination.last_page ||
+            if (page === 1 || page === pagination.last_page ||
                 Math.abs(page - pagination.current_page) <= 2
             ) {
                 html += `
                     <li class="page-item ${page === pagination.current_page ? 'active' : ''}">
-                        <a
-                            class="page-link"
-                            href="#"
-                            data-page="${page}"
-                        >${page}</a>
+                        <a class="page-link"
+                        href="#"
+                        data-page="${page}">
+                            ${page}
+                        </a>
                     </li>
                 `;
             } else if (
@@ -396,125 +467,98 @@ $(document).ready(function () {
                 `;
             }
         }
-
-        if (pagination.current_page < pagination.last_page) {
-            html += `
-                <li class="page-item">
-                    <a
-                        class="page-link"
-                        href="#"
-                        data-page="${pagination.current_page + 1}"
-                    >&raquo;</a>
-                </li>
-            `;
-        }
-
         html += `
+                    <li class="page-item ${pagination.current_page >= pagination.last_page ? 'disabled' : ''}">
+                        <a class="page-link"
+                        href="#"
+                        data-page="${pagination.current_page + 1}">
+                            &raquo;
+                        </a>
+                    </li>
                 </ul>
             </nav>
         `;
-
         $('#sanatanPagination').html(html);
     }
-
-    // Load events using AJAX
-    function loadEvents(page = 1) {
-        const thisRequestId = ++requestId;
-
-        if (currentRequest) {
-            currentRequest.abort();
-        }
-
-        $('#sanatanResults').addClass('sanatan-loading');
-
-        const request = $.ajax({
-            url: listingUrl,
-            type: 'GET',
-            dataType: 'json',
-
-            data: {
-                program_type: $('#program_type').val(),
-                created_by: $('#created_by').val(),
-                page: page
-            },
-
-            success: function (response) {
-                if (thisRequestId !== requestId) {
-                    return;
-                }
-
-                $('#sanatanCards').html(
-                    renderEvents(response.events)
-                );
-
-                const pagination = response.pagination || {};
-
-                renderPagination(pagination);
-
-                $('#sanatanResultsCount').text(
-                    `Showing ${pagination.from || 0}–${pagination.to || 0} of ${pagination.total || 0} events`
-                );
-            },
-
-            error: function (xhr, status) {
-                if (
-                    status !== 'abort' &&
-                    thisRequestId === requestId
-                ) {
-                    $('#sanatanCards').html(`
-                        <div class="col-12">
-                            <div class="sanatan-empty">
-                                <h5>Unable to Load Events</h5>
-                                <p>Please refresh the page and try again.</p>
-                            </div>
-                        </div>
-                    `);
-
-                    $('#sanatanPagination').html('');
-                }
-            },
-
-            complete: function () {
-                if (thisRequestId === requestId) {
-                    $('#sanatanResults').removeClass('sanatan-loading');
-                    currentRequest = null;
-                }
+        // Load events using AJAX
+        function loadEvents(page = 1) {
+            const thisRequestId = ++requestId;
+            if (currentRequest) {
+                currentRequest.abort();
             }
+            $('#sanatanResults').addClass('sanatan-loading');
+            const request = $.ajax({
+                url: listingUrl,
+                type: 'GET',
+                dataType: 'json',
+                data: {
+                    program_type: $('#program_type').val(),
+                    created_by: $('#created_by').val(),
+                    page: page
+                },
+                success: function (response) {
+                    if (thisRequestId !== requestId) {
+                        return;
+                    }
+                    $('#sanatanCards').html(
+                        renderEvents(response.events)
+                    );
+                    const pagination = response.pagination || {};
+                    renderPagination(pagination);
+                    $('#sanatanResultsCount').text(
+                        `Showing ${pagination.from || 0}–${pagination.to || 0} of ${pagination.total || 0} events`
+                    );
+                },
+                error: function (xhr, status) {
+                    if (
+                        status !== 'abort' &&
+                        thisRequestId === requestId
+                    ) {
+                        $('#sanatanCards').html(`
+                            <div class="col-12">
+                                <div class="sanatan-empty">
+                                    <h5>Unable to Load Events</h5>
+                                    <p>Please refresh the page and try again.</p>
+                                </div>
+                            </div>
+                        `);
+                        $('#sanatanPagination').html('');
+                    }
+                },
+                complete: function () {
+                    if (thisRequestId === requestId) {
+                        $('#sanatanResults').removeClass('sanatan-loading');
+                        currentRequest = null;
+                    }
+                }
+            });
+            currentRequest = request;
+        }
+        // Apply filters
+        $('#program_type, #created_by').on('change', function () {
+            loadEvents(1);
         });
-
-        currentRequest = request;
-    }
-
-    // Apply filters
-    $('#program_type, #created_by').on('change', function () {
-        loadEvents(1);
-    });
-
-    // Reset filters
-    $('#resetSanatanFilters').on('click', function () {
+        // Reset filters
+        $('#resetSanatanFilters').on('click', function () {
         $('#program_type').val('').trigger('change.select2');
         $('#created_by').val('').trigger('change.select2');
-
         loadEvents(1);
     });
-
     // Pagination click
     $(document).on(
-        'click',
-        '#sanatanPagination a[data-page]',
-        function (event) {
-            event.preventDefault();
-
-            const page = parseInt(
-                $(this).attr('data-page'),
-                10
-            );
-
-            if (page > 0) {
-                loadEvents(page);
-            }
+    'click',
+    '#sanatanPagination a[data-page]',
+    function (event) {
+        event.preventDefault();
+        if ($(this).closest('.page-item').hasClass('disabled')) {
+            return;
         }
-    );
+        const page = parseInt($(this).attr('data-page'), 10);
+        if (!isNaN(page) && page > 0) {
+            loadEvents(page);
+        }
+    }
+);
 });
 </script>
 @endpush
