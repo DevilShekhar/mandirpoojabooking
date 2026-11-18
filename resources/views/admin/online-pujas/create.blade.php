@@ -233,14 +233,14 @@
                                 <section>
                                     <div class="row">
                                         <div class="form-group col-md-6">
-                                            <label>Puja Date & Time</label>
+                                            <label>Puja Date & Time <span class="text-danger">*</span></label>
                                             <input type="datetime-local"
                                                 name="puja_datetime"
                                                 value="{{ old('puja_datetime') }}"
                                                 class="form-control">
                                         </div>
                                         <div class="form-group col-md-6">
-                                            <label>Puja Day</label>
+                                            <label>Puja Day <span class="text-danger">*</span></label>
                                             <input type="text" name="puja_day"
                                                 value="{{ old('puja_day') }}"
                                                 class="form-control"
@@ -251,7 +251,7 @@
 
                                         <div class="form-group col-md-6">
 
-                                            <label>Tithi</label>
+                                            <label>Tithi <span class="text-danger">*</span></label>
 
                                             <input type="text" name="tithi"
 
@@ -265,7 +265,7 @@
 
                                         <div class="form-group col-md-6">
 
-                                            <label>Muhurat</label>
+                                            <label>Muhurat <span class="text-danger">*</span></label>
 
                                             <input type="text" name="muhurat"
 
@@ -279,7 +279,7 @@
 
                                         <div class="form-group col-md-6">
 
-                                            <label>Muhurat End At</label>
+                                            <label>Muhurat End At <span class="text-danger">*</span></label>
 
                                             <input type="datetime-local"
 
@@ -293,7 +293,7 @@
 
                                         <div class="form-group col-md-6">
 
-                                            <label>Booking Start At</label>
+                                            <label>Booking Start At <span class="text-danger">*</span></label>
 
                                             <input type="datetime-local"
 
@@ -307,7 +307,7 @@
 
                                         <div class="form-group col-md-6">
 
-                                            <label>Booking End At</label>
+                                            <label>Booking End At <span class="text-danger">*</span></label>
 
                                             <input type="datetime-local"
 
@@ -321,7 +321,7 @@
 
                                         <div class="form-group col-md-6">
 
-                                            <label>Total Seats</label>
+                                            <label>Total Seats <span class="text-danger">*</span></label>
 
                                             <input type="number" min="0"
 
