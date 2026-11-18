@@ -86,7 +86,7 @@
                                             </td>
                                             <td>
                                                 <span class="badge badge-info">
-                                                    {{ $puja->confirmed_bookings_count ?? 0 }}
+                                                    {{ $puja->booked_seat ?? 0 }}
                                                     /
                                                     {{ $puja->total_seat ?? 0 }}
                                                 </span>
