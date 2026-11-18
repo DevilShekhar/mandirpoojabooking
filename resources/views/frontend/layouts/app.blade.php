@@ -6,7 +6,7 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
 
     <title>@yield('title', 'Computer Hardware')</title>
-    <meta name="keywords" content="@yield('meta_keyword', 'computer hardware, computer parts')">
+    <meta name="keywords" content="@yield('meta_keywords', 'computer hardware, computer parts')">
     <meta name="description" content="@yield('meta_description', 'Computer Hardware')">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
