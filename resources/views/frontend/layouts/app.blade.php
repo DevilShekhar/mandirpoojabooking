@@ -39,7 +39,7 @@
     <!-- Helper CSS -->
     <link rel="stylesheet" href="{{ asset('assets/frontend/assets/css/helper.css') }}">
     <!-- Main Style CSS -->
-    <link rel="stylesheet" href="{{ asset('assets/frontend/assets/css/style-custom.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/frontend/assets/css/style-new-custom.css') }}">
     <!-- Responsive CSS -->
     <link rel="stylesheet" href="{{ asset('assets/frontend/assets/css/responsive.css') }}">
     <!-- Modernizr JS -->
@@ -319,7 +319,7 @@
                         <div class="col-lg-3">
                             <div class="logo pb-sm-30 pb-xs-30">
                                 <a href="{{ url('/') }}">
-                                    <img src="{{ asset('assets/frontend/assets/images/menu/logo/logo.png') }}"
+                                    <img src="{{ asset('assets/frontend/assets/images/menu/logo/logo.jpeg') }}"
                                         alt="Footer Logo" alt="">
                                 </a>
                             </div>
@@ -555,12 +555,10 @@
                             <!-- Begin Footer Logo Area -->
                             <div class="col-lg-6 col-md-6">
                                 <div class="footer-logo">
-                                    <img src="{{ asset('assets/frontend/assets/images/menu/logo/logo.png') }}"
+                                    <img src="{{ asset('assets/frontend/assets/images/menu/logo/logo.jpeg') }}"
                                         alt="Footer Logo">
                                     <p class="info">
-                                        computer hardwareis your trusted destination for quality products, competitive
-                                        prices, and reliable service. Explore our products, discover leading brands, and
-                                        build your perfect PC with our PC Builder.
+                                        Your trusted destination for online puja and temple booking. Explore sacred temples across India, book divine rituals and special pujas online, and participate in spiritual ceremonies from anywhere. Experience a seamless way to connect with traditions, seek blessings, and bring peace, happiness, and prosperity to your family.
                                     </p>
                                 </div>
                                 <ul class="des">

@@ -43,56 +43,55 @@
         </div>
     </div>
 </div>
-<section class="team-area pt-60 pt-sm-44">
+
+<section class="temples-section">
     <div class="container">
-        <div class="row">
-            <div class="col-12">
-                <div class="li-section-title capitalize mb-25">
-                    <h2>
-                        <span>Our Temples</span>
-                    </h2>
-                </div>
+        <div class="temples-header">
+            <div>
+                <span class="section-subtitle">DIVINE DESTINATIONS</span>
+                <h2>Explore Our Temples</h2>
+                <p>Discover sacred temples and connect with divine blessings.</p>
             </div>
+            <a href="{{ route('frontend.our-temples') }}" class="temple-main-btn">
+                Our Temples <i class="fa fa-arrow-right"></i>
+            </a>
         </div>
         <div class="row">
             <div class="product-active owl-carousel">
                 @forelse($temples as $temple)
                     <div class="col-lg-12">
-                        <div class="team-member mb-60"
-                            style="height: 360px; display: flex; flex-direction: column;">
-
-                            <div class="team-thumb"
-                                style="height: 220px; flex-shrink: 0; overflow: hidden;">
-                                <img
-                                    src="{{ $temple->main_image ? asset('storage/' . $temple->main_image) : asset('assets/frontend/assets/images/temple-placeholder.jpg') }}"
-                                    alt="{{ $temple->name }}"
-                                    style="width:100%;height:220px;object-fit:cover;">
-                            </div>
-
-                            <div class="team-content text-center"
-                                style="height: 140px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 15px;">
-
-                                <h3 style="margin-bottom: 8px;">
-                                    {{ $temple->name }}
-                                </h3>
-
-                                <p style="margin-bottom: 10px;">
-                                    {{ $temple->city->name ?? '' }},
-                                    {{ $temple->state->name ?? '' }}
-                                </p>
-
+                        <div class="temple-card">
+                            <div class="temple-image">
+                                <img src="{{ $temple->main_image ? asset('storage/' . $temple->main_image): asset('assets/frontend/assets/images/temple-placeholder.jpg') }}"
+                                    alt="{{ $temple->name }}">
+                                <div class="temple-image-overlay"></div>
                                 @if($temple->is_verified)
-                                    <span class="badge bg-success">
-                                        Verified Temple
+                                    <span class="verified-badge">
+                                        <i class="fa fa-check-circle"></i>
+                                        Verified
                                     </span>
                                 @endif
+                            </div>
+                            <div class="temple-content">
+                                <span class="temple-location">
+                                    <i class="fa fa-map-marker"></i>
+                                    {{ $temple->city->name ?? '' }},
+                                    {{ $temple->state->name ?? '' }}
+                                </span>
+                                <h3>{{ $temple->name }}</h3>
+                                <a href="{{ route('frontend.our-temple.show', $temple->slug) }}" class="temple-footer">
+                                    <span>Explore Temple</span>
+                                    <i class="fa fa-arrow-right"></i>
+                                </a>
                             </div>
                         </div>
                     </div>
                 @empty
                     <div class="col-12">
-                        <div class="text-center py-5">
-                            <h4>No temples available.</h4>
+                        <div class="temple-empty">
+                            <i class="fa fa-university"></i>
+                            <h4>No Temples Available</h4>
+                            <p>Our sacred destinations will be listed here soon.</p>
                         </div>
                     </div>
                 @endforelse
@@ -100,56 +99,84 @@
         </div>
     </div>
 </section>
-<section class="special-puja-area pt-60 pb-60">
+
+<section class="special-puja-area pt-60 pb-60 bg-light">
     <div class="container">
+
+        <!-- Heading -->
         <div class="row">
             <div class="col-12">
                 <div class="special-puja-heading text-center mb-30">
-                    <h2>
-                        <span>Sri Mandir</span> Special Pujas
+
+                    <span class="badge bg-danger text-white px-3 py-2 rounded-pill mb-3">
+                        DIVINE EXPERIENCES
+                    </span>
+
+                    <h2 class="fw-bold text-dark">
+                        <span class="text-danger">All Sanatan</span> Special Pujas
                     </h2>
-                    <p>
-                        Begin 2026 with faith - get special pujas performed in your name
-                        at India's powerful temples to achieve peace and protection for your family.
+
+                    <p class="text-muted">
+                        Begin your spiritual journey with sacred rituals.
+                        Get special pujas performed in your name at India's
+                        powerful temples to achieve peace and protection for your family.
                     </p>
+
                 </div>
             </div>
         </div>
 
+        <!-- Auto Slider - Original Structure Preserved -->
         <div class="row">
             <div class="col-12">
                 <div class="special-puja-slider owl-carousel">
+
                     @forelse($pujas as $puja)
+
                         <div class="col-lg-4">
-                            <div class="special-puja-card">
-                                <div class="puja-image">
+                            <div class="special-puja-card bg-white shadow rounded-4 border-0 overflow-hidden mb-4">
+
+                                <!-- Image -->
+                                <div class="puja-image position-relative overflow-hidden">
+
                                     @if($puja->image)
-                                        <img src="{{ asset('storage/' . $puja->image) }}" alt="{{ $puja->name }}">
+                                        <img src="{{ asset('storage/' . $puja->image) }}"
+                                             alt="{{ $puja->name }}"
+                                             class="w-100">
                                     @else
-                                        <img src="{{ asset('assets/frontend/assets/images/puja/puja-1.jpg') }}" alt="{{ $puja->name }}">
+                                        <img src="{{ asset('assets/frontend/assets/images/puja/puja-1.jpg') }}"
+                                             alt="{{ $puja->name }}"
+                                             class="w-100">
                                     @endif
+
                                 </div>
 
-                                <div class="puja-content">
-                                    <div class="puja-category">
+                                <!-- Content -->
+                                <div class="puja-content p-4">
+
+                                    <div class="puja-category badge bg-danger text-white rounded-pill px-3 py-2 mb-3">
                                         {{ $puja->pujaCategory->name ?? 'SPECIAL PUJA' }}
                                     </div>
 
-                                    <h3>
+                                    <h3 class="fw-bold text-dark mb-3">
                                         {{ $puja->name }}
                                     </h3>
 
                                     @if($puja->description)
-                                        <p class="puja-description">
+                                        <p class="puja-description text-muted mb-3">
                                             {{ \Illuminate\Support\Str::limit(strip_tags($puja->description), 120) }}
                                         </p>
                                     @endif
 
-                                    <div class="puja-info">
+                                    <!-- Details -->
+                                    <div class="puja-info border-top border-bottom py-3 mb-3">
+
                                         @if($puja->temple)
-                                            <div>
-                                                <i class="fa fa-map-marker"></i>
-                                                <span>
+                                            <div class="d-flex align-items-start mb-3">
+
+                                                <i class="fa fa-map-marker text-danger me-3 mt-1"></i>
+
+                                                <span class="text-muted">
                                                     {{ $puja->temple->address ?? $puja->temple->name }}
 
                                                     @if($puja->temple->city)
@@ -160,45 +187,66 @@
                                                         , {{ $puja->temple->state->name }}
                                                     @endif
                                                 </span>
+
                                             </div>
                                         @endif
 
                                         @if($puja->duration)
-                                            <div>
-                                                <i class="fa fa-clock-o"></i>
-                                                <span>
+                                            <div class="d-flex align-items-center">
+
+                                                <i class="fa fa-clock-o text-danger me-3"></i>
+
+                                                <span class="text-muted ">
                                                     {{ $puja->duration }}
                                                 </span>
+
                                             </div>
                                         @endif
+
                                     </div>
 
-                                    <a href="#" class="puja-btn">
+                                    <!-- Participate -->
+                                    <a href="{{ route('frontend.puja.show', ['slug' => $puja->slug]) }}" class="puja-btn btn btn-danger w-100 rounded-pill py-3 fw-semibold">
                                         PARTICIPATE
-                                        <i class="fa fa-arrow-right"></i>
+                                        <i class="fa fa-arrow-right ms-2"></i>
                                     </a>
+
                                 </div>
                             </div>
                         </div>
+
                     @empty
+
                         <div class="col-12 text-center">
-                            <p>No pujas available.</p>
+                            <div class="bg-white shadow-sm rounded-4 p-5">
+                                <i class="fa fa-om fa-3x text-danger mb-3"></i>
+                                <h4 class="fw-bold">No Pujas Available</h4>
+                                <p class="text-muted mb-0">New pujas will be available soon.</p>
+                            </div>
                         </div>
+
                     @endforelse
+
                 </div>
             </div>
         </div>
 
+        <!-- View All -->
         <div class="row">
             <div class="col-12 text-center mt-25">
-                <a href="#" class="view-all-pujas">
+
+                <a href="{{ route('frontend.puja') }}"
+                   class="view-all-pujas btn btn-outline-danger rounded-pill px-4 py-3 fw-semibold">
                     View All Pujas
-                    <i class="fa fa-arrow-right"></i>
+                    <i class="fa fa-arrow-right ms-2"></i>
                 </a>
+
             </div>
         </div>
+
     </div>
 </section>
+
 <section class="why-buy-section">
     <div class="container">
         <div class="why-buy-heading text-center">
