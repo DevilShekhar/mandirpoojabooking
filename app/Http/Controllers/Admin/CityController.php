@@ -56,10 +56,13 @@ class CityController extends Controller
             'country_id' => 'required|exists:countries,id',
             'state_id' => 'required|exists:states,id',
             'district_id' => 'required|exists:districts,id',
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:cities,name',
             'pincode' => 'nullable|string|max:10',
             'latitude' => 'nullable|numeric|between:-90,90',
             'longitude' => 'nullable|numeric|between:-180,180',
+        ], [
+            'name.unique' => 'This city name already exists. Please enter a different city name.',
+            'name.required' => 'Please enter the city name.',
         ]);
 
         $state = State::where('id', $request->state_id)
@@ -74,7 +77,7 @@ class CityController extends Controller
             'country_id' => $request->country_id,
             'state_id' => $state->id,
             'district_id' => $district->id,
-            'name' => $request->name,
+            'name' => trim($request->name),
             'slug' => Str::slug($request->name),
             'pincode' => $request->pincode,
             'latitude' => $request->latitude,
@@ -117,11 +120,17 @@ class CityController extends Controller
             'country_id' => 'required|exists:countries,id',
             'state_id' => 'required|exists:states,id',
             'district_id' => 'required|exists:districts,id',
-            'name' => 'required|string|max:255',
+
+            // Ignore current city ID during duplicate validation
+            'name' => 'required|string|max:255|unique:cities,name,' . $city->id,
+
             'pincode' => 'nullable|string|max:10',
             'latitude' => 'nullable|numeric|between:-90,90',
             'longitude' => 'nullable|numeric|between:-180,180',
             'status' => 'required|boolean',
+        ], [
+            'name.required' => 'Please enter the city name.',
+            'name.unique' => 'This city name already exists. Please enter a different city name.',
         ]);
 
         $state = State::where('id', $request->state_id)
@@ -136,7 +145,7 @@ class CityController extends Controller
             'country_id' => $request->country_id,
             'state_id' => $state->id,
             'district_id' => $district->id,
-            'name' => $request->name,
+            'name' => trim($request->name),
             'slug' => Str::slug($request->name),
             'pincode' => $request->pincode,
             'latitude' => $request->latitude,
