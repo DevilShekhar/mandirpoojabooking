@@ -292,7 +292,7 @@
                                  src="{{ asset('images/default-user.png') }}"
                                  alt="Officer Profile Preview"
                                  class="officer-profile-preview mr-3"
-                                 onerror="this.onerror=null;this.src='{{ asset('assets/img/users/user-1.png') }}';">
+                                 onerror="this.onerror=null;this.src='{{ asset('assets/img/users/user-1.png') }}';" height="100px" width="100px">
                             <div>
                                 <strong>Upload Officer Profile Photo</strong>
                                 <p class="text-muted mb-0">

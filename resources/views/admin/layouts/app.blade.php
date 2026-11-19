@@ -426,6 +426,7 @@
                                 </ul>
                             </li>
                         @endcan
+                        
                         @can('home-banners.view')
                             <li class="{{ request()->routeIs('home-banners.*') ? 'active' : '' }}">
                                 <a href="{{ route('home-banners.index') }}" class="nav-link">
@@ -695,6 +696,14 @@
                                 </ul>
                             </li>
                         @endcanany
+                        @can('darshan-verification-officers.view')
+                            <li class="{{ request()->routeIs('admin.darshan-verification-officers.*') ? 'active' : '' }}">
+                                <a href="{{ route('admin.darshan-verification-officers.index') }}">
+                                    <i data-feather="user-check"></i>
+                                     Verification Officers
+                                </a>
+                            </li>
+                        @endcan
                         @canany(['news.view', 'news.index', 'news.create'])
                             <li class="dropdown {{ request()->routeIs('my-news.*') ? 'active' : '' }}">
                                 <a href="#" class="menu-toggle nav-link has-dropdown">
