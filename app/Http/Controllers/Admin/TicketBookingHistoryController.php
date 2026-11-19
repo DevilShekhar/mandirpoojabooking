@@ -32,7 +32,7 @@ class TicketBookingHistoryController extends Controller
             ->join('temples', 'temples.id', '=', 'ticket_bookings.temple_id')
             ->where('ticket_bookings.booking_status', 'confirmed');
 
-        if ($user->hasRole('Admin') || $user->hasRole('Super Admin')) {
+        if ($user->hasAnyRole(['Admin', 'Super Admin'])) {
             // Admin and Super Admin can view all confirmed bookings.
         } elseif ($user->hasRole('Temple Manager')) {
 
@@ -43,6 +43,14 @@ class TicketBookingHistoryController extends Controller
 
             $query->whereIn('ticket_bookings.temple_id', $templeIds);
 
+        } elseif ($user->hasRole('Darshan Verification Officer')) {
+            if (empty($user->temple_id)) {
+                abort(403, 'No temple is assigned to your account.');
+            }
+            $query->where(
+                'ticket_bookings.temple_id',
+                $user->temple_id
+            );
         } elseif ($user->hasRole('Customer')) {
 
             $query->where('ticket_bookings.user_id', $user->id);
@@ -91,6 +99,7 @@ class TicketBookingHistoryController extends Controller
         return view('admin.ticket-booking.my-index', compact('bookings'));
     }
 
+    
     public function cancelledBookings(Request $request)
     {
         $user = Auth::user();
@@ -112,8 +121,16 @@ class TicketBookingHistoryController extends Controller
                 'partially_refunded'
             ]);
 
-        if ($user->hasRole('Admin') || $user->hasRole('Super Admin')) {
+        /*
+        |--------------------------------------------------------------------------
+        | Role-Based Access
+        |--------------------------------------------------------------------------
+        */
+
+        if ($user->hasAnyRole(['Admin', 'Super Admin'])) {
+
             // View all cancelled bookings.
+
         } elseif ($user->hasRole('Temple Manager')) {
 
             $templeIds = DB::table('temple_user')
@@ -123,6 +140,19 @@ class TicketBookingHistoryController extends Controller
 
             $query->whereIn('ticket_bookings.temple_id', $templeIds);
 
+        } elseif ($user->hasRole('Darshan Verification Officer')) {
+
+            // Only assigned temple bookings.
+
+            if (empty($user->temple_id)) {
+                abort(403, 'No temple is assigned to your account.');
+            }
+
+            $query->where(
+                'ticket_bookings.temple_id',
+                $user->temple_id
+            );
+
         } elseif ($user->hasRole('Customer')) {
 
             $query->where('ticket_bookings.user_id', $user->id);
@@ -130,6 +160,28 @@ class TicketBookingHistoryController extends Controller
         } else {
             abort(403, 'You do not have permission to view cancelled bookings.');
         }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Search
+        |--------------------------------------------------------------------------
+        */
+
+        if ($request->filled('search')) {
+            $search = trim($request->search);
+
+            $query->where(function ($q) use ($search) {
+                $q->where('temples.name', 'like', "%{$search}%")
+                    ->orWhere('ticket_bookings.razorpay_order_id', 'like', "%{$search}%")
+                    ->orWhere('ticket_bookings.booking_reference', 'like', "%{$search}%");
+            });
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Group Bookings
+        |--------------------------------------------------------------------------
+        */
 
         $query->select(
             'ticket_bookings.razorpay_order_id',
@@ -153,24 +205,14 @@ class TicketBookingHistoryController extends Controller
             'temples.name'
         );
 
-        if ($request->filled('search')) {
-            $search = trim($request->search);
-
-            $query->where(function ($q) use ($search) {
-                $q->where('temples.name', 'like', "%{$search}%")
-                    ->orWhere('ticket_bookings.razorpay_order_id', 'like', "%{$search}%")
-                    ->orWhere('ticket_bookings.booking_reference', 'like', "%{$search}%");
-            });
-        }
-
         $bookings = $query
             ->orderByDesc('latest_id')
             ->paginate(10)
             ->withQueryString();
 
         return view('admin.ticket-booking.cancel', compact('bookings'));
-    }
-
+    }    
+    
     public function myBookingDetails(string $orderId)
     {
         $user = Auth::user();
@@ -179,49 +221,74 @@ class TicketBookingHistoryController extends Controller
             abort(403, 'You are not authorized to view these bookings.');
         }
 
+        // Permission check
         if (!$user->can('all-tickit-booking.index')) {
             abort(403, 'You do not have permission to view ticket booking details.');
         }
 
+        // Base booking query
         $bookingQuery = TicketBooking::with('temple')
             ->where('razorpay_order_id', $orderId);
 
-        if ($user->hasRole('Admin') || $user->hasRole('Super Admin')) {
-            // Admin and Super Admin can view all bookings.
+        // Role-wise booking access
+        if ($user->hasAnyRole(['Admin', 'Super Admin'])) {
+
+            // Admin and Super Admin can view all bookings
+
         } elseif ($user->hasRole('Temple Manager')) {
 
+            // Temple Manager: approved assigned temples
             $templeIds = DB::table('temple_user')
                 ->where('user_id', $user->id)
                 ->where('approval_status', 'approved')
                 ->pluck('temple_id');
 
+            if ($templeIds->isEmpty()) {
+                abort(403, 'No approved temple is assigned to your account.');
+            }
+
             $bookingQuery->whereIn('temple_id', $templeIds);
+
+        } elseif ($user->hasRole('Darshan Verification Officer')) {
+
+            // Darshan Verification Officer: only assigned temple
+            if (empty($user->temple_id)) {
+                abort(403, 'No temple is assigned to your account.');
+            }
+
+            $bookingQuery->where('temple_id', $user->temple_id);
 
         } elseif ($user->hasRole('Customer')) {
 
+            // Customer: only own bookings
             $bookingQuery->where('user_id', $user->id);
 
         } else {
             abort(403, 'You do not have permission to view ticket booking details.');
         }
 
-        $bookingQuery->whereIn('payment_status', [
-            'paid',
-            'refunded',
-            'partially_refunded'
-        ])->whereIn('booking_status', [
-            'confirmed',
-            'cancel_requested',
-            'cancelled'
-        ]);
+        // Booking and payment status filters
+        $bookingQuery
+            ->whereIn('payment_status', [
+                'paid',
+                'refunded',
+                'partially_refunded'
+            ])
+            ->whereIn('booking_status', [
+                'confirmed',
+                'cancel_requested',
+                'cancelled'
+            ]);
 
+        // Fetch authorized bookings
         $bookings = (clone $bookingQuery)
             ->orderBy('id')
             ->get();
 
-        abort_if($bookings->isEmpty(), 404);
+        abort_if($bookings->isEmpty(), 404, 'Booking not found.');
 
         $firstBooking = $bookings->first();
+
         $totalAmount = (float) $bookings->sum('price');
 
         $cancellationPolicy = $this->calculateCancellationPolicy(
@@ -229,6 +296,7 @@ class TicketBookingHistoryController extends Controller
             $totalAmount
         );
 
+        // Fetch cancellation record only after booking authorization
         $existingCancellation = DB::table('ticket_booking_cancellations')
             ->where('razorpay_order_id', $orderId)
             ->whereIn('cancellation_status', [
@@ -239,10 +307,15 @@ class TicketBookingHistoryController extends Controller
             ->latest('id')
             ->first();
 
+        // Refresh Razorpay refund status
         if (
             $existingCancellation &&
             !empty($existingCancellation->razorpay_refund_id) &&
-            in_array($existingCancellation->refund_status, ['pending', 'processing'], true)
+            in_array(
+                $existingCancellation->refund_status,
+                ['pending', 'processing'],
+                true
+            )
         ) {
             try {
                 $api = new Api(
@@ -255,7 +328,10 @@ class TicketBookingHistoryController extends Controller
                 );
 
                 $latestRefundStatus = strtolower(
-                    (string) ($refund['status'] ?? $existingCancellation->refund_status)
+                    (string) (
+                        $refund['status']
+                        ?? $existingCancellation->refund_status
+                    )
                 );
 
                 $refundUpdates = [
@@ -265,7 +341,10 @@ class TicketBookingHistoryController extends Controller
 
                 if (
                     $latestRefundStatus === 'processed' &&
-                    Schema::hasColumn('ticket_booking_cancellations', 'refunded_at')
+                    Schema::hasColumn(
+                        'ticket_booking_cancellations',
+                        'refunded_at'
+                    )
                 ) {
                     $refundUpdates['refunded_at'] = now();
                 }
@@ -281,9 +360,10 @@ class TicketBookingHistoryController extends Controller
                 if ($latestRefundStatus === 'processed') {
 
                     (clone $bookingQuery)->update([
-                        'payment_status' => (float) $existingCancellation->refund_amount >= $totalAmount
-                            ? 'refunded'
-                            : 'partially_refunded',
+                        'payment_status' =>
+                            (float) $existingCancellation->refund_amount >= $totalAmount
+                                ? 'refunded'
+                                : 'partially_refunded',
                         'updated_at' => now(),
                     ]);
 
@@ -294,11 +374,15 @@ class TicketBookingHistoryController extends Controller
                 }
 
             } catch (Throwable $e) {
-                Log::warning('Unable to refresh ticket booking Razorpay refund status.', [
-                    'order_id' => $orderId,
-                    'refund_id' => $existingCancellation->razorpay_refund_id,
-                    'error' => $e->getMessage(),
-                ]);
+
+                Log::warning(
+                    'Unable to refresh ticket booking Razorpay refund status.',
+                    [
+                        'order_id' => $orderId,
+                        'refund_id' => $existingCancellation->razorpay_refund_id,
+                        'error' => $e->getMessage(),
+                    ]
+                );
             }
         }
 

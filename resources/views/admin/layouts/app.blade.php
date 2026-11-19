@@ -850,11 +850,9 @@
                                     @endcan                                   
                                 </ul>
                             </li>
-                        @endcanany
-
-                        
+                        @endcanany                       
                         @can('puja-bookings-my.view')
-                            <li class="{{ request()->routeIs('booking-puja-order.*', 'puja-bookings.*', 'customer-cancel-booking.*') ? 'active' : '' }}">
+                            <li class="{{ request()->routeIs('booking-puja-order.*', 'puja-bookings.*', 'customer-cancel-booking.*', 'booking-puja-order-completed') ? 'active' : '' }}">
                                 <a href="javascript:void(0);" class="nav-link has-dropdown">
                                     <i data-feather="shopping-cart"></i>
                                     <span>Mandir Puja Booking</span>
@@ -872,6 +870,11 @@
                                             </a>
                                         </li>
                                     @endcan
+                                    <li class="{{ request()->routeIs('booking-puja-order-completed') ? 'active' : '' }}">
+                                        <a class="nav-link" href="{{ route('booking-puja-order-completed') }}">
+                                            Completed
+                                        </a>
+                                    </li>
                                 </ul>
                             </li>
                         @endcan

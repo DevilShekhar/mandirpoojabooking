@@ -717,35 +717,79 @@
                                             </small>
                                         @endif
                                     </div>
+                                    @can('puja_completed-otp.show')
+                                        <div class="samgri-otp-info mt-3">
+                                            <span class="otp-label">
+                                                <i class="fas fa-shield-alt"></i>
+                                                Puja Completion OTP:
+                                            </span>
+
+                                            <strong class="">
+                                                {{ $pujaBooking->puja_completed_otp ?? 'N/A' }}
+                                            </strong>
+                                        </div>
+
+                                        @if($pujaBooking->puja_completed_otp_at)
+                                            <small class="text-muted d-block mt-1">
+                                                <i class="fas fa-clock"></i>
+                                                Generated:
+                                                {{ $pujaBooking->puja_completed_otp_at->format('d M Y, h:i A') }}
+                                            </small>
+                                        @endif
+                                    @endcan
                                 </div>
                             </div>
+                            
                             <div class="col-lg-4 text-lg-right">
+
                                 @if($hasCompletionPermission)
+
                                     @if($canCompletePuja)
-                                        <form action="{{ route('booking-puja-order.complete', $pujaBooking->id) }}" method="POST" id="completePujaBookingForm">
+
+                                        <form action="{{ route('booking-puja-order.complete', ['pujaBooking' => $pujaBooking->id]) }}"
+                                            method="POST"
+                                            id="completePujaBookingForm">
+
                                             @csrf
-                                            <button type="button" class="btn btn-success completion-action-btn" id="completePujaBookingBtn">
+
+                                            <input type="hidden" name="otp" id="completion_otp">
+
+                                            <button type="button"
+                                                    class="btn btn-success completion-action-btn"
+                                                    id="completePujaBookingBtn">
+
                                                 <i class="fas fa-check-circle mr-1"></i>
                                                 Mark as Completed
+
                                             </button>
+
                                         </form>
+
                                     @else
+
                                         <div class="completion-notice completion-notice-warning">
                                             <i class="fas fa-info-circle"></i>
+
                                             @if($bookingStatus !== 'confirmed')
                                                 Only confirmed bookings can be completed.
                                             @else
                                                 Payment must be paid, successful, or captured before completion.
                                             @endif
                                         </div>
+
                                     @endif
+
                                 @else
+
                                     <div class="completion-notice completion-notice-muted">
                                         <i class="fas fa-lock"></i>
                                         You do not have permission to complete this booking.
                                     </div>
+
                                 @endif
+
                             </div>
+
                         </div>
                     @endif
                 </div>
@@ -1194,52 +1238,94 @@
 @endsection
 
 @push('scripts')
+
 <script>
-    $(document).ready(function () {
+$(document).ready(function () {
 
-        // SweetAlert2 confirmation for puja completion.
-        $('#completePujaBookingBtn').on('click', function () {
-            const form = $('#completePujaBookingForm');
+    $('#completePujaBookingBtn').on('click', function () {
 
-            if (!form.length) {
-                return;
+        Swal.fire({
+            title: 'Verify Completion OTP',
+
+            html: `
+                <p class="text-muted mb-3">
+                    Enter the 6-digit OTP received by the customer.
+                </p>
+
+                <input
+                    type="text"
+                    id="completionOtpInput"
+                    class="swal2-input"
+                    placeholder="Enter 6-digit OTP"
+                    maxlength="6"
+                    inputmode="numeric"
+                    autocomplete="one-time-code"
+                    style="text-align:center; letter-spacing:8px; font-size:24px; font-weight:bold;"
+                >
+            `,
+
+            icon: 'question',
+
+            showCancelButton: true,
+
+            confirmButtonText: 'Verify & Complete',
+
+            cancelButtonText: 'Cancel',
+
+            confirmButtonColor: '#28a745',
+
+            cancelButtonColor: '#6c757d',
+
+            allowOutsideClick: false,
+
+            focusConfirm: false,
+
+            didOpen: () => {
+                document.getElementById('completionOtpInput').focus();
+            },
+
+            preConfirm: () => {
+
+                const otp = document
+                    .getElementById('completionOtpInput')
+                    .value.trim();
+
+                if (!/^[0-9]{6}$/.test(otp)) {
+
+                    Swal.showValidationMessage(
+                        'Please enter a valid 6-digit OTP.'
+                    );
+
+                    return false;
+                }
+
+                return otp;
             }
 
-            if (typeof Swal === 'undefined') {
-                if (window.confirm('Are you sure you want to mark this puja booking as completed?')) {
-                    $('#completePujaBookingBtn')
-                        .prop('disabled', true)
-                        .html('<i class="fas fa-spinner fa-spin"></i> Processing...');
-                    form.trigger('submit');
-                }
-                return;
+        }).then((result) => {
+
+            if (result.isConfirmed) {
+
+                $('#completion_otp').val(result.value);
+
+                Swal.fire({
+                    title: 'Completing Puja...',
+                    text: 'Please wait while we verify the OTP.',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                $('#completePujaBookingForm').trigger('submit');
             }
 
-            Swal.fire({
-                title: 'Complete Puja Booking?',
-                html: '<p>Are you sure you want to mark this puja booking as completed?</p>' +
-                    '<small class="text-muted">The booking status will be updated after confirmation.</small>',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#159447',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: '<i class="fas fa-check-circle"></i> Yes, Complete',
-                cancelButtonText: 'Cancel',
-                reverseButtons: true,
-                allowOutsideClick: false
-            }).then(function (result) {
-                if (result.isConfirmed) {
-                    $('#completePujaBookingBtn')
-                        .prop('disabled', true)
-                        .html('<i class="fas fa-spinner fa-spin"></i> Processing...');
-                    form.trigger('submit');
-                }
-            });
         });
 
-        @if($errors->has('cancellation_reason') && $canRequestCancellation)
-            $('#cancelBookingModal').modal('show');
-        @endif
     });
+
+});
 </script>
+
 @endpush

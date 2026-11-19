@@ -56,6 +56,8 @@ class PujaBooking extends Model
         'total_amount'    => 'decimal:2',
         'selected_products' => 'array',
         'samgri_otp'        => 'string',
+        'puja_completed_otp' => 'string',
+        'puja_completed_otp_at' => 'datetime',
     ];
 
     public function user()
@@ -126,5 +128,12 @@ class PujaBooking extends Model
     public function completedBy()
     {
         return $this->belongsTo(User::class, 'completed_by');
+    }
+    public function pujaCompletedOtpVerifiedBy()
+    {
+        return $this->belongsTo(
+            User::class,
+            'puja_completed_otp_verify_by'
+        );
     }
 }

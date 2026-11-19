@@ -2,7 +2,7 @@
 @extends('admin.layouts.app')
 @section('title', 'My Booking Details')
 @section('content')
-@can('my-tickit-booking.details')
+@canany(['my-tickit-booking.details', 'all-tickit-booking.details'])
 @php
     $firstBooking = $bookings->first();
     $cancellationStatus = $existingCancellation->cancellation_status ?? null;
@@ -386,365 +386,365 @@
 
         </div>
     </div>
+    @if(!auth()->user()->hasRole('Darshan Verification Officer'))
+        {{-- Ticket Cancellation --}}
+        <div class="card">
 
-    {{-- Ticket Cancellation --}}
-    <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
 
-        <div class="card-header d-flex justify-content-between align-items-center">
+                <h5>Ticket Cancellation</h5>
 
-            <h5>Ticket Cancellation</h5>
+                @if($existingCancellation)
+                    <span class="badge {{ $statusClass }}">
+                        {{ in_array($cancellationStatus, ['approved', 'cancelled'], true)
+                            ? 'Cancelled'
+                            : ucfirst($cancellationStatus) }}
+                    </span>
+                @endif
 
-            @if($existingCancellation)
-                <span class="badge {{ $statusClass }}">
-                    {{ in_array($cancellationStatus, ['approved', 'cancelled'], true)
-                        ? 'Cancelled'
-                        : ucfirst($cancellationStatus) }}
-                </span>
-            @endif
+            </div>
 
-        </div>
+            <div class="card-body">
 
-        <div class="card-body">
+                {{-- Existing Cancellation Details --}}
+                @if($existingCancellation)
 
-            {{-- Existing Cancellation Details --}}
-            @if($existingCancellation)
+                    <div class="booking-alert booking-alert-info">
 
-                <div class="booking-alert booking-alert-info">
+                        <h6 class="font-weight-bold mb-3">
+                            Cancellation Request Details
+                        </h6>
 
-                    <h6 class="font-weight-bold mb-3">
-                        Cancellation Request Details
-                    </h6>
+                        <div class="row">
 
-                    <div class="row">
-
-                        <div class="col-md-4 mb-3">
-                            <span class="detail-label">Cancellation Status</span>
-
-                            <div class="detail-value">
-                                {{ in_array($existingCancellation->cancellation_status, ['approved', 'cancelled'], true)
-                                    ? 'Cancelled'
-                                    : ucfirst($existingCancellation->cancellation_status) }}
-                            </div>
-                        </div>
-
-                        <div class="col-md-4 mb-3">
-                            <span class="detail-label">Total Amount</span>
-
-                            <div class="detail-value">
-                                ₹{{ number_format((float) $existingCancellation->total_amount, 2) }}
-                            </div>
-                        </div>
-
-                        <div class="col-md-4 mb-3">
-                            <span class="detail-label">Deduction Percentage</span>
-
-                            <div class="detail-value">
-                                {{ number_format((float) $existingCancellation->deduction_percentage, 2) }}%
-                            </div>
-                        </div>
-
-                        <div class="col-md-4 mb-3">
-                            <span class="detail-label">Refund Percentage</span>
-
-                            <div class="detail-value">
-                                {{ number_format((float) $existingCancellation->refund_percentage, 2) }}%
-                            </div>
-                        </div>
-
-                        <div class="col-md-4 mb-3">
-                            <span class="detail-label">Refund Amount</span>
-
-                            <div class="detail-value refund-value">
-                                ₹{{ number_format((float) $existingCancellation->refund_amount, 2) }}
-                            </div>
-                        </div>
-
-                        <div class="col-md-4 mb-3">
-                            <span class="detail-label">Refund Status</span>
-
-                            <div class="detail-value">
-                                {{ ucfirst(str_replace('_', ' ', $existingCancellation->refund_status ?? 'N/A')) }}
-                            </div>
-                        </div>
-
-                        <div class="col-md-4 mb-3">
-                            <span class="detail-label">Request Date</span>
-
-                            <div class="detail-value">
-                                {{ $existingCancellation->requested_at
-                                    ? \Illuminate\Support\Carbon::parse($existingCancellation->requested_at)->format('d-m-Y h:i A')
-                                    : 'N/A' }}
-                            </div>
-                        </div>
-
-                        @if(!empty($existingCancellation->razorpay_refund_id))
-
-                            <div class="col-md-12 mb-3">
-
-                                <span class="detail-label">Razorpay Refund ID</span>
+                            <div class="col-md-4 mb-3">
+                                <span class="detail-label">Cancellation Status</span>
 
                                 <div class="detail-value">
-                                    {{ $existingCancellation->razorpay_refund_id }}
+                                    {{ in_array($existingCancellation->cancellation_status, ['approved', 'cancelled'], true)
+                                        ? 'Cancelled'
+                                        : ucfirst($existingCancellation->cancellation_status) }}
+                                </div>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <span class="detail-label">Total Amount</span>
+
+                                <div class="detail-value">
+                                    ₹{{ number_format((float) $existingCancellation->total_amount, 2) }}
+                                </div>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <span class="detail-label">Deduction Percentage</span>
+
+                                <div class="detail-value">
+                                    {{ number_format((float) $existingCancellation->deduction_percentage, 2) }}%
+                                </div>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <span class="detail-label">Refund Percentage</span>
+
+                                <div class="detail-value">
+                                    {{ number_format((float) $existingCancellation->refund_percentage, 2) }}%
+                                </div>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <span class="detail-label">Refund Amount</span>
+
+                                <div class="detail-value refund-value">
+                                    ₹{{ number_format((float) $existingCancellation->refund_amount, 2) }}
+                                </div>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <span class="detail-label">Refund Status</span>
+
+                                <div class="detail-value">
+                                    {{ ucfirst(str_replace('_', ' ', $existingCancellation->refund_status ?? 'N/A')) }}
+                                </div>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <span class="detail-label">Request Date</span>
+
+                                <div class="detail-value">
+                                    {{ $existingCancellation->requested_at
+                                        ? \Illuminate\Support\Carbon::parse($existingCancellation->requested_at)->format('d-m-Y h:i A')
+                                        : 'N/A' }}
+                                </div>
+                            </div>
+
+                            @if(!empty($existingCancellation->razorpay_refund_id))
+
+                                <div class="col-md-12 mb-3">
+
+                                    <span class="detail-label">Razorpay Refund ID</span>
+
+                                    <div class="detail-value">
+                                        {{ $existingCancellation->razorpay_refund_id }}
+                                    </div>
+
+                                </div>
+
+                            @endif
+
+                        </div>
+
+                        @if(!empty($existingCancellation->refund_error))
+
+                            <div class="booking-alert booking-alert-danger mb-3">
+                                {{ $existingCancellation->refund_error }}
+                            </div>
+
+                        @endif
+
+                        @if($existingCancellation->cancellation_reason)
+
+                            <hr>
+
+                            <span class="detail-label">Cancellation Reason</span>
+
+                            <div class="detail-value">
+                                {{ $existingCancellation->cancellation_reason }}
+                            </div>
+
+                        @endif
+
+                    </div>
+
+                    @if($cancellationStatus === 'pending')
+
+                        <div class="booking-alert mt-3">
+                            Your cancellation request is waiting for approval.
+                        </div>
+
+                    @elseif($cancellationStatus === 'approved')
+
+                        <div class="booking-alert booking-alert-success mt-3">
+
+                            Your ticket booking has been cancelled.
+
+                            Refund Status:
+
+                            <strong>
+                                {{ ucfirst(str_replace('_', ' ', $existingCancellation->refund_status ?? 'processing')) }}
+                            </strong>
+
+                        </div>
+
+                    @elseif($cancellationStatus === 'cancelled')
+
+                        <div class="booking-alert booking-alert-success mt-3">
+                            Your ticket booking has been cancelled.
+                        </div>
+
+                    @elseif($cancellationStatus === 'rejected')
+
+                        <div class="booking-alert booking-alert-danger mt-3">
+                            Your cancellation request was rejected.
+                        </div>
+
+                    @endif
+
+                @else
+
+                    {{-- Cancellation Policy --}}
+                    <div class="policy-box mb-4">
+
+                        <h6 class="font-weight-bold mb-3">
+                            Cancellation & Refund Policy
+                        </h6>
+
+                        {{-- Role-Based Policy --}}
+                        <div class="booking-alert booking-alert-info mb-4">
+
+                            @if($isCustomer)
+
+                                <strong>Customer Cancellation Policy</strong>
+
+                                <p class="mb-0 mt-2">
+                                    Cancellation is allowed only within 72 hours
+                                    of booking creation. Refund is calculated
+                                    according to the applicable refund slab.
+                                </p>
+
+                            @elseif($isAdminCancellation)
+
+                                <strong>Administrative Cancellation Policy</strong>
+
+                                <p class="mb-0 mt-2">
+                                    Admin, Super Admin and Temple Manager are
+                                    eligible for a 100% refund when cancelling
+                                    a booking.
+                                </p>
+
+                            @endif
+
+                        </div>
+
+                        <div class="row">
+
+                            <div class="col-md-4 mb-3">
+
+                                <span class="detail-label">
+                                    Booking Created At
+                                </span>
+
+                                <div class="policy-value">
+                                    {{ $cancellationPolicy['booking_created_at'] }}
                                 </div>
 
                             </div>
 
-                        @endif
+                            <div class="col-md-4 mb-3">
 
-                    </div>
+                                <span class="detail-label">
+                                    Time Since Booking Created
+                                </span>
 
-                    @if(!empty($existingCancellation->refund_error))
+                                <div class="policy-value">
+                                    {{ number_format($cancellationPolicy['elapsed_hours'], 2) }}
+                                    Hours
+                                </div>
 
-                        <div class="booking-alert booking-alert-danger mb-3">
-                            {{ $existingCancellation->refund_error }}
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+
+                                <span class="detail-label">
+                                    Applicable Policy Slab
+                                </span>
+
+                                <div class="policy-value">
+                                    {{ $cancellationPolicy['policy_slab'] ?: 'Not Applicable' }}
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+
+                                <span class="detail-label">
+                                    Deduction Percentage
+                                </span>
+
+                                <div class="policy-value">
+                                    {{ number_format((float) $cancellationPolicy['deduction_percentage'], 2) }}%
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+
+                                <span class="detail-label">
+                                    Refund Percentage
+                                </span>
+
+                                <div class="policy-value refund-value">
+                                    {{ number_format((float) $cancellationPolicy['refund_percentage'], 2) }}%
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+
+                                <span class="detail-label">
+                                    Refund Amount
+                                </span>
+
+                                <div class="policy-value refund-value">
+                                    ₹{{ number_format((float) $cancellationPolicy['refund_amount'], 2) }}
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+
+                                <span class="detail-label">
+                                    Deduction Amount
+                                </span>
+
+                                <div class="policy-value">
+                                    ₹{{ number_format((float) $cancellationPolicy['deduction_amount'], 2) }}
+                                </div>
+
+                            </div>
+
                         </div>
-
-                    @endif
-
-                    @if($existingCancellation->cancellation_reason)
-
-                        <hr>
-
-                        <span class="detail-label">Cancellation Reason</span>
-
-                        <div class="detail-value">
-                            {{ $existingCancellation->cancellation_reason }}
-                        </div>
-
-                    @endif
-
-                </div>
-
-                @if($cancellationStatus === 'pending')
-
-                    <div class="booking-alert mt-3">
-                        Your cancellation request is waiting for approval.
-                    </div>
-
-                @elseif($cancellationStatus === 'approved')
-
-                    <div class="booking-alert booking-alert-success mt-3">
-
-                        Your ticket booking has been cancelled.
-
-                        Refund Status:
-
-                        <strong>
-                            {{ ucfirst(str_replace('_', ' ', $existingCancellation->refund_status ?? 'processing')) }}
-                        </strong>
-
-                    </div>
-
-                @elseif($cancellationStatus === 'cancelled')
-
-                    <div class="booking-alert booking-alert-success mt-3">
-                        Your ticket booking has been cancelled.
-                    </div>
-
-                @elseif($cancellationStatus === 'rejected')
-
-                    <div class="booking-alert booking-alert-danger mt-3">
-                        Your cancellation request was rejected.
-                    </div>
-
-                @endif
-
-            @else
-
-                {{-- Cancellation Policy --}}
-                <div class="policy-box mb-4">
-
-                    <h6 class="font-weight-bold mb-3">
-                        Cancellation & Refund Policy
-                    </h6>
-
-                    {{-- Role-Based Policy --}}
-                    <div class="booking-alert booking-alert-info mb-4">
 
                         @if($isCustomer)
 
-                            <strong>Customer Cancellation Policy</strong>
+                        
+                        @else
 
-                            <p class="mb-0 mt-2">
-                                Cancellation is allowed only within 72 hours
-                                of booking creation. Refund is calculated
-                                according to the applicable refund slab.
-                            </p>
-
-                        @elseif($isAdminCancellation)
-
-                            <strong>Administrative Cancellation Policy</strong>
-
-                            <p class="mb-0 mt-2">
-                                Admin, Super Admin and Temple Manager are
-                                eligible for a 100% refund when cancelling
-                                a booking.
-                            </p>
+                            <div class="policy-note mt-3">
+                                Administrative cancellations are eligible
+                                for a full refund, regardless of booking age.
+                            </div>
 
                         @endif
 
                     </div>
 
-                    <div class="row">
+                    {{-- Cancellation Button --}}
+                    @if($canCancel)
 
-                        <div class="col-md-4 mb-3">
+                        <form
+                            id="ticketCancellationForm"
+                            action="{{ route(
+                                'admin.my-tickit-booking.cancel-request',
+                                $firstBooking->razorpay_order_id
+                            ) }}"
+                            method="POST"
+                        >
 
-                            <span class="detail-label">
-                                Booking Created At
-                            </span>
+                            @csrf
 
-                            <div class="policy-value">
-                                {{ $cancellationPolicy['booking_created_at'] }}
-                            </div>
+                            <input
+                                type="hidden"
+                                name="cancellation_reason"
+                                id="cancellation_reason"
+                                value="{{ old('cancellation_reason') }}"
+                            >
 
-                        </div>
+                            <button type="submit" class="btn btn-danger">
 
-                        <div class="col-md-4 mb-3">
+                                @if($isCustomer)
 
-                            <span class="detail-label">
-                                Time Since Booking Created
-                            </span>
+                                    Request Cancellation
+                                    ({{ $cancellationPolicy['refund_percentage'] }}% Refund)
 
-                            <div class="policy-value">
-                                {{ number_format($cancellationPolicy['elapsed_hours'], 2) }}
-                                Hours
-                            </div>
+                                @else
 
-                        </div>
+                                    Cancel Booking (100% Refund)
 
-                        <div class="col-md-4 mb-3">
+                                @endif
 
-                            <span class="detail-label">
-                                Applicable Policy Slab
-                            </span>
+                            </button>
 
-                            <div class="policy-value">
-                                {{ $cancellationPolicy['policy_slab'] ?: 'Not Applicable' }}
-                            </div>
+                        </form>
 
-                        </div>
-
-                        <div class="col-md-4 mb-3">
-
-                            <span class="detail-label">
-                                Deduction Percentage
-                            </span>
-
-                            <div class="policy-value">
-                                {{ number_format((float) $cancellationPolicy['deduction_percentage'], 2) }}%
-                            </div>
-
-                        </div>
-
-                        <div class="col-md-4 mb-3">
-
-                            <span class="detail-label">
-                                Refund Percentage
-                            </span>
-
-                            <div class="policy-value refund-value">
-                                {{ number_format((float) $cancellationPolicy['refund_percentage'], 2) }}%
-                            </div>
-
-                        </div>
-
-                        <div class="col-md-4 mb-3">
-
-                            <span class="detail-label">
-                                Refund Amount
-                            </span>
-
-                            <div class="policy-value refund-value">
-                                ₹{{ number_format((float) $cancellationPolicy['refund_amount'], 2) }}
-                            </div>
-
-                        </div>
-
-                        <div class="col-md-4 mb-3">
-
-                            <span class="detail-label">
-                                Deduction Amount
-                            </span>
-
-                            <div class="policy-value">
-                                ₹{{ number_format((float) $cancellationPolicy['deduction_amount'], 2) }}
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                    @if($isCustomer)
-
-                       
                     @else
 
-                        <div class="policy-note mt-3">
-                            Administrative cancellations are eligible
-                            for a full refund, regardless of booking age.
+                        <div class="booking-alert booking-alert-danger">
+
+                            <strong>Cancellation Not Available</strong>
+
+                            <p class="mb-0 mt-2">
+                                {{ $cancellationPolicy['message'] }}
+                            </p>
+
                         </div>
 
                     @endif
 
-                </div>
-
-                {{-- Cancellation Button --}}
-                @if($canCancel)
-
-                    <form
-                        id="ticketCancellationForm"
-                        action="{{ route(
-                            'admin.my-tickit-booking.cancel-request',
-                            $firstBooking->razorpay_order_id
-                        ) }}"
-                        method="POST"
-                    >
-
-                        @csrf
-
-                        <input
-                            type="hidden"
-                            name="cancellation_reason"
-                            id="cancellation_reason"
-                            value="{{ old('cancellation_reason') }}"
-                        >
-
-                        <button type="submit" class="btn btn-danger">
-
-                            @if($isCustomer)
-
-                                Request Cancellation
-                                ({{ $cancellationPolicy['refund_percentage'] }}% Refund)
-
-                            @else
-
-                                Cancel Booking (100% Refund)
-
-                            @endif
-
-                        </button>
-
-                    </form>
-
-                @else
-
-                    <div class="booking-alert booking-alert-danger">
-
-                        <strong>Cancellation Not Available</strong>
-
-                        <p class="mb-0 mt-2">
-                            {{ $cancellationPolicy['message'] }}
-                        </p>
-
-                    </div>
-
                 @endif
 
-            @endif
-
+            </div>
         </div>
-    </div>
-
+    @endif
     {{-- Member Details --}}
     <div class="card">
 

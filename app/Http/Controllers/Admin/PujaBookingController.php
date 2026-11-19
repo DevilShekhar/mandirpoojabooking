@@ -10,6 +10,9 @@ use App\Models\PujaAssignment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\PujaBookingCompletedMail;
 
 class PujaBookingController extends Controller
 {
@@ -321,50 +324,143 @@ class PujaBookingController extends Controller
     }
     
     
-    public function complete(PujaBooking $pujaBooking)
+    
+    public function complete(Request $request, PujaBooking $pujaBooking)
     {
         $user = auth()->user();
+
         if (!$user || !$user->can('complete-puja-booking')) {
             abort(403, 'You do not have permission to complete Puja bookings.');
         }
+
         if (!$this->canViewBooking($user, $pujaBooking)) {
             abort(403, 'You are not authorized to complete this booking.');
         }
+
+        $request->validate([
+            'otp' => ['required', 'digits:6'],
+        ], [
+            'otp.required' => 'Please enter the completion OTP.',
+            'otp.digits' => 'OTP must contain exactly 6 digits.',
+        ]);
+
         try {
-            DB::transaction(function () use ($pujaBooking, $user) {
+
+            // Verify OTP and complete booking.
+            $booking = DB::transaction(function () use (
+                $pujaBooking,
+                $user,
+                $request
+            ) {
+
                 $booking = PujaBooking::whereKey($pujaBooking->id)
                     ->lockForUpdate()
                     ->firstOrFail();
+
                 if (strtolower((string) $booking->booking_status) === 'completed') {
-                    throw new \RuntimeException('This booking has already been completed.');
+                    throw new \RuntimeException(
+                        'This booking has already been completed.'
+                    );
                 }
+
                 if (strtolower((string) $booking->booking_status) !== 'confirmed') {
-                    throw new \RuntimeException('Only confirmed bookings can be completed.');
+                    throw new \RuntimeException(
+                        'Only confirmed bookings can be completed.'
+                    );
                 }
-                if (!in_array(strtolower((string) $booking->payment_status),['paid', 'success', 'captured'], true)) {
+
+                if (!in_array(
+                    strtolower((string) $booking->payment_status),
+                    ['paid', 'success', 'captured'],
+                    true
+                )) {
                     throw new \RuntimeException(
                         'Payment must be successful before completing this booking.'
                     );
                 }
+
+                if (empty($booking->puja_completed_otp)) {
+                    throw new \RuntimeException(
+                        'Completion OTP has not been generated for this booking.'
+                    );
+                }
+
+                // Verify customer OTP.
+                if (!hash_equals(
+                    (string) $booking->puja_completed_otp,
+                    (string) $request->otp
+                )) {
+                    throw new \RuntimeException(
+                        'Invalid OTP. Please enter the correct customer OTP.'
+                    );
+                }
+
+                // Complete booking.
                 $booking->booking_status = 'completed';
                 $booking->completed_by = $user->id;
                 $booking->completed_at = now();
+                $booking->puja_completed_otp_verify_by = $user->id;
                 $booking->updated_by = $user->id;
+
                 $booking->save();
+
+                return $booking->fresh();
             });
+
+        } catch (\RuntimeException $e) {
+
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with('error', $e->getMessage());
+
+        } catch (\Throwable $e) {
+
+            report($e);
+
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with('error', 'Something went wrong while completing the booking. Please try again.');
+
+        }
+
+        // Send customer completion email separately.
+        $emailSent = false;
+
+        if (!empty($booking->customer_email)) {
+
+            try {
+
+                Mail::to($booking->customer_email)
+                    ->send(new PujaBookingCompletedMail($booking));
+
+                $emailSent = true;
+
+            } catch (\Throwable $e) {
+
+                report($e);
+
+            }
+
+        }
+
+        // Always redirect to completed bookings after successful completion.
+        if ($emailSent) {
+
             return redirect()
                 ->route('booking-puja-order-completed')
-                ->with('success', 'Puja booking successfully marked as completed.');
-        } catch (\RuntimeException $e) {
-            return redirect()->back()->with('error', $e->getMessage());
-        } catch (\Throwable $e) {
-            report($e);
-            return redirect()->back()->with(
-                'error',
-                'Something went wrong while completing the booking.'
-            );
+                ->with('success', 'Puja booking successfully completed and customer email sent.');
+
         }
+
+        return redirect()
+            ->route('booking-puja-order-completed')
+            ->with('success', 'Puja booking successfully completed.')
+            ->with('warning', 'Booking completed, but customer email could not be sent.');
+
     }
+
     
     public function completed(Request $request)
     {

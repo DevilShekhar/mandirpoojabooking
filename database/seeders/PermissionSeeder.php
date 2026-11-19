@@ -258,7 +258,16 @@ class PermissionSeeder extends Seeder
             'my-online-pujabooking.show',
             'online-puja.cancelbooking',
             'online-puja.completed',
-            'reports.online-puja-details'
+            'reports.online-puja-details',
+            'darshan-verification-officers.view',
+            'darshan-verification-officers.index',
+            'darshan-verification-officers.create',
+            'darshan-verification-officers.store',
+            'darshan-verification-officers.show',
+            'darshan-verification-officers.edit',
+            'darshan-verification-officers.update',
+            'darshan-verification-officers.delete',
+            'puja_completed-otp.show',
         ];
         foreach ($permissions as $permission) {
             Permission::firstOrCreate([

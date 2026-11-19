@@ -4,29 +4,31 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 
 class RoleSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        // Rename existing role instead of creating a new one
-        Role::where('name', 'Puja Manager')
-            ->where('guard_name', 'web')
-            ->update(['name' => 'Store Manager']);
+        app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // Create other roles only if they don't already exist
+        // Remove Finance Manager
+        Role::where('name', 'Finance Manager')
+            ->where('guard_name', 'web')
+            ->delete();
+
+        // Create roles if they don't exist
         $roles = [
             'Super Admin',
             'Admin',
             'Temple Manager',
+            'Store Manager',
             'Pandit',
-            'Finance Manager',
+            'Darshan Verification Officer',
             'Delivery Manager',
             'Support Executive',
             'Customer',
+            'Event Creator',
         ];
 
         foreach ($roles as $role) {
@@ -35,5 +37,7 @@ class RoleSeeder extends Seeder
                 'guard_name' => 'web',
             ]);
         }
+
+        app()[PermissionRegistrar::class]->forgetCachedPermissions();
     }
 }
