@@ -83,6 +83,7 @@ use App\Http\Controllers\Frontend\FrontendOnlinePujaCartController;
 use App\Http\Controllers\Admin\MyOnlinePujaBookingController;
 use App\Http\Controllers\Admin\OnlinePujaReportController;
 use App\Http\Controllers\Admin\OnlinePujaDetailedReportController;
+use App\Http\Controllers\Admin\DarshanVerificationOfficerController;
 
 Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
 Route::get('our-temples', [OurTemplesContoller::class, 'index'])->name('frontend.our-temples');
@@ -249,6 +250,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/tickit-booking-history',[TicketBookingHistoryController::class, 'managerHistory'])->name('admin.tickit-booking-history');
     Route::get('/tickit-booking-history/{bookingReference}',[TicketBookingHistoryController::class, 'managerBookingDetails'])->name('admin.tickit-booking-history.show');
     Route::resource('store-managers', StoreManagerController::class)->names('admin.store-managers');
+    Route::resource('darshan-verification-officers',DarshanVerificationOfficerController::class)->names('admin.darshan-verification-officers');
     Route::resource('temple-products', TempleProductController::class)->names('admin.temple-products')->parameters(['temple-products' => 'id']);
     Route::get('/samgri-booking', [SamgriBookingController::class, 'index'])->name('samgri-booking.index');
     Route::get('/samgri-booking/{booking}/view', [SamgriBookingController::class, 'show'])->name('samgri-booking.show');
