@@ -942,48 +942,48 @@
                     </div>
                 </div>
                 {{-- Completed Event Bookings Count --}}
-<div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
-    <div class="card card-statistic-1">
-        <div class="card-icon l-bg-green">
-            <i class="fas fa-check-circle"></i>
-        </div>
-        <div class="card-wrap">
-            <div class="padding-20">
-                <div class="text-right">
-                    <h3 class="font-light mb-0">
-                        {{ number_format($completedSanatanEventBookingCount ?? 0) }}
-                    </h3>
-                    <span class="text-muted">
-                        <a href="{{ route('customer.sanatan-event-bookings.completed') }}">
-                            Completed Bookings
-                        </a>
-                    </span>
+            <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                <div class="card card-statistic-1">
+                    <div class="card-icon l-bg-green">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="card-wrap">
+                        <div class="padding-20">
+                            <div class="text-right">
+                                <h3 class="font-light mb-0">
+                                    {{ number_format($completedSanatanEventBookingCount ?? 0) }}
+                                </h3>
+                                <span class="text-muted">
+                                    <a href="{{ route('customer.sanatan-event-bookings.completed') }}">
+                                        Completed Bookings
+                                    </a>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
 
-{{-- Completed Event Booking Amount --}}
-<div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
-    <div class="card card-statistic-1">
-        <div class="card-icon l-bg-purple">
-            <i class="fas fa-rupee-sign"></i>
-        </div>
-        <div class="card-wrap">
-            <div class="padding-20">
-                <div class="text-right">
-                    <h3 class="font-light mb-0">
-                        ₹{{ number_format((float) ($completedSanatanEventBookingAmount ?? 0), 2) }}
-                    </h3>
-                    <span class="text-muted">
-                        Completed Booking Amount
-                    </span>
+            {{-- Completed Event Booking Amount --}}
+            <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                <div class="card card-statistic-1">
+                    <div class="card-icon l-bg-purple">
+                        <i class="fas fa-rupee-sign"></i>
+                    </div>
+                    <div class="card-wrap">
+                        <div class="padding-20">
+                            <div class="text-right">
+                                <h3 class="font-light mb-0">
+                                    ₹{{ number_format((float) ($completedSanatanEventBookingAmount ?? 0), 2) }}
+                                </h3>
+                                <span class="text-muted">
+                                    Completed Booking Amount
+                                </span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
             </div>
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
@@ -1298,7 +1298,76 @@
                         </div>
                     </div>
                 </div>
-                
+                <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12">
+                    <div class="card card-statistic-1">
+                        <div class="card-icon l-bg-purple">
+                            <i class="fas fa-praying-hands"></i>
+                        </div>
+
+                        <div class="card-wrap">
+                            <div class="padding-20">
+                                <div class="text-right">
+                                    <h3 class="font-light mb-0">
+                                        {{ $onlinePujaCount ?? 0 }}
+                                    </h3>
+
+                                    <span class="text-muted">
+                                     
+                                            Online Puja Total
+                                        </a>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12">
+                    <div class="card card-statistic-1">
+                        <div class="card-icon l-bg-green">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+
+                        <div class="card-wrap">
+                            <div class="padding-20">
+                                <div class="text-right">
+                                    <h3 class="font-light mb-0">
+                                        {{ $completedOnlinePujaCount ?? 0 }}
+                                    </h3>
+
+                                    <span class="text-muted">
+                                        <a href="{{ route('online-pujas.completed') }}">
+                                        Completed Online Puja
+                                        </a>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12">
+                    <div class="card card-statistic-1">
+                        <div class="card-icon l-bg-orange">
+                            <i class="fas fa-spinner"></i>
+                        </div>
+
+                        <div class="card-wrap">
+                            <div class="padding-20">
+                                <div class="text-right">
+                                    <h3 class="font-light mb-0">
+                                        {{ $inProcessOnlinePujaCount ?? 0 }}
+                                    </h3>
+
+                                    <span class="text-muted">
+                                        <a href="{{ route('online-pujas.index') }}">
+                                        Inprogress Online Puja
+                                        </a>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+               
             </div>
             <div class="row mb-4">
                 <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
@@ -2290,7 +2359,11 @@
                     ['title' => 'Sanatan Event Bookings', 'value' => $sanatanEventBookingCount ?? 0, 'icon' => 'fa-calendar-check', 'color' => 'purple', 'url' => route('customer.sanatan-event-bookings.index')],
                     ['title' => 'Successful Puja Bookings', 'value' => $successfulPujaBookingCount ?? 0, 'icon' => 'fa-check-circle', 'color' => 'green', 'url' => route('booking-puja-order.successful')],
                     ['title' => 'Failed Puja Payments', 'value' => $failedPujaPaymentCount ?? 0, 'icon' => 'fa-times-circle', 'color' => 'red', 'url' => route('booking-puja-order.failed')],
-                    ['title' => 'Cancelled Puja Bookings', 'value' => $cancelledPujaBookingCount ?? 0, 'icon' => 'fa-ban', 'color' => 'orange', 'url' => route('booking-puja-order.cancelled')]
+                    ['title' => 'Cancelled Puja Bookings', 'value' => $cancelledPujaBookingCount ?? 0, 'icon' => 'fa-ban', 'color' => 'orange', 'url' => route('booking-puja-order.cancelled')],
+                    ['title' => 'Total Online Puja','value' => $onlinePujaCount ?? 0,'icon' => 'fa-praying-hands','color' => 'purple','url' => '#'],
+                    ['title' => 'Completed Online Puja','value' => $completedOnlinePujaCount ?? 0,'icon' => 'fa-check-circle','color' => 'green','url' => route('online-pujas.index')],
+                    ['title' => 'In Process Online Puja','value' => $inProcessOnlinePujaCount ?? 0,'icon' => 'fa-spinner','color' => 'orange','url' => route('online-pujas.index')],
+                    ['title' => 'Cancelled Online Puja','value' => $cancelledOnlinePujaCount ?? 0,'icon' => 'fa-times-circle','color' => 'red','url' => route('online-pujas.cancelled-bookings')],
                 ];
             @endphp
 

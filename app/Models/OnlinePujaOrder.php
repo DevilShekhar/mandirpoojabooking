@@ -81,4 +81,8 @@ class OnlinePujaOrder extends Model
     {
         return $this->belongsTo(User::class, 'cancelled_by');
     }
+    public function onlinePuja()
+    {
+        return $this->belongsTo(OnlinePuja::class, 'online_puja_id', 'id');
+    }
 }

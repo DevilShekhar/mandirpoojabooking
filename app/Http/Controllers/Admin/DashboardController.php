@@ -15,6 +15,9 @@ use App\Models\HomeBanner;
 use App\Models\Deity;
 use App\Models\PujaCategory;
 use App\Models\PujaBookingPayment;
+use App\Models\OnlinePuja;
+use App\Models\OnlinePujaOrder;
+
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -88,6 +91,23 @@ class DashboardController extends Controller
         $pujaRefundAmount = 0;
         $completedSanatanEventBookingCount = 0;
         $completedSanatanEventBookingAmount = 0;
+        $onlinePujaCount = 0;
+        $completedOnlinePujaCount = 0;
+        $inProcessOnlinePujaCount = 0;
+        $cancelledOnlinePujaCount = 0;
+
+        if ($user->hasAnyRole(['Super Admin', 'Admin'])) {
+            $onlinePujaCount = OnlinePuja::count();
+            $completedOnlinePujaCount = OnlinePuja::where('status', 2)->count();
+            $inProcessOnlinePujaCount = OnlinePuja::where('status', 1)->count();
+            $cancelledOnlinePujaCount = OnlinePuja::where('status', 0)->count();
+
+        } else {
+            $onlinePujaCount = OnlinePuja::where('created_by', $user->id)->count();
+            $completedOnlinePujaCount = OnlinePuja::where('created_by', $user->id)->where('status', 2)->count();
+            $inProcessOnlinePujaCount = OnlinePuja::where('created_by', $user->id)->where('status', 1)->count();
+            $cancelledOnlinePujaCount = OnlinePuja::where('created_by', $user->id)->where('status', 0)->count();
+        }
         $completedSanatanEventBookings = collect();
         if ($user->hasRole('Customer')) {
             $bookingQuery = PujaBooking::where('user_id', $user->id);
@@ -505,6 +525,10 @@ $completedSanatanEventBookingAmount = (clone $completedSanatanEventBookingQuery)
             'completedPujaBookingAmount',
             'completedSanatanEventBookingCount',
             'completedSanatanEventBookingAmount',
+            'onlinePujaCount',
+            'completedOnlinePujaCount',
+            'inProcessOnlinePujaCount',
+            'cancelledOnlinePujaCount',
         ));
     }
 }

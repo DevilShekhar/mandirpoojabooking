@@ -56,7 +56,7 @@ class OnlinePujaController extends Controller
     }
     public function cancelledBookings()
     {
-       
+
         // Query cancelled bookings, loading puja, package, and cancelledBy relationships
         $cancelledBookings = OnlinePujaOrder::with(['puja', 'package', 'cancelledBy'])
             ->where('booking_status', 'cancelled')
@@ -68,7 +68,7 @@ class OnlinePujaController extends Controller
         $totalRefundAmount = $cancelledBookings->sum('refund_amount');
 
         return view(
-            'admin.online-pujas.cancelled-bookings', 
+            'admin.online-pujas.cancelled-bookings',
             compact('cancelledBookings', 'totalCancelledAmount', 'totalRefundAmount')
         );
     }
