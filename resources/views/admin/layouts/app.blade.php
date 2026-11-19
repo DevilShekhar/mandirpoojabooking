@@ -434,14 +434,139 @@
                                 </a>
                             </li>
                         @endcan
-                        @can('puja-review-rating')
-                        <li class="{{ request()->routeIs('admin.puja-reviews.*') ? 'active' : '' }}">
-                            <a href="{{ route('admin.puja-reviews.index') }}" class="nav-link">
-                                <i data-feather="star"></i>
-                                <span>Reviews & Ratings</span>
-                            </a>
-                        </li>
-                        @endcan
+                        @canany(['santan-event-view', 'view-event-bookings'])
+                            <li class="{{ request()->routeIs('admin.sanatan-events.*', 'customer.sanatan-event-bookings.*') ? 'active' : '' }}">
+                                <a href="javascript:void(0);" class="nav-link has-dropdown">
+                                    <i data-feather="calendar"></i>
+                                    <span>Sanatan Events</span>
+                                </a>
+
+                                <ul class="dropdown-menu">
+
+                                    @can('santan-event-view')
+                                        <li class="{{ request()->routeIs('admin.sanatan-events.*') ? 'active' : '' }}">
+                                            <a href="{{ route('admin.sanatan-events.index') }}">
+                                                <i data-feather="calendar"></i>
+                                                Manage Events
+                                            </a>
+                                        </li>
+                                    @endcan
+
+                                    @can('view-event-bookings')
+                                        <li class="{{ request()->routeIs('customer.sanatan-event-bookings.index') ? 'active' : '' }}">
+                                            <a href="{{ route('customer.sanatan-event-bookings.index') }}">
+                                                <i data-feather="list"></i>
+                                                All Bookings
+                                            </a>
+                                        </li>
+
+                                        <li class="{{ request()->routeIs('customer.sanatan-event-bookings.confirmed') ? 'active' : '' }}">
+                                            <a href="{{ route('customer.sanatan-event-bookings.confirmed') }}">
+                                                <i data-feather="check-square"></i>
+                                                Confirmed Bookings
+                                            </a>
+                                        </li>
+
+                                        <li class="{{ request()->routeIs('customer.sanatan-event-bookings.completed') ? 'active' : '' }}">
+                                            <a href="{{ route('customer.sanatan-event-bookings.completed') }}">
+                                                <i data-feather="check-circle"></i>
+                                                Completed Bookings
+                                            </a>
+                                        </li>
+
+                                        <li class="{{ request()->routeIs('customer.sanatan-event-bookings.cancelled') ? 'active' : '' }}">
+                                            <a href="{{ route('customer.sanatan-event-bookings.cancelled') }}">
+                                                <i data-feather="x-circle"></i>
+                                                Cancelled Bookings
+                                            </a>
+                                        </li>
+                                    @endcan
+
+                                </ul>
+                            </li>
+                        @endcanany
+                       
+                        {{-- Puja --}}
+                        @canany(['puja-review-rating','puja-categories.view','pujas.view','puja-packages.view','samgri-booking.view','samgri-booking-completed.view'])
+                            <li class="dropdown {{ request()->routeIs('admin.puja-reviews.*', 'puja-categories.*', 'pujas.*', 'puja-packages.*', 'package-features.*', 'package-addons.*', 'puja-schedules.*', 'puja-bookings.*', 'samgri-booking.*', 'completed-samgri-booking.*') ? 'active' : '' }}">
+                                <a href="javascript:void(0);" class="nav-link has-dropdown">
+                                    <i data-feather="heart"></i>
+                                    <span>Mandir Puja</span>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    @can('puja-categories.view')
+                                        <li class="{{ request()->routeIs('puja-categories.*') ? 'active' : '' }}">
+                                            <a href="{{ route('puja-categories.index') }}">
+                                                <i data-feather="list"></i>
+                                                Puja Categories
+                                            </a>
+                                        </li>
+                                    @endcan
+                                    @can('pujas.view')
+                                        <li class="{{ request()->routeIs('pujas.*') ? 'active' : '' }}">
+                                            <a href="{{ route('pujas.index') }}">
+                                                <i data-feather="heart"></i>
+                                                Pujas
+                                            </a>
+                                        </li>
+                                    @endcan
+                                    @can('puja-review-rating')
+                                        <li class="{{ request()->routeIs('admin.puja-reviews.*') ? 'active' : '' }}">
+                                            <a href="{{ route('admin.puja-reviews.index') }}">
+                                                <i data-feather="star"></i>
+                                                Reviews & Ratings
+                                            </a>
+                                        </li>
+                                    @endcan
+                                    @can('samgri-booking.view')
+                                        <li class="{{ request()->routeIs('samgri-booking.*') ? 'active' : '' }}">
+                                            <a href="{{ route('samgri-booking.index') }}">
+                                                <i data-feather="package"></i>
+                                                Samagri Bookings
+                                            </a>
+                                        </li>
+                                    @endcan
+                                    @can('samgri-booking-completed.view')
+                                        <li class="{{ request()->routeIs('completed-samgri-booking.*') ? 'active' : '' }}">
+                                            <a href="{{ route('completed-samgri-booking.index') }}">
+                                                <i data-feather="check-circle"></i>
+                                                Completed Samagri
+                                            </a>
+                                        </li>
+                                    @endcan
+                                </ul>
+                            </li>
+                        @endcanany
+                        @can('puja-bookings-order.view')
+                            <li class="dropdown {{ request()->routeIs('booking-puja-order.*') ? 'active' : '' }}">
+                                <a href="#" class="menu-toggle nav-link has-dropdown">
+                                    <i data-feather="shopping-cart"></i>
+                                    <span>Mandir Puja Order</span>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li class="{{ request()->routeIs('booking-puja-order.successful') ? 'active' : '' }}">
+                                        <a class="nav-link" href="{{ route('booking-puja-order.successful') }}">
+                                            Assigned
+                                        </a>
+                                    </li>
+                                    <li class="{{ request()->routeIs('booking-puja-order.failed') ? 'active' : '' }}">
+                                        <a class="nav-link" href="{{ route('booking-puja-order.failed') }}">
+                                            Failed
+                                        </a>
+                                    </li>
+                                    <li class="{{ request()->routeIs('booking-puja-order.cancelled') ? 'active' : '' }}">
+                                        <a class="nav-link" href="{{ route('booking-puja-order.cancelled') }}">
+                                            Cancelled
+                                        </a>
+                                    </li>
+                                    <li class="{{ request()->routeIs('booking-puja-order-completed') ? 'active' : '' }}">
+                                        <a class="nav-link" href="{{ route('booking-puja-order-completed') }}">
+                                            Completed
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        @endcan                           
                         @if(auth()->user()->can('online-puja.view') || auth()->user()->can('online-puja-categories.view'))
                             <li class="{{ request()->routeIs('online-pujas.*') || request()->routeIs('online-puja-categories.*') ? 'active' : '' }}">
                                 <a href="javascript:void(0);" class="nav-link has-dropdown">
@@ -489,14 +614,7 @@
                                 </ul>
                             </li>
                         @endif
-                        @can('santan-event-view')
-                        <li class="{{ request()->routeIs('admin.sanatan-events.*') ? 'active' : '' }}">
-                            <a href="{{ route('admin.sanatan-events.index') }}" class="nav-link">
-                                <i data-feather="calendar"></i>
-                                <span>Sanatan Events</span>
-                            </a>
-                        </li>
-                        @endcan                        
+                                             
                         @can('all-templae-register.list')
                         <li class="{{ request()->routeIs('all-templae-register*') ? 'active' : '' }}">
                             <a href="{{ route('all-templae-register') }}" class="nav-link">
@@ -611,23 +729,7 @@
                             </a>
                         </li>
                         @endcan
-                        @can('samgri-booking.view')
-                            <li class="{{ request()->routeIs('samgri-booking.*') ? 'active' : '' }}">
-                                <a href="{{ route('samgri-booking.index') }}" class="nav-link">
-                                    <i data-feather="package"></i>
-                                    <span>Samagri Bookings</span>
-                                </a>
-                            </li>
-                        @endcan
-
-                        @can('samgri-booking-completed.view')
-                            <li class="{{ request()->routeIs('completed-samgri-booking.*') ? 'active' : '' }}">
-                                <a href="{{ route('completed-samgri-booking.index') }}" class="nav-link">
-                                    <i data-feather="check-circle"></i>
-                                    <span>Completed Samagri</span>
-                                </a>
-                            </li>
-                        @endcan
+                        
                         @can('roles.view')
                             <li class="dropdown {{ request()->routeIs('roles.*') ? 'active' : '' }}">
                                 <a href="#" class="menu-toggle nav-link has-dropdown">
@@ -750,35 +852,7 @@
                             </li>
                         @endcanany
 
-                        {{-- Puja --}}
-                        @canany(['puja-categories.view','pujas.view','puja-packages.view'])
-                            <li class="dropdown {{ request()->routeIs('puja-categories.*', 'pujas.*', 'puja-packages.*', 'package-features.*', 'package-addons.*', 'puja-schedules.*', 'puja-bookings.*') ? 'active' : '' }}">
-
-                                <a href="#" class="menu-toggle nav-link has-dropdown">
-                                    <i data-feather="heart"></i>
-                                    <span>Puja</span>
-                                </a>
-
-                                <ul class="dropdown-menu">
-
-                                    @can('puja-categories.view')
-                                        <li class="{{ request()->routeIs('puja-categories.*') ? 'active' : '' }}">
-                                            <a class="nav-link" href="{{ route('puja-categories.index') }}">
-                                                Puja Categories
-                                            </a>
-                                        </li>
-                                    @endcan
-
-                                    @can('pujas.view')
-                                        <li class="{{ request()->routeIs('pujas.*') ? 'active' : '' }}">
-                                            <a class="nav-link" href="{{ route('pujas.index') }}">
-                                                Pujas
-                                            </a>
-                                        </li>
-                                    @endcan
-                                </ul>
-                            </li>
-                        @endcanany
+                        
                         @can('puja-bookings-my.view')
                             <li class="{{ request()->routeIs('booking-puja-order.*', 'puja-bookings.*', 'customer-cancel-booking.*') ? 'active' : '' }}">
                                 <a href="javascript:void(0);" class="nav-link has-dropdown">
@@ -809,42 +883,8 @@
                                     <span>Online Puja Booking</span>
                                 </a>
                             </li>
-                        @endcan
-                        
-                        @can('view-event-bookings')
-                            <li class="{{ request()->routeIs('customer.sanatan-event-bookings.*') ? 'active' : '' }}">
-                                <a href="javascript:void(0);" class="nav-link has-dropdown">
-                                    <i data-feather="calendar"></i>
-                                    <span>Event Bookings</span>
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li class="{{ request()->routeIs('customer.sanatan-event-bookings.index') ? 'active' : '' }}">
-                                        <a href="{{ route('customer.sanatan-event-bookings.index') }}">
-                                            <i data-feather="list"></i>
-                                            All Bookings
-                                        </a>
-                                    </li>
-                                    <li class="{{ request()->routeIs('customer.sanatan-event-bookings.confirmed') ? 'active' : '' }}">
-                                        <a href="{{ route('customer.sanatan-event-bookings.confirmed') }}">
-                                            <i data-feather="check-square"></i>
-                                            Confirmed Bookings
-                                        </a>
-                                    </li>
-                                    <li class="{{ request()->routeIs('customer.sanatan-event-bookings.completed') ? 'active' : '' }}">
-                                        <a href="{{ route('customer.sanatan-event-bookings.completed') }}">
-                                            <i data-feather="check-circle"></i>
-                                            Completed Bookings
-                                        </a>
-                                    </li>
-                                     <li class="{{ request()->routeIs('customer.sanatan-event-bookings.cancelled') ? 'active' : '' }}">
-                                        <a href="{{ route('customer.sanatan-event-bookings.cancelled') }}">
-                                            <i data-feather="x-circle"></i>
-                                            Cancelled Bookings
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
-                        @endcan
+                        @endcan                        
+                         
                         @can('view-event-calendar')
                             <li class="{{ request()->routeIs('admin.sanatan-events-calendar.*') ? 'active' : '' }}">
                                 <a href="{{ route('admin.sanatan-events-calendar.index') }}" class="nav-link">
@@ -852,37 +892,7 @@
                                     <span>Event Calendar</span>
                                 </a>
                             </li>
-                        @endcan
-                        @can('puja-bookings-order.view')
-                            <li class="dropdown {{ request()->routeIs('booking-puja-order.*') ? 'active' : '' }}">
-                                <a href="#" class="menu-toggle nav-link has-dropdown">
-                                    <i data-feather="shopping-cart"></i>
-                                    <span>Mandir Puja Order</span>
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li class="{{ request()->routeIs('booking-puja-order.successful') ? 'active' : '' }}">
-                                        <a class="nav-link" href="{{ route('booking-puja-order.successful') }}">
-                                            Assigned
-                                        </a>
-                                    </li>
-                                    <li class="{{ request()->routeIs('booking-puja-order.failed') ? 'active' : '' }}">
-                                        <a class="nav-link" href="{{ route('booking-puja-order.failed') }}">
-                                            Failed
-                                        </a>
-                                    </li>
-                                    <li class="{{ request()->routeIs('booking-puja-order.cancelled') ? 'active' : '' }}">
-                                        <a class="nav-link" href="{{ route('booking-puja-order.cancelled') }}">
-                                            Cancelled
-                                        </a>
-                                    </li>
-                                    <li class="{{ request()->routeIs('booking-puja-order-completed') ? 'active' : '' }}">
-                                        <a class="nav-link" href="{{ route('booking-puja-order-completed') }}">
-                                            Completed
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
-                        @endcan                     
+                        @endcan                 
                         
                         @can('ticket-prices.index')
                             <li class="{{ request()->routeIs('ticket-prices.*') ? 'active' : '' }}">
