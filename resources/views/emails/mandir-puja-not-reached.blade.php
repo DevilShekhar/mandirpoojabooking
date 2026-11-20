@@ -100,24 +100,6 @@
                     </td>
                 </tr>
 
-                <tr>
-                    <td style="padding:10px; border-bottom:1px solid #eeeeee;">
-                        <strong>Samagri OTP</strong>
-                    </td>
-                    <td style="padding:10px; border-bottom:1px solid #eeeeee;">
-                        {{ !empty($booking->samgri_otp) ? 'Verified / Available' : 'Pending' }}
-                    </td>
-                </tr>
-
-                <tr>
-                    <td style="padding:10px; border-bottom:1px solid #eeeeee;">
-                        <strong>Puja Completion OTP</strong>
-                    </td>
-                    <td style="padding:10px; border-bottom:1px solid #eeeeee;">
-                        {{ !empty($booking->puja_completed_otp) ? 'Available' : 'Pending' }}
-                    </td>
-                </tr>
-
             </table>
 
             <p style="margin-top:25px;">
