@@ -24,6 +24,7 @@ class TicketBooking extends Model
         'razorpay_payment_id',
         'payment_status',
         'booking_status',
+        'ticket_otp',
     ];
 
     protected function casts(): array
