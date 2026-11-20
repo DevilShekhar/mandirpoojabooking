@@ -269,6 +269,7 @@ class TicketBookingHistoryController extends Controller
                 'cancel_requested',
                 'cancelled',
                 'completed',
+                'not_reached',
             ]);
 
         // Fetch authorized bookings
@@ -1133,5 +1134,40 @@ class TicketBookingHistoryController extends Controller
         $bookings = $query->orderByDesc('latest_id')->paginate(10)->withQueryString();
         return view('admin.ticket-booking.completed',compact('bookings'));
     }
+    public function notReachedBookings(Request $request)
+    {
+        $user = Auth::user();
 
+        if (!$user) {
+            abort(403, 'You are not authorized to view these bookings.');
+        }
+
+        $bookings = DB::table('ticket_bookings')
+            ->join('temples', 'temples.id', '=', 'ticket_bookings.temple_id')
+            ->where('ticket_bookings.booking_status', 'not_reached')
+            ->select(
+                'ticket_bookings.razorpay_order_id',
+                DB::raw('MIN(ticket_bookings.booking_reference) as booking_reference'),
+                'ticket_bookings.temple_id',
+                DB::raw('MAX(temples.name) as temple_name'),
+                'ticket_bookings.booking_date',
+                'ticket_bookings.payment_status',
+                'ticket_bookings.booking_status',
+                DB::raw('COUNT(ticket_bookings.id) as total_members'),
+                DB::raw('SUM(ticket_bookings.price) as total_amount'),
+                DB::raw('MAX(ticket_bookings.updated_at) as updated_at'),
+                DB::raw('MAX(ticket_bookings.id) as latest_id')
+            )
+            ->groupBy(
+                'ticket_bookings.razorpay_order_id',
+                'ticket_bookings.temple_id',
+                'ticket_bookings.booking_date',
+                'ticket_bookings.payment_status',
+                'ticket_bookings.booking_status'
+            )
+            ->orderByDesc('latest_id')
+            ->get();
+
+        return view('admin.ticket-booking.not-reached', compact('bookings'));
+    }
 }
