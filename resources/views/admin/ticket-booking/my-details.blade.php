@@ -465,6 +465,12 @@
                                 : 'N/A' }}
                         </div>
                     </div>
+                    <div class="col-md-6 mb-3">
+                        <span class="detail-label">OTP Verified By</span>
+                        <div class="detail-value">
+                            {{ $firstBooking->ticketOtpVerifiedBy?->name ?? 'N/A' }}
+                        </div>
+                    </div>
 
                 @endif
 

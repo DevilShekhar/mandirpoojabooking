@@ -25,6 +25,8 @@ class TicketBooking extends Model
         'payment_status',
         'booking_status',
         'ticket_otp',
+        'ticket_otp_verified_by',
+        'ticket_otp_verified_at',
     ];
 
     protected function casts(): array
@@ -33,6 +35,7 @@ class TicketBooking extends Model
             'booking_date' => 'date',
             'booking_time' => 'string',
             'price' => 'decimal:2',
+            'ticket_otp_verified_at' => 'datetime',
         ];
     }
 
@@ -44,5 +47,9 @@ class TicketBooking extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+    public function ticketOtpVerifiedBy()
+    {
+        return $this->belongsTo(User::class, 'ticket_otp_verified_by');
     }
 }

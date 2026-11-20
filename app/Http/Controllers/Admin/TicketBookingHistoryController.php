@@ -228,7 +228,7 @@ class TicketBookingHistoryController extends Controller
         }
 
         // Base booking query
-        $bookingQuery = TicketBooking::with('temple')
+        $bookingQuery = TicketBooking::with('temple','ticketOtpVerifiedBy',)
             ->where('razorpay_order_id', $orderId);
 
         // Role-wise booking access
