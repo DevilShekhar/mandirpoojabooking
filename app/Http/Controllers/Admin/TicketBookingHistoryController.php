@@ -162,11 +162,7 @@ class TicketBookingHistoryController extends Controller
             abort(403, 'You do not have permission to view cancelled bookings.');
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Search
-        |--------------------------------------------------------------------------
-        */
+       
 
         if ($request->filled('search')) {
             $search = trim($request->search);
@@ -177,12 +173,6 @@ class TicketBookingHistoryController extends Controller
                     ->orWhere('ticket_bookings.booking_reference', 'like', "%{$search}%");
             });
         }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Group Bookings
-        |--------------------------------------------------------------------------
-        */
 
         $query->select(
             'ticket_bookings.razorpay_order_id',
@@ -208,8 +198,7 @@ class TicketBookingHistoryController extends Controller
 
         $bookings = $query
             ->orderByDesc('latest_id')
-            ->paginate(10)
-            ->withQueryString();
+            ->get();
 
         return view('admin.ticket-booking.cancel', compact('bookings'));
     }    
