@@ -13,7 +13,8 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\ValidationException;
 use Razorpay\Api\Api;
 use Throwable;
-
+use App\Mail\TicketBookingCompletedMail;
+use Illuminate\Support\Facades\Mail;
 class TicketBookingHistoryController extends Controller
 {
     public function myBookings(Request $request)
@@ -277,7 +278,8 @@ class TicketBookingHistoryController extends Controller
             ->whereIn('booking_status', [
                 'confirmed',
                 'cancel_requested',
-                'cancelled'
+                'cancelled',
+                'completed',
             ]);
 
         // Fetch authorized bookings
@@ -974,4 +976,173 @@ class TicketBookingHistoryController extends Controller
         }
         return null;
     }
+    
+    public function complete(Request $request, string $orderId)
+    {
+        $user = Auth::user();
+        if (!$user) {
+            abort(403, 'You are not authorized.');
+        }
+        // Permission check
+        if (!$user->can('complete-tickit-booking')) {
+            abort(403, 'You do not have permission to complete ticket bookings.');
+        }
+        $request->validate([
+            'otp' => ['required', 'digits:6'],
+        ]);
+        // Complete booking inside transaction
+        $bookingForEmail = DB::transaction(function () use ($user, $orderId, $request) {
+            $query = TicketBooking::where('razorpay_order_id', $orderId);
+            if ($user->hasAnyRole(['Admin', 'Super Admin'])) {
+            } elseif ($user->hasRole('Temple Manager')) {
+                $templeIds = DB::table('temple_user')
+                    ->where('user_id', $user->id)
+                    ->where('approval_status', 'approved')
+                    ->pluck('temple_id');
+                if ($templeIds->isEmpty()) {
+                    abort(403, 'No approved temple assigned.');
+                }
+                $query->whereIn('temple_id', $templeIds);
+            } elseif ($user->hasRole('Darshan Verification Officer')) {
+                if (empty($user->temple_id)) {
+                    abort(403, 'No temple assigned to your account.');
+                }
+                $query->where('temple_id', $user->temple_id);
+            } else {
+                abort(403, 'You are not authorized to complete this booking.');
+            }
+            $bookings = $query->lockForUpdate()->get();
+            if ($bookings->isEmpty()) {
+                abort(404, 'Ticket booking not found.');
+            }
+            if ($bookings->count() !== TicketBooking::where(
+                'razorpay_order_id',
+                $orderId
+            )->count()) {
+                abort(403, 'You cannot complete bookings outside your assigned temple.');
+            }
+
+            if ($bookings->contains(function ($booking) {
+                return $booking->booking_status !== 'confirmed';
+            })) {
+                throw ValidationException::withMessages([
+                    'otp' => 'Only confirmed ticket bookings can be completed.',
+                ]);
+            }
+            if ($bookings->contains(function ($booking) {
+                return $booking->payment_status !== 'paid';
+            })) {
+                throw ValidationException::withMessages([
+                    'otp' => 'Only paid ticket bookings can be completed.',
+                ]);
+            }
+            $storedOtp = (string) $bookings->first()->ticket_otp;
+            $enteredOtp = (string) $request->otp;
+            if (empty($storedOtp) || !hash_equals($storedOtp, $enteredOtp)
+            ) {
+                throw ValidationException::withMessages([
+                    'otp' => 'Invalid OTP. Please enter the correct customer OTP.',
+                ]);
+            }
+
+            TicketBooking::where('razorpay_order_id', $orderId)
+                ->update([
+                    'booking_status' => 'completed',
+                    'completed_by' => $user->id,
+                    'completed_at' => now(),
+                    'ticket_otp_verified_by' => $user->id,
+                    'ticket_otp_verified_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            return TicketBooking::with(['user', 'temple'])->where('razorpay_order_id', $orderId)->first();
+        });
+        try {
+            if ($bookingForEmail && $bookingForEmail->user && !empty($bookingForEmail->user->email)
+            ) {
+                Mail::to($bookingForEmail->user->email)->send(new TicketBookingCompletedMail($bookingForEmail));
+            } else {
+                Log::warning('Ticket completion email not sent: Customer email unavailable.', [
+                    'order_id' => $orderId,
+                ]);
+            }
+        } catch (\Throwable $e) {
+            Log::error('Ticket booking completed but thank-you email failed.', [
+                'order_id' => $orderId,
+                'error' => $e->getMessage(),
+            ]);
+        }
+        return redirect()->route('admin.my-tickit-booking.show', ['orderId' => $orderId,])->with('success', 'Ticket booking successfully completed after OTP verification.');
+    }
+    
+    public function completedBookings(Request $request)
+    {
+        $user = Auth::user();
+        if (!$user) {
+            abort(403, 'You are not authorized to view these bookings.');
+        }
+        if (!$user->can('all-tickit-booking.index')) {
+            abort(403, 'You do not have permission to view completed ticket bookings.');
+        }
+        $query = DB::table('ticket_bookings')
+            ->join('temples', 'temples.id', '=', 'ticket_bookings.temple_id')
+            ->where('ticket_bookings.booking_status', 'completed')
+            ->where('ticket_bookings.payment_status', 'paid');
+        if ($user->hasAnyRole(['Admin', 'Super Admin'])) {
+        } elseif ($user->hasRole('Temple Manager')) {
+            $templeIds = DB::table('temple_user')
+                ->where('user_id', $user->id)
+                ->where('approval_status', 'approved')
+                ->pluck('temple_id');
+            if ($templeIds->isEmpty()) {
+                abort(403, 'No approved temple is assigned to your account.');
+            }
+            $query->whereIn('ticket_bookings.temple_id', $templeIds);
+        } elseif ($user->hasRole('Darshan Verification Officer')) {
+            if (empty($user->temple_id)) {
+                abort(403, 'No temple is assigned to your account.');
+            }
+            $query->where(
+                'ticket_bookings.temple_id',
+                $user->temple_id
+            );
+        } elseif ($user->hasRole('Customer')) {
+            $query->where('ticket_bookings.user_id', $user->id);
+        } else {
+            abort(403, 'You do not have permission to view completed ticket bookings.');
+        }
+        $query->select(
+            'ticket_bookings.razorpay_order_id',
+            'ticket_bookings.user_id',
+            'ticket_bookings.temple_id',
+            'ticket_bookings.booking_date',
+            'ticket_bookings.payment_status',
+            'ticket_bookings.booking_status',
+            'temples.name as temple_name',
+            DB::raw('MIN(ticket_bookings.booking_reference) AS booking_reference'),
+            DB::raw('COUNT(ticket_bookings.id) AS total_members'),
+            DB::raw('SUM(ticket_bookings.price) AS total_amount'),
+            DB::raw('MAX(ticket_bookings.id) AS latest_id'),
+            DB::raw('MAX(ticket_bookings.completed_at) AS completed_at')
+        )->groupBy(
+            'ticket_bookings.razorpay_order_id',
+            'ticket_bookings.user_id',
+            'ticket_bookings.temple_id',
+            'ticket_bookings.booking_date',
+            'ticket_bookings.payment_status',
+            'ticket_bookings.booking_status',
+            'temples.name'
+        );
+        // Search
+        if ($request->filled('search')) {
+            $search = trim($request->search);
+            $query->where(function ($q) use ($search) {
+                $q->where('temples.name', 'like', "%{$search}%")
+                    ->orWhere('ticket_bookings.razorpay_order_id', 'like', "%{$search}%")
+                    ->orWhere('ticket_bookings.booking_reference', 'like', "%{$search}%");
+            });
+        }
+        $bookings = $query->orderByDesc('latest_id')->paginate(10)->withQueryString();
+        return view('admin.ticket-booking.completed',compact('bookings'));
+    }
+
 }

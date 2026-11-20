@@ -5,6 +5,16 @@
 @canany(['my-tickit-booking.details', 'all-tickit-booking.details'])
 @php
     $firstBooking = $bookings->first();
+        $canCompleteTicket = $bookings->isNotEmpty()
+        && $bookings->every(function ($booking) {
+            return $booking->booking_status === 'confirmed'
+                && $booking->payment_status === 'paid';
+        });
+
+    $isTicketCompleted = $bookings->isNotEmpty()
+        && $bookings->every(function ($booking) {
+            return $booking->booking_status === 'completed';
+        });
     $cancellationStatus = $existingCancellation->cancellation_status ?? null;
     $actorType = $cancellationPolicy['actor_type'] ?? 'customer';
     $statusClass = 'status-secondary';
@@ -386,7 +396,118 @@
 
         </div>
     </div>
-    @if(!auth()->user()->hasRole('Darshan Verification Officer'))
+    {{-- Ticket OTP Verification --}}
+    <div class="card mt-4">
+
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5>
+                <i class="fas fa-shield-alt"></i>
+                Ticket OTP Verification
+            </h5>
+
+            @if($isTicketCompleted)
+                <span class="badge status-success">Completed</span>
+            @else
+                <span class="badge status-pending">Pending Verification</span>
+            @endif
+        </div>
+
+        <div class="card-body">
+
+            @can('ticket-otp.show')
+                <div class="booking-alert booking-alert-info mb-3">
+                    <span class="detail-label">Ticket OTP</span>
+                    <h4 class="mb-0">
+                        {{ $firstBooking->ticket_otp ?? 'N/A' }}
+                    </h4>
+                </div>
+            @endcan
+
+            <div class="row">
+
+                <div class="col-md-6 mb-3">
+                    <span class="detail-label">Booking Reference</span>
+                    <div class="detail-value">
+                        {{ $firstBooking->booking_reference ?? 'N/A' }}
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <span class="detail-label">Payment Status</span>
+                    <div class="detail-value">
+                        {{ ucfirst($firstBooking->payment_status ?? 'N/A') }}
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <span class="detail-label">Booking Status</span>
+                    <div class="detail-value">
+                        {{ ucfirst($firstBooking->booking_status ?? 'N/A') }}
+                    </div>
+                </div>
+
+                @if($isTicketCompleted)
+
+                    <div class="col-md-6 mb-3">
+                        <span class="detail-label">Completed At</span>
+                        <div class="detail-value">
+                            {{ $firstBooking->completed_at
+                                ? \Carbon\Carbon::parse($firstBooking->completed_at)->format('d-m-Y h:i A')
+                                : 'N/A' }}
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <span class="detail-label">OTP Verified At</span>
+                        <div class="detail-value">
+                            {{ $firstBooking->ticket_otp_verified_at
+                                ? \Carbon\Carbon::parse($firstBooking->ticket_otp_verified_at)->format('d-m-Y h:i A')
+                                : 'N/A' }}
+                        </div>
+                    </div>
+
+                @endif
+
+            </div>
+
+            <hr>
+
+            @if($isTicketCompleted)
+
+                <div class="booking-alert booking-alert-success">
+                    <i class="fas fa-check-circle"></i>
+                    Ticket booking successfully completed after OTP verification.
+                </div>
+
+            @elseif($canCompleteTicket)
+
+                @can('complete-tickit-booking')
+                    <p class="text-muted">
+                        Customer must provide the six-digit OTP received
+                        in their ticket booking confirmation email.
+                    </p>
+
+                    <button type="button"
+                        class="btn btn-success"
+                        id="markTicketCompleted">
+                        <i class="fas fa-check-circle"></i>
+                        Mark as Completed
+                    </button>
+                @endcan
+
+            @else
+
+                <div class="booking-alert booking-alert-danger">
+                    Booking must be confirmed and payment must be paid
+                    before completion.
+                </div>
+
+            @endif
+
+        </div>
+    </div>
+
+    @if(!auth()->user()->hasRole('Darshan Verification Officer')  && !$isTicketCompleted)
         {{-- Ticket Cancellation --}}
         <div class="card">
 
@@ -1103,6 +1224,76 @@
     });
 
 </script>
+
+
+@push('scripts')
+<script>
+    $(document).ready(function () {
+
+        $('#markTicketCompleted').on('click', function () {
+
+            Swal.fire({
+                title: 'Ticket OTP Verification',
+                text: 'Enter the six-digit OTP received by the customer.',
+                icon: 'question',
+                input: 'text',
+                inputPlaceholder: 'Enter 6 Digit OTP',
+
+                inputAttributes: {
+                    maxlength: 6,
+                    minlength: 6,
+                    autocomplete: 'one-time-code',
+                    inputmode: 'numeric'
+                },
+
+                showCancelButton: true,
+                confirmButtonText: 'Verify & Complete',
+                cancelButtonText: 'Cancel',
+                confirmButtonColor: '#28a745',
+
+                inputValidator: (value) => {
+                    if (!value) {
+                        return 'Please enter OTP.';
+                    }
+
+                    if (!/^[0-9]{6}$/.test(value)) {
+                        return 'Please enter a valid 6-digit OTP.';
+                    }
+                }
+
+            }).then((result) => {
+
+                if (result.isConfirmed) {
+
+                    let form = $('<form>', {
+                        method: 'POST',
+                        action: @json(route(
+                            'admin.my-tickit-booking.complete',
+                            ['orderId' => $firstBooking->razorpay_order_id]
+                        ))
+                    });
+
+                    form.append($('<input>', {
+                        type: 'hidden',
+                        name: '_token',
+                        value: @json(csrf_token())
+                    }));
+
+                    form.append($('<input>', {
+                        type: 'hidden',
+                        name: 'otp',
+                        value: result.value
+                    }));
+
+                    $('body').append(form);
+                    form.submit();
+                }
+            });
+        });
+    });
+</script>
+@endpush
+
 
 @else
 
