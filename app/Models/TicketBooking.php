@@ -27,6 +27,7 @@ class TicketBooking extends Model
         'ticket_otp',
         'ticket_otp_verified_by',
         'ticket_otp_verified_at',
+        'not_reached_notified_at',
     ];
 
     protected function casts(): array
@@ -36,6 +37,7 @@ class TicketBooking extends Model
             'booking_time' => 'string',
             'price' => 'decimal:2',
             'ticket_otp_verified_at' => 'datetime',
+            'not_reached_notified_at' => 'datetime',
         ];
     }
 
