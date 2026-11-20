@@ -945,6 +945,14 @@
                                     </a>
                                 </li>
                                 @endcan
+                                @can('all-tickit-booking.index')
+                                <li class="{{ request()->routeIs('admin.my-tickit-booking.completed') ? 'active' : '' }}">
+                                    <a href="{{ route('admin.my-tickit-booking.completed') }}">
+                                        <i data-feather="check-circle"></i>
+                                        <span>Completed</span>
+                                    </a>
+                                </li>
+                                @endcan
 
                                 @can('all-tickit-booking-history.index')
                                 <li class="{{ request()->routeIs('admin.tickit-booking-history*') ? 'active' : '' }}">

@@ -268,6 +268,7 @@ class PermissionSeeder extends Seeder
             'darshan-verification-officers.update',
             'darshan-verification-officers.delete',
             'puja_completed-otp.show',
+            'ticket-otp.show',
         ];
         foreach ($permissions as $permission) {
             Permission::firstOrCreate([
