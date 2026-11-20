@@ -13,6 +13,9 @@ use Illuminate\Support\Str;
 use Razorpay\Api\Api;
 use Throwable;
 use DomainException;
+use App\Mail\TicketBookingConfirmedMail;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 
 class RazorpayTicketController extends Controller
 {
@@ -224,16 +227,7 @@ class RazorpayTicketController extends Controller
                     );
                 }
 
-                // Never create a confirmed booking with a missing visit time.
-                foreach ($cartItems as $cartItem) {
-                    if (blank($cartItem->booking_time)) {
-                        throw new DomainException(
-                            'A visit time is missing from your cart. The payment was captured, but the booking was not saved. Contact support.'
-                        );
-                    }
-                }
-
-                // Validate the original order amount against the complete cart.
+                // Verify original member count.
                 if ($cartItems->count() !== $expectedMembers) {
                     throw new DomainException(
                         'The active cart member count differs from the original payment order. Contact support before retrying.'
@@ -272,17 +266,13 @@ class RazorpayTicketController extends Controller
                             return
                                 (int) $booking->temple_id === (int) $item->temple_id &&
                                 (string) $booking->booking_date === (string) $item->booking_date &&
-                                (
-                                    blank($booking->booking_time) ||
-                                    $this->normalizeBookingTime($booking->booking_time) ===
-                                        $this->normalizeBookingTime($item->booking_time)
-                                ) &&
+                                (string) ($booking->booking_time ?? '') === (string) ($item->booking_time ?? '') &&
                                 trim((string) $booking->member_name) === trim((string) $item->member_name) &&
                                 (string) $booking->aadhaar_number === (string) $item->aadhaar_number &&
-                                strtolower(trim((string) $booking->ticket_type)) ===
-                                    strtolower(trim((string) $item->ticket_type)) &&
-                                strtolower(trim((string) $booking->type)) ===
-                                    strtolower(trim((string) $item->type)) &&
+                                strtolower(trim($booking->ticket_type)) ===
+                                    strtolower(trim($item->ticket_type)) &&
+                                strtolower(trim($booking->type)) ===
+                                    strtolower(trim($item->type)) &&
                                 (int) $booking->age === (int) $item->age &&
                                 (int) $booking->ticket_price_id === (int) $item->ticket_price_id &&
                                 (int) round((float) $booking->price * 100) ===
@@ -291,12 +281,6 @@ class RazorpayTicketController extends Controller
                     );
 
                     if ($matched) {
-                        // Recover an older partial booking whose visit time was not saved.
-                        if (blank($matched->booking_time)) {
-                            $matched->booking_time = $this->normalizeBookingTime($item->booking_time);
-                            $matched->save();
-                        }
-
                         $matchedBookingIds[] = $matched->id;
                     } else {
                         $missingItems[] = $item;
@@ -327,12 +311,13 @@ class RazorpayTicketController extends Controller
                     ?? ('TKT-' . strtoupper(Str::random(12)));
 
                 foreach ($missingItems as $item) {
-                    $booking = TicketBooking::create([
+
+                    TicketBooking::create([
                         'booking_reference' => $bookingReference,
                         'user_id' => auth()->id(),
                         'temple_id' => $item->temple_id,
                         'booking_date' => $item->booking_date,
-                        'booking_time' => $this->normalizeBookingTime($item->booking_time),
+                        'booking_time' => $item->booking_time,
                         'member_name' => $item->member_name,
                         'aadhaar_number' => $item->aadhaar_number,
                         'aadhaar_photo' => $item->aadhaar_photo,
@@ -346,18 +331,136 @@ class RazorpayTicketController extends Controller
                         'payment_status' => 'paid',
                         'booking_status' => 'confirmed',
                     ]);
-
-                    if (blank($booking->booking_time)) {
-                        throw new DomainException(
-                            'The visit time could not be saved to the booking. Contact support for payment reconciliation.'
-                        );
-                    }
                 }
 
-                // Remove cart rows only after every missing member is saved.
-                TicketCart::whereIn('id', $cartItems->pluck('id'))->delete();
+                // Remove cart rows only after all bookings are saved.
+                TicketCart::whereIn(
+                    'id',
+                    $cartItems->pluck('id')
+                )->delete();
+
             }, 3);
 
+            /*
+            |--------------------------------------------------------------------------
+            | 5. Generate and Save Ticket OTP
+            |--------------------------------------------------------------------------
+            */
+
+            $otpResult = DB::transaction(function () use ($validated, $expectedMembers) {
+
+                $bookings = TicketBooking::where(
+                    'razorpay_order_id',
+                    $validated['razorpay_order_id']
+                )
+                    ->where('user_id', auth()->id())
+                    ->where('booking_status', 'confirmed')
+                    ->lockForUpdate()
+                    ->get();
+
+                if ($bookings->count() !== $expectedMembers) {
+                    throw new DomainException(
+                        'All confirmed ticket members could not be found. Contact support.'
+                    );
+                }
+
+                // Reuse existing OTP when verification is retried.
+                $existingOtp = $bookings->first(
+                    fn ($booking) => !empty($booking->ticket_otp)
+                );
+
+                if ($existingOtp) {
+
+                    // Ensure all members have the same OTP.
+                    foreach ($bookings as $booking) {
+
+                        if ($booking->ticket_otp !== $existingOtp->ticket_otp) {
+                            throw new DomainException(
+                                'Ticket OTP records do not match. Contact support.'
+                            );
+                        }
+                    }
+
+                    return [
+                        'otp' => $existingOtp->ticket_otp,
+                        'booking_reference' => $bookings->first()->booking_reference,
+                        'should_send_email' => false,
+                    ];
+                }
+
+                // Generate new six-digit OTP.
+                $ticketOtp = (string) random_int(100000, 999999);
+
+                // Save same OTP for every member.
+                TicketBooking::where(
+                    'razorpay_order_id',
+                    $validated['razorpay_order_id']
+                )
+                    ->where('user_id', auth()->id())
+                    ->where('booking_status', 'confirmed')
+                    ->update([
+                        'ticket_otp' => $ticketOtp,
+                    ]);
+
+                return [
+                    'otp' => $ticketOtp,
+                    'booking_reference' => $bookings->first()->booking_reference,
+                    'should_send_email' => true,
+                ];
+
+            }, 3);
+
+            /*
+            |--------------------------------------------------------------------------
+            | 6. Send Ticket Confirmation Email
+            |--------------------------------------------------------------------------
+            */
+
+            if ($otpResult['should_send_email']) {
+
+                try {
+
+                    $customer = auth()->user();
+
+                    if ($customer && $customer->email) {
+
+                        $confirmedBookings = TicketBooking::with('temple')
+                            ->where(
+                                'razorpay_order_id',
+                                $validated['razorpay_order_id']
+                            )
+                            ->where('user_id', auth()->id())
+                            ->where('booking_status', 'confirmed')
+                            ->get();
+
+                        Mail::to($customer->email)->send(
+                            new TicketBookingConfirmedMail(
+                                $confirmedBookings,
+                                $otpResult['otp'],
+                                $otpResult['booking_reference']
+                            )
+                        );
+
+                    } else {
+
+                        Log::warning('Ticket confirmation email skipped: customer email missing.', [
+                            'order_id' => $validated['razorpay_order_id'],
+                            'user_id' => auth()->id(),
+                        ]);
+                    }
+
+                } catch (Throwable $mailException) {
+
+                    // Email failure must not cancel confirmed tickets.
+                    Log::error('Ticket booking confirmation email failed.', [
+                        'order_id' => $validated['razorpay_order_id'],
+                        'user_id' => auth()->id(),
+                        'error' => $mailException->getMessage(),
+                    ]);
+                }
+            }
+
+            // 7. Clear payment session.
             session()->forget([
                 'ticket_payment_order_id',
                 'ticket_payment_user_id',
@@ -365,7 +468,7 @@ class RazorpayTicketController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Payment verified. All ticket members have been booked.',
+                'message' => 'Payment verified. All tickets have been booked successfully. Ticket OTP has been generated.',
                 'redirect_url' => route('frontend.ticket-booking.success'),
             ]);
         } catch (DomainException $e) {
@@ -384,6 +487,7 @@ class RazorpayTicketController extends Controller
                     ? 'Payment is captured, but booking could not be completed. Contact support before retrying.'
                     : 'Payment verification failed. Please check your payment status.',
                 'payment_captured' => $paymentCaptured,
+                'refund_required' => $paymentCaptured,
             ], 500);
         }
     }
@@ -501,18 +605,10 @@ class RazorpayTicketController extends Controller
                 'Payment was not completed. Your cart is still available.'
             );
     }
-
+    
     public function success()
     {
-        $bookings = TicketBooking::with('temple')
-            ->where('user_id', auth()->id())
-            ->where('booking_status', 'confirmed')
-            ->latest()
-            ->get();
-
-        return view(
-            'frontend.ticket-booking.success',
-            compact('bookings')
-        );
+        $user = auth()->user();
+        return view('frontend.ticket-booking.success', compact('user'));
     }
 }
