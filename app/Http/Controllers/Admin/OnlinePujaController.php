@@ -77,7 +77,7 @@ class OnlinePujaController extends Controller
         $onlinePujas = OnlinePuja::with(['category', 'creator'])
             ->where('status', 2)
             ->latest()
-            ->paginate(10);
+            ->get();
         return view('admin.online-pujas.completed', compact('onlinePujas'));
     }
     public function create()

@@ -44,7 +44,7 @@ class TicketPriceController extends Controller
             ->where('temple_id', $temple->id)
             ->where('created_by', auth()->id())
             ->latest()
-            ->paginate(10);
+            ->get();
 
         return view('admin.ticket-prices.index', compact('ticketPrices'));
     }

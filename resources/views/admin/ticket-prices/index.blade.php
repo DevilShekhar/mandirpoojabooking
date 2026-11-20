@@ -1,4 +1,5 @@
 @extends('admin.layouts.app')
+@section('title', 'Ticket Price Management')
 @section('content')
 @can('ticket-prices.index')
 <div class="container-fluid">
@@ -18,10 +19,7 @@
                     @if (session('success'))
                         <div class="alert alert-success alert-dismissible fade show">
                             {{ session('success') }}
-                            <button type="button"
-                                    class="close"
-                                    data-dismiss="alert"
-                                    aria-label="Close">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
@@ -29,19 +27,16 @@
                     @if (session('error'))
                         <div class="alert alert-danger alert-dismissible fade show">
                             {{ session('error') }}
-                            <button type="button"
-                                    class="close"
-                                    data-dismiss="alert"
-                                    aria-label="Close">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
                     @endif
                     <div class="table-responsive">
-                        <table class="table table-bordered table-striped table-hover">
+                        <table class="table table-striped" id="table-1">
                             <thead>
                                 <tr>
-                                    <th>#</th>
+                                    <th class="text-center">#</th>
                                     <th>Temple</th>
                                     <th>Ticket Type</th>
                                     <th>Visitor Category</th>
@@ -51,14 +46,14 @@
                                     <th>Created By</th>
                                     <th>Updated By</th>
                                     <th>Status</th>
-                                    <th width="160">Action</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse ($ticketPrices as $ticketPrice)
                                     <tr>
-                                        <td>
-                                            {{ $ticketPrices->firstItem() + $loop->index }}
+                                        <td class="text-center">
+                                            {{ $loop->iteration }}
                                         </td>
                                         <td>
                                             {{ $ticketPrice->temple->name ?? 'N/A' }}
@@ -79,20 +74,20 @@
                                             @endif
                                         </td>
                                         <td>
-                                            {{ $ticketPrice->type }}
+                                            {{ $ticketPrice->type ?? 'N/A' }}
                                         </td>
                                         <td>
                                             {{ $ticketPrice->min_age }} years
                                         </td>
                                         <td>
-                                            @if ($ticketPrice->max_age !== null)
-                                                {{ $ticketPrice->max_age }} years
-                                            @else
-                                                No limit
-                                            @endif
+                                            {{ $ticketPrice->max_age !== null
+                                                ? $ticketPrice->max_age . ' years'
+                                                : 'No limit' }}
                                         </td>
                                         <td>
-                                            ₹{{ number_format((float) $ticketPrice->price, 2) }}
+                                            <strong>
+                                                ₹{{ number_format((float) $ticketPrice->price, 2) }}
+                                            </strong>
                                         </td>
                                         <td>
                                             {{ $ticketPrice->creator->name ?? 'N/A' }}
@@ -113,7 +108,6 @@
                                         </td>
                                         <td>
                                             <div class="d-flex">
-
                                                 @can('ticket-prices.view')
                                                     <a href="{{ route('ticket-prices.show', $ticketPrice->id) }}"
                                                        class="btn btn-info btn-sm mr-1"
@@ -122,21 +116,15 @@
                                                     </a>
                                                 @endcan
                                                 @can('ticket-prices.edit')
-                                                    <a href="{{ route('ticket-prices.edit', $ticketPrice->id) }}"
-                                                       class="btn btn-warning btn-sm mr-1"
-                                                       title="Edit">
+                                                    <a href="{{ route('ticket-prices.edit', $ticketPrice->id) }}" class="btn btn-warning btn-sm mr-1" title="Edit">
                                                         <i class="fas fa-edit"></i>
                                                     </a>
                                                 @endcan
                                                 @can('ticket-prices.delete')
-                                                    <form action="{{ route('ticket-prices.destroy', $ticketPrice->id) }}"
-                                                          method="POST"
-                                                          class="delete-form d-inline">
+                                                    <form action="{{ route('ticket-prices.destroy', $ticketPrice->id) }}" method="POST" class="delete-form d-inline">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="submit"
-                                                                class="btn btn-danger btn-sm"
-                                                                title="Delete">
+                                                        <button type="submit" class="btn btn-danger btn-sm"  title="Delete">
                                                             <i class="fas fa-trash"></i>
                                                         </button>
                                                     </form>
@@ -146,7 +134,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="13" class="text-center">
+                                        <td colspan="11" class="text-center">
                                             No ticket prices found.
                                         </td>
                                     </tr>
@@ -154,26 +142,43 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="d-flex justify-content-end mt-3">
-                        {{ $ticketPrices->links() }}
-                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+@else
+    @php
+        abort(403);
+    @endphp
+@endcan
+@endsection
+@push('scripts')
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        document.querySelectorAll('.delete-form').forEach(function (form) {
-            form.addEventListener('submit', function (event) {
-                if (!confirm('Are you sure you want to delete this ticket price?')) {
-                    event.preventDefault();
+    $(document).ready(function () {
+        $('#table-1').DataTable({
+            ordering: true,
+            searching: true,
+            paging: true,
+            info: true,
+            pageLength: 10,
+            lengthMenu: [
+                [10, 25, 50, 100, -1],
+                [10, 25, 50, 100, 'All']
+            ],
+            columnDefs: [
+                {
+                    orderable: false,
+                    targets: [0, 10]
                 }
-            });
+            ],
+            order: [[1, 'asc']]
+        });
+        $('.delete-form').on('submit', function (event) {
+            if (!confirm('Are you sure you want to delete this ticket price?')) {
+                event.preventDefault();
+            }
         });
     });
 </script>
-@else
-    @php abort(403); @endphp
-@endcan
-@endsection
+@endpush

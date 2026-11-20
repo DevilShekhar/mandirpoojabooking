@@ -45,7 +45,7 @@ class TempleDailyTicketLimitController extends Controller
         ])
             ->whereIn('temple_id', $templeIds)
             ->latest()
-            ->paginate(15);
+            ->get();
 
         return view('admin.temple-daily-ticket-limits.index', compact('limits'));
     }
