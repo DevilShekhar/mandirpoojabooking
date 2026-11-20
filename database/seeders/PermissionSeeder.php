@@ -270,6 +270,7 @@ class PermissionSeeder extends Seeder
             'puja_completed-otp.show',
             'ticket-otp.show',
             'all-tickit-not-reached.index',
+            'puja-bookings-order-not-reached.index',
         ];
         foreach ($permissions as $permission) {
             Permission::firstOrCreate([

@@ -41,6 +41,7 @@ class PujaBooking extends Model
         'updated_by',
         'completed_by',
         'completed_at',
+        'otp_reminder_sent_at',
     ];
 
     protected $casts = [
@@ -58,6 +59,7 @@ class PujaBooking extends Model
         'samgri_otp'        => 'string',
         'puja_completed_otp' => 'string',
         'puja_completed_otp_at' => 'datetime',
+        'otp_reminder_sent_at' => 'datetime',
     ];
 
     public function user()

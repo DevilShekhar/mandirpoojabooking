@@ -14,3 +14,8 @@ Schedule::command('ticket-bookings:mark-not-reached')
     ->dailyAt('01:00')
     ->timezone('Asia/Kolkata')
     ->withoutOverlapping();
+// Automatically send Mandir Puja OTP reminder emails
+Schedule::command('mandir-puja:not-reached')
+    ->dailyAt('01:00')
+    ->timezone('Asia/Kolkata')
+    ->withoutOverlapping();

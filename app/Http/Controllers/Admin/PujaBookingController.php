@@ -490,4 +490,13 @@ class PujaBookingController extends Controller
             ->get();
         return view('admin.booking-puja-order.completed',compact('bookings'));
     }
+    public function notReached(Request $request)
+    {
+        $user = Auth::user();
+        if (!$user) {
+            abort(403, 'You are not authorized to view these bookings.');
+        }
+        $pujaBookings = PujaBooking::with(['temple', 'user'])->where('booking_status', 'not_reached')->latest()->get();
+        return view('admin.booking-puja-order.not-reached', compact('pujaBookings'));
+    }
 }

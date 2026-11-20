@@ -565,6 +565,13 @@
                                             Completed
                                         </a>
                                     </li>
+                                    @can('puja-bookings-order-not-reached.index')
+                                        <li class="{{ request()->routeIs('booking-puja-order.not-reached') ? 'active' : '' }}">
+                                            <a class="nav-link" href="{{ route('booking-puja-order.not-reached') }}">
+                                                Not Reached
+                                            </a>
+                                        </li>
+                                    @endcan
                                 </ul>
                             </li>
                         @endcan                           

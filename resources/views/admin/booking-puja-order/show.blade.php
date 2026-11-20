@@ -117,7 +117,7 @@
             </button>
         </div>
     @endif
-    @if($canCancelByRole || $cancellationRequest)
+    @if($bookingStatus !== 'not_reached' && ($canCancelByRole || $cancellationRequest))
         <div class="card mb-4 puja-cancellation-card mt-4">
             <div class="card-header">
                 <h5 class="mb-0">Booking Cancellation</h5>
@@ -245,7 +245,7 @@
             </div>
         </div>
     @endif
-    <div class="card mb-4 puja-booking-card">
+    <div class="card mb-4 puja-booking-card mt-2">
         <div class="card-header">
             <h5 class="mb-0">Booking Information</h5>
         </div>
@@ -559,6 +559,7 @@
             @endif
         </div>
     </div>
+    @if($pujaBooking->booking_status !== 'not_reached')
     <div class="row">
         <div class="col-lg-12">
             <div class="card puja-completion-card mb-4">
@@ -796,6 +797,7 @@
             </div>
         </div>
     </div>
+    @endif
     <div class="card mb-4 puja-pandit-card">
         <div class="card-header">
             <h5 class="mb-0">Assigned Pandit Details</h5>
