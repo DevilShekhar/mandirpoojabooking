@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Console\Commands;
 
 use App\Mail\MandirPujaNotReached;
@@ -11,14 +12,20 @@ use Throwable;
 class SendMandirPujaNotReached extends Command
 {
     protected $signature = 'mandir-puja:not-reached';
+
     protected $description = 'Send not reached emails and update Mandir Puja booking status';
+
     public function handle()
     {
         $this->info('Starting Mandir Puja Not Reached process...');
+
+        // Only yesterday's puja bookings
+        $yesterday = now()->subDay()->toDateString();
+
         $bookings = PujaBooking::with(['puja', 'temple'])
             ->where('booking_status', 'confirmed')
             ->whereNull('otp_reminder_sent_at')
-            ->where('created_at', '<=', now()->subDay())
+            ->whereDate('schedule_date', $yesterday)
             ->where(function ($query) {
                 $query->whereNull('samgri_otp')
                     ->orWhere('samgri_otp', '')
@@ -26,41 +33,65 @@ class SendMandirPujaNotReached extends Command
                     ->orWhere('puja_completed_otp', '');
             })
             ->get();
+
         if ($bookings->isEmpty()) {
-            $this->info('No eligible Mandir Puja bookings found.');
+            $this->info("No eligible bookings found for {$yesterday}.");
+
             return self::SUCCESS;
         }
+
         $sentCount = 0;
         $skippedCount = 0;
         $failedCount = 0;
+
         foreach ($bookings as $booking) {
+
             if (empty($booking->customer_email)) {
                 $this->warn(
                     "Email missing for booking: {$booking->booking_number}"
                 );
+
                 Log::warning('Mandir Puja Not Reached email skipped: customer email missing.', [
                     'booking_id' => $booking->id,
                     'booking_number' => $booking->booking_number,
                 ]);
+
                 $skippedCount++;
                 continue;
             }
+
             try {
-                Mail::to($booking->customer_email)->send(new MandirPujaNotReached($booking));
-                // Update status only after successful email sending.
+
+                // Send email first
+                Mail::to($booking->customer_email)
+                    ->send(new MandirPujaNotReached($booking));
+
+                // Update booking only after successful email
                 $booking->booking_status = 'not_reached';
                 $booking->otp_reminder_sent_at = now();
                 $booking->save();
+
                 $sentCount++;
-                $this->info("Not Reached email sent: {$booking->booking_number}");
+
+                $this->info(
+                    "Not Reached email sent: {$booking->booking_number}"
+                );
+
                 Log::info('Mandir Puja Not Reached email sent successfully.', [
                     'booking_id' => $booking->id,
                     'booking_number' => $booking->booking_number,
                     'customer_email' => $booking->customer_email,
+                    'schedule_date' => $booking->schedule_date,
                 ]);
+
             } catch (Throwable $e) {
+
                 $failedCount++;
-                $this->error("Failed for booking {$booking->booking_number}: {$e->getMessage()}");
+
+                $this->error(
+                    "Failed for booking {$booking->booking_number}: {$e->getMessage()}"
+                );
+
                 Log::error('Mandir Puja Not Reached email failed.', [
                     'booking_id' => $booking->id,
                     'booking_number' => $booking->booking_number,
@@ -69,11 +100,15 @@ class SendMandirPujaNotReached extends Command
                 ]);
             }
         }
+
         $this->newLine();
+
         $this->info('Mandir Puja Not Reached process completed.');
+        $this->info("Puja Date Checked: {$yesterday}");
         $this->info("Emails sent: {$sentCount}");
         $this->info("Skipped: {$skippedCount}");
         $this->info("Failed: {$failedCount}");
+
         return self::SUCCESS;
     }
 }
