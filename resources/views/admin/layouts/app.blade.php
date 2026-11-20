@@ -953,6 +953,14 @@
                                     </a>
                                 </li>
                                 @endcan
+                                @can('all-tickit-not-reached.index')
+                                <li class="{{ request()->routeIs('admin.my-tickit-booking.not-reached') ? 'active' : '' }}">
+                                    <a class="nav-link" href="{{ route('admin.my-tickit-booking.not-reached') }}">
+                                        <i data-feather="alert-circle"></i>
+                                        <span>Not Reached</span>
+                                    </a>
+                                </li>
+                                @endcan
 
                                 @can('all-tickit-booking-history.index')
                                 <li class="{{ request()->routeIs('admin.tickit-booking-history*') ? 'active' : '' }}">

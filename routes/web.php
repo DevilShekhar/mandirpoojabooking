@@ -245,6 +245,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/my-tickit-booking', [TicketBookingHistoryController::class,'myBookings'])->name('admin.my-tickit-booking');
     Route::get('/my-tickit-booking/cancelled', [TicketBookingHistoryController::class,'cancelledBookings'])->name('admin.my-tickit-booking.cancelled');
     Route::get('/my-tickit-booking/completed', [TicketBookingHistoryController::class,'completedBookings'])->name('admin.my-tickit-booking.completed');
+    Route::get('/my-tickit-booking/not-reached', [TicketBookingHistoryController::class, 'notReachedBookings'])->name('admin.my-tickit-booking.not-reached');
     Route::get('/my-tickit-booking/{orderId}',[TicketBookingHistoryController::class, 'myBookingDetails'])->name('admin.my-tickit-booking.show');
     Route::post('/my-tickit-booking/{orderId}/complete',[TicketBookingHistoryController::class, 'complete'])->name('admin.my-tickit-booking.complete');
     // Temple Manager: Ticket Booking History

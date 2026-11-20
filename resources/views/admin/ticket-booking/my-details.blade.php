@@ -11,10 +11,12 @@
                 && $booking->payment_status === 'paid';
         });
 
-    $isTicketCompleted = $bookings->isNotEmpty()
-        && $bookings->every(function ($booking) {
-            return $booking->booking_status === 'completed';
-        });
+    $isTicketCompleted = $bookings->isNotEmpty() && $bookings->every(function ($booking) {
+        return $booking->booking_status === 'completed';
+    });
+    $isNotReached = $bookings->contains(function ($booking) {
+        return $booking->booking_status === 'not_reached';
+    });
     $cancellationStatus = $existingCancellation->cancellation_status ?? null;
     $actorType = $cancellationPolicy['actor_type'] ?? 'customer';
     $statusClass = 'status-secondary';
@@ -513,7 +515,7 @@
         </div>
     </div>
 
-    @if(!auth()->user()->hasRole('Darshan Verification Officer')  && !$isTicketCompleted)
+    @if(!auth()->user()->hasRole('Darshan Verification Officer') && !$isTicketCompleted && !$isNotReached)
         {{-- Ticket Cancellation --}}
         <div class="card">
 

@@ -269,6 +269,7 @@ class PermissionSeeder extends Seeder
             'darshan-verification-officers.delete',
             'puja_completed-otp.show',
             'ticket-otp.show',
+            'all-tickit-not-reached.index',
         ];
         foreach ($permissions as $permission) {
             Permission::firstOrCreate([
