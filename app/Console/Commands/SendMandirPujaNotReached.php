@@ -23,7 +23,7 @@ class SendMandirPujaNotReached extends Command
         $yesterday = now()->subDay()->toDateString();
 
         $bookings = PujaBooking::with(['puja', 'temple'])
-            ->where('booking_status', 'confirmed')
+            ->where('booking_status', 'Confirmed')
             ->whereNull('otp_reminder_sent_at')
             ->whereDate('schedule_date', $yesterday)
             ->where(function ($query) {
