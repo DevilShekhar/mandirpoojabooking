@@ -822,17 +822,13 @@
                                 </ul>
                             </li>
                         @endcanany
-                        {{-- Temples --}}
-                        @can('temples.view')
-                            <li class="dropdown {{ request()->routeIs('temples.*') ? 'active' : '' }}">
-
+                        @canany(['temples.view', 'temple-timing-categories.view'])
+                            <li class="dropdown {{ request()->routeIs('temples.*', 'temple-timing-categories.*') ? 'active' : '' }}">
                                 <a href="#" class="menu-toggle nav-link has-dropdown">
                                     <i data-feather="home"></i>
                                     <span>Temples</span>
                                 </a>
-
                                 <ul class="dropdown-menu">
-
                                     @can('temples.view')
                                         <li class="{{ request()->routeIs('temples.*') ? 'active' : '' }}">
                                             <a class="nav-link" href="{{ route('temples.index') }}">
@@ -840,12 +836,16 @@
                                             </a>
                                         </li>
                                     @endcan
-
+                                    @can('temple-timing-categories.view')
+                                        <li class="{{ request()->routeIs('temple-timing-categories.*') ? 'active' : '' }}">
+                                            <a class="nav-link" href="{{ route('temple-timing-categories.index') }}">
+                                                Timing Categories
+                                            </a>
+                                        </li>
+                                    @endcan
                                 </ul>
                             </li>
-                        @endcan
-
-
+                        @endcanany
                         {{-- Deities --}}
                         @canany(['deities.view','temple-deities.view'])
                             <li class="dropdown {{ request()->routeIs('deities.*', 'temple-deities.*') ? 'active' : '' }}">

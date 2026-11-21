@@ -271,6 +271,11 @@ class PermissionSeeder extends Seeder
             'ticket-otp.show',
             'all-tickit-not-reached.index',
             'puja-bookings-order-not-reached.index',
+            'temple-timing-categories.index',
+            'temple-timing-categories.create',
+            'temple-timing-categories.view',
+            'temple-timing-categories.delete',
+            'temple-timing-categories.edit',
         ];
         foreach ($permissions as $permission) {
             Permission::firstOrCreate([
