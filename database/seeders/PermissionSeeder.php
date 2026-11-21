@@ -276,6 +276,12 @@ class PermissionSeeder extends Seeder
             'temple-timing-categories.view',
             'temple-timing-categories.delete',
             'temple-timing-categories.edit',
+            'temple-timings.index',
+            'temple-timings.create',
+            'temple-timings.edit',
+            'temple-timings.delete',
+            'temple-timings.view',
+            'temple-timings.show',
         ];
         foreach ($permissions as $permission) {
             Permission::firstOrCreate([
