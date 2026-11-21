@@ -327,8 +327,7 @@
                         <!-- Header Logo Area End Here -->
                         <!-- Begin Header Middle Right Area -->
                         <div class="col-lg-9 pl-0 ml-sm-15 ml-xs-15 p-4">
-                            <form action="{{ route('frontend.puja') }}" method="GET" class="hm-searchbox"
-                                id="pujaSearchForm">
+                            <form action="{{ route('frontend.puja') }}" method="GET" class="hm-searchbox" id="pujaSearchForm">
                                <select name="temple_id" id="headerTempleSelect" class="nice-select select-search-category">
                                     <option value="">All Temples</option>
                                     @foreach($headerTemples as $temple)
@@ -351,40 +350,7 @@
                                 <button class="li-btn" type="submit">
                                     <i class="fa fa-search"></i>
                                 </button>
-                            </form>
-
-                            <div class="header-middle-right">
-                                <ul class="hm-menu">
-                                    <li class="hm-wishlist">
-                                        <a href="">
-                                            <span class="cart-item-count wishlist-item-count">0</span>
-                                            <i class="fa fa-heart-o"></i>
-                                        </a>
-                                    </li>
-                                    <li class="hm-minicart">
-                                        <div class="hm-minicart-trigger">
-                                            <span class="item-icon"></span>
-                                            <span class="item-text">
-                                                ₹<span id="minicart-header-total">0.00</span>
-                                                <span class="cart-item-count" id="minicart-count">0</span>
-                                            </span>
-                                        </div>
-                                        <span></span>
-                                        <div class="minicart">
-                                            <ul class="minicart-product-list" id="minicart-product-list"></ul>
-                                            <p class="minicart-total">
-                                                SUBTOTAL:
-                                                <span id="minicart-subtotal">₹0.00</span>
-                                            </p>
-                                            <div class="minicart-button">
-                                                <a href="" class="li-button li-button-fullwidth li-button-dark">View
-                                                    Full Cart</a>
-                                                <a href="" class="li-button li-button-fullwidth">Checkout</a>
-                                            </div>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
+                            </form>                            
                         </div>
                         <!-- Header Middle Right Area End Here -->
                     </div>
