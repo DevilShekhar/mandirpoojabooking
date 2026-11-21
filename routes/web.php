@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\StateController;
 use App\Http\Controllers\Admin\TempleController;
+use App\Http\Controllers\Admin\TempleTimingCategoryController;
 use App\Http\Controllers\Admin\PasswordController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\HomeBannerController;
@@ -198,6 +199,7 @@ Route::middleware('auth')->group(function () {
     Route::get('cities/get-districts/{state}',[CityController::class, 'getDistricts'])->name('cities.get-districts');
     //Temples
     Route::resource('temples', TempleController::class);
+    Route::resource('temple-timing-categories',TempleTimingCategoryController::class);
     Route::get('temples/get-districts/{state}',[TempleController::class, 'getDistricts'])->name('temples.get-districts');
     Route::get('temples/get-cities/{district}',[TempleController::class, 'getCities'])->name('temples.get-cities');
     //Deities
