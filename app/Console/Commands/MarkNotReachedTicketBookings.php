@@ -17,18 +17,27 @@ class MarkNotReachedTicketBookings extends Command
 
     public function handle()
     {
-        $yesterday = Carbon::yesterday('Asia/Kolkata')->toDateString();
+        $now = Carbon::now('Asia/Kolkata');
 
-        $this->info("Checking ticket bookings up to: {$yesterday}");
+        $this->info("Current India time: " . $now->toDateTimeString());
 
         $totalProcessed = 0;
         $totalMarked = 0;
         $totalFailed = 0;
 
         TicketBooking::with(['user', 'temple'])
-            ->whereDate('booking_date', '<=', $yesterday)
             ->where('payment_status', 'paid')
-            ->where('booking_status', 'confirmed')
+            ->whereRaw(
+                'TIMESTAMP(booking_date, booking_time) <= ?',
+                [$now->toDateTimeString()]
+            )
+            ->where(function ($query) {
+                $query->where('booking_status', 'confirmed')
+                    ->orWhere(function ($q) {
+                        $q->where('booking_status', 'not_reached')
+                            ->whereNull('not_reached_notified_at');
+                    });
+            })
             ->chunkById(100, function ($ticketBookings) use (
                 &$totalProcessed,
                 &$totalMarked,
@@ -37,22 +46,25 @@ class MarkNotReachedTicketBookings extends Command
                 foreach ($ticketBookings as $ticketBooking) {
                     try {
 
-                        // Update booking status first
-                        $ticketBooking->booking_status = 'not_reached';
-                        $ticketBooking->save();
+                        // Mark booking as not reached
+                        if ($ticketBooking->booking_status === 'confirmed') {
 
-                        $totalMarked++;
+                            $ticketBooking->booking_status = 'not_reached';
+                            $ticketBooking->save();
 
-                        $this->info(
-                            "Marked as not reached: {$ticketBooking->booking_reference}"
-                        );
+                            $totalMarked++;
 
-                        Log::info('Ticket booking marked as not reached', [
-                            'ticket_booking_id' => $ticketBooking->id,
-                            'booking_reference' => $ticketBooking->booking_reference,
-                        ]);
+                            Log::info('Ticket booking marked as not reached', [
+                                'ticket_booking_id' => $ticketBooking->id,
+                                'booking_reference' => $ticketBooking->booking_reference,
+                            ]);
 
-                        // Prevent duplicate notification
+                            $this->info(
+                                "Marked not reached: {$ticketBooking->booking_reference}"
+                            );
+                        }
+
+                        // Prevent duplicate emails
                         if ($ticketBooking->not_reached_notified_at) {
                             continue;
                         }
@@ -61,40 +73,41 @@ class MarkNotReachedTicketBookings extends Command
                         if (!$ticketBooking->user ||
                             empty($ticketBooking->user->email)) {
 
-                            Log::warning('Ticket booking notification skipped', [
+                            Log::warning('Ticket booking email unavailable', [
                                 'ticket_booking_id' => $ticketBooking->id,
-                                'reason' => 'Customer email not found',
                             ]);
 
                             continue;
                         }
 
-                        // Send notification
+                        // Send notification email
                         Mail::to($ticketBooking->user->email)
                             ->send(new NotReachedTicketBookingMail($ticketBooking));
 
                         // Update notification timestamp
-                        $ticketBooking->not_reached_notified_at = now('Asia/Kolkata');
+                        $ticketBooking->not_reached_notified_at =
+                            Carbon::now('Asia/Kolkata');
+
                         $ticketBooking->save();
 
                         $totalProcessed++;
 
                         $this->info(
-                            "Email sent successfully: {$ticketBooking->booking_reference}"
+                            "Email sent: {$ticketBooking->booking_reference}"
                         );
 
                     } catch (\Throwable $e) {
 
                         $totalFailed++;
 
-                        Log::error('Ticket booking not reached processing failed', [
+                        Log::error('Ticket booking not reached failed', [
                             'ticket_booking_id' => $ticketBooking->id,
                             'booking_reference' => $ticketBooking->booking_reference,
                             'error' => $e->getMessage(),
                         ]);
 
                         $this->error(
-                            "Failed booking ID: {$ticketBooking->id}"
+                            "Failed booking ID: {$ticketBooking->id} - {$e->getMessage()}"
                         );
                     }
                 }
@@ -102,7 +115,7 @@ class MarkNotReachedTicketBookings extends Command
 
         $this->newLine();
 
-        $this->info("Total ticket bookings marked: {$totalMarked}");
+        $this->info("Total bookings marked: {$totalMarked}");
         $this->info("Total emails sent: {$totalProcessed}");
         $this->info("Total failed: {$totalFailed}");
 
