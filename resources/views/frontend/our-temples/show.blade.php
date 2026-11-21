@@ -18,7 +18,6 @@
     color: var(--temple-text);
     overflow: hidden;
 }
-
 .temple-hero {
     position: relative;
     min-height: 510px;
@@ -28,7 +27,6 @@
     background-size: cover;
     background-repeat: no-repeat;
 }
-
 .temple-hero::before {
     content: "";
     position: absolute;
@@ -43,7 +41,6 @@
             rgba(20, 9, 5, .45),
             transparent 60%);
 }
-
 .temple-hero::after {
     content: "";
     position: absolute;
@@ -64,14 +61,12 @@
             transparent 98px);
     pointer-events: none;
 }
-
 .temple-hero-content {
     position: relative;
     z-index: 2;
     width: 100%;
     padding: 80px 0 90px;
 }
-
 .temple-om-symbol {
     color: #f2bd5d;
     font-family: Georgia, "Times New Roman", serif;
@@ -79,7 +74,6 @@
     line-height: 1;
     margin-bottom: 12px;
 }
-
 .temple-hero-eyebrow {
     display: flex;
     align-items: center;
@@ -91,14 +85,12 @@
     text-transform: uppercase;
     margin-bottom: 16px;
 }
-
 .temple-hero-eyebrow::before {
     content: "";
     width: 36px;
     height: 1px;
     background: #e4ad4d;
 }
-
 .temple-hero-title {
     max-width: 800px;
     color: #fff;
@@ -109,7 +101,6 @@
     font-weight: 700;
     margin: 0 0 18px;
 }
-
 .temple-hero-location {
     display: flex;
     align-items: center;
@@ -117,26 +108,22 @@
     color: rgba(255, 255, 255, .9);
     font-size: 15px;
 }
-
 .temple-hero-location i {
     color: #f1b94f;
     font-size: 18px;
 }
-
 .temple-main-section {
     position: relative;
     z-index: 5;
     margin-top: -35px;
     padding-bottom: 55px;
 }
-
 .temple-main-image-card {
     background: #fff;
     padding: 9px;
     border-radius: 17px;
     box-shadow: 0 20px 55px rgba(50, 29, 16, .12);
 }
-
 .temple-main-image {
     display: block;
     width: 100%;
@@ -144,7 +131,6 @@
     object-fit: cover;
     border-radius: 11px;
 }
-
 .temple-details-card {
     position: relative;
     height: 100%;
@@ -154,7 +140,6 @@
     box-shadow: 0 20px 55px rgba(50, 29, 16, .1);
     overflow: hidden;
 }
-
 .temple-details-card::after {
     content: "";
     position: absolute;
@@ -165,7 +150,6 @@
     border: 1px solid rgba(196, 124, 32, .16);
     border-radius: 50%;
 }
-
 .temple-details-card::before {
     content: "";
     position: absolute;
@@ -176,7 +160,6 @@
     border: 1px solid rgba(196, 124, 32, .1);
     border-radius: 50%;
 }
-
 .temple-details-header {
     position: relative;
     z-index: 2;
@@ -187,13 +170,11 @@
     padding-bottom: 17px;
     border-bottom: 1px solid var(--temple-border);
 }
-
 .temple-details-heading {
     display: flex;
     align-items: center;
     gap: 12px;
 }
-
 .temple-heading-icon {
     width: 45px;
     height: 45px;
@@ -206,7 +187,6 @@
     color: var(--temple-gold);
     font-size: 21px;
 }
-
 .temple-details-heading h2 {
     color: #25201c;
     font-family: Georgia, "Times New Roman", serif;
@@ -215,11 +195,9 @@
     margin: 0;
     font-weight: 700;
 }
-
 .temple-details-heading h2 span {
     color: var(--temple-red);
 }
-
 .temple-verified {
     display: inline-flex;
     align-items: center;
@@ -232,19 +210,16 @@
     font-weight: 700;
     white-space: nowrap;
 }
-
 .temple-detail-list {
     position: relative;
     z-index: 2;
 }
-
 .temple-detail-item {
     display: flex;
     gap: 14px;
     padding: 15px 0;
     border-bottom: 1px solid #eee7de;
 }
-
 .temple-detail-icon {
     width: 40px;
     height: 40px;
@@ -257,12 +232,10 @@
     color: var(--temple-gold);
     font-size: 15px;
 }
-
 .temple-detail-content {
     width: 100%;
     min-width: 0;
 }
-
 .temple-detail-label {
     display: block;
     color: #999089;
@@ -272,7 +245,6 @@
     text-transform: uppercase;
     margin-bottom: 4px;
 }
-
 .temple-detail-value {
     display: block;
     color: #2e2722;
@@ -280,20 +252,17 @@
     line-height: 1.55;
     font-weight: 500;
 }
-
 .temple-coordinate-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 10px;
 }
-
 .temple-coordinate {
     padding: 9px 11px;
     border: 1px solid #eee5d9;
     background: #faf8f4;
     border-radius: 8px;
 }
-
 .temple-coordinate small {
     display: block;
     color: #a29a92;
@@ -302,26 +271,21 @@
     letter-spacing: .7px;
     margin-bottom: 3px;
 }
-
 .temple-coordinate strong {
     display: block;
     color: #332923;
     font-size: 12px;
 }
-
 .temple-status-active {
     color: #198754;
 }
-
 .temple-status-inactive {
     color: #dc3545;
 }
-
 .temple-status-icon {
     font-size: 7px;
     vertical-align: middle;
 }
-
 .temple-map-button {
     position: relative;
     z-index: 3;
@@ -340,13 +304,11 @@
     font-weight: 700;
     transition: all .3s ease;
 }
-
 .temple-map-button:hover {
     color: #fff;
     background: var(--temple-dark-red);
     transform: translateY(-2px);
 }
-
 .temple-heritage-section {
     position: relative;
     overflow: hidden;
@@ -357,7 +319,6 @@
             #ae151c 60%,
             #8b0d13 100%);
 }
-
 .temple-heritage-section::before {
     content: "";
     position: absolute;
@@ -383,12 +344,10 @@
             #f4cf86 82px,
             transparent 83px);
 }
-
 .temple-heritage-content {
     position: relative;
     z-index: 2;
 }
-
 .temple-heritage-eyebrow {
     color: #f1c45e;
     font-size: 10px;
@@ -397,14 +356,12 @@
     text-transform: uppercase;
     margin-bottom: 7px;
 }
-
 .temple-heritage-title {
     color: #fff;
     font-family: Georgia, "Times New Roman", serif;
     font-size: 29px;
     margin: 0 0 6px;
 }
-
 .temple-heritage-text {
     max-width: 620px;
     color: rgba(255, 255, 255, .83);
@@ -412,27 +369,23 @@
     line-height: 1.7;
     margin: 0;
 }
-
 .temple-heritage-features {
     display: flex;
     justify-content: flex-end;
     height: 100%;
 }
-
 .temple-heritage-feature {
     min-width: 115px;
     padding: 3px 20px;
     text-align: center;
     border-left: 1px solid rgba(255, 255, 255, .2);
 }
-
 .temple-heritage-feature-icon {
     display: block;
     color: #f2c45f;
     font-size: 23px;
     margin-bottom: 7px;
 }
-
 .temple-heritage-feature-text {
     display: block;
     color: #fff;
@@ -440,19 +393,16 @@
     font-weight: 600;
     line-height: 1.35;
 }
-
 .temple-location-section {
     padding: 55px 0 65px;
     background: #fffdf9;
 }
-
 .temple-location-heading {
     display: flex;
     align-items: center;
     gap: 13px;
     margin-bottom: 18px;
 }
-
 .temple-location-heading-icon {
     width: 43px;
     height: 43px;
@@ -465,7 +415,6 @@
     color: var(--temple-gold);
     font-size: 20px;
 }
-
 .temple-location-heading h2 {
     color: #28211c;
     font-family: Georgia, "Times New Roman", serif;
@@ -473,13 +422,11 @@
     line-height: 1;
     margin: 0;
 }
-
 .temple-location-heading p {
     color: #91877f;
     font-size: 12px;
     margin: 5px 0 0;
 }
-
 .temple-map-wrapper {
     height: 340px;
     overflow: hidden;
@@ -487,13 +434,11 @@
     border-radius: 14px;
     box-shadow: 0 15px 45px rgba(47, 31, 20, .08);
 }
-
 .temple-map-wrapper iframe {
     width: 100%;
     height: 100%;
     border: 0;
 }
-
 .temple-no-map {
     height: 100%;
     display: flex;
@@ -502,37 +447,31 @@
     background: #faf7f2;
     text-align: center;
 }
-
 .temple-no-map-icon {
     color: var(--temple-gold);
     font-size: 35px;
     margin-bottom: 12px;
 }
-
 .temple-no-map h4 {
     color: #332923;
     margin-bottom: 5px;
 }
-
 .temple-no-map p {
     color: #91877f;
     font-size: 13px;
     margin: 0;
 }
-
 .temple-footer {
     padding: 28px 0;
     background: #fff;
     border-top: 1px solid #eee4d8;
 }
-
 .temple-footer-content {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 20px;
 }
-
 .temple-back-button {
     display: inline-flex;
     align-items: center;
@@ -547,18 +486,15 @@
     font-weight: 600;
     transition: all .3s ease;
 }
-
 .temple-back-button:hover {
     color: var(--temple-red);
     border-color: var(--temple-red);
 }
-
 .temple-created {
     display: flex;
     align-items: center;
     gap: 11px;
 }
-
 .temple-created-icon {
     width: 38px;
     height: 38px;
@@ -569,134 +505,106 @@
     background: #fff6e5;
     color: var(--temple-gold);
 }
-
 .temple-created-label {
     display: block;
     color: #968d85;
     font-size: 10px;
     margin-bottom: 2px;
 }
-
 .temple-created-date {
     display: block;
     color: #332923;
     font-size: 12px;
     font-weight: 700;
 }
-
 @media (max-width: 991px) {
     .temple-hero {
         min-height: 470px;
     }
-
     .temple-hero-content {
         padding: 70px 0 70px;
     }
-
     .temple-main-section {
         margin-top: -20px;
     }
-
     .temple-details-card {
         margin-top: 25px;
     }
-
     .temple-heritage-features {
         justify-content: flex-start;
         margin-top: 25px;
     }
-
     .temple-heritage-feature:first-child {
         padding-left: 0;
         border-left: 0;
     }
 }
-
 @media (max-width: 767px) {
     .temple-hero {
         min-height: 410px;
     }
-
     .temple-hero-content {
         padding: 60px 0 55px;
     }
-
     .temple-hero-title {
         font-size: 43px;
         letter-spacing: -1px;
     }
-
     .temple-hero-location {
         font-size: 13px;
     }
-
     .temple-main-image {
         height: 360px;
     }
-
     .temple-details-card {
         padding: 24px 20px;
     }
-
     .temple-details-header {
         align-items: flex-start;
         flex-direction: column;
     }
-
     .temple-details-heading h2 {
         font-size: 27px;
     }
-
     .temple-coordinate-grid {
         grid-template-columns: 1fr;
     }
-
     .temple-heritage-section {
         padding: 35px 0;
     }
-
     .temple-heritage-features {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         width: 100%;
     }
-
     .temple-heritage-feature {
         min-width: 0;
         padding: 5px 8px;
     }
-
     .temple-location-section {
         padding: 45px 0 50px;
     }
-
     .temple-map-wrapper {
         height: 290px;
     }
-
     .temple-footer-content {
         align-items: flex-start;
         flex-direction: column;
     }
 }
-
 @media (max-width: 480px) {
     .temple-hero-title {
         font-size: 37px;
     }
-
     .temple-main-image {
         height: 300px;
     }
-
     .temple-heritage-feature-icon {
         font-size: 19px;
     }
-
     .temple-heritage-feature-text {
         font-size: 9px;
     }
-
     .temple-location-heading h2 {
         font-size: 25px;
     }
@@ -706,7 +614,6 @@
     background: #fbf8f2;
     overflow: hidden;
 }
-
 .temple-puja-top {
     display: flex;
     align-items: flex-end;
@@ -1537,6 +1444,284 @@ body.ticket-modal-open {
         grid-template-columns: minmax(0, 1fr);
     }
 }
+
+.temple-timings-section {
+    background: #faf8f5;
+}
+
+.temple-timings-heading {
+    max-width: 650px;
+    margin: auto;
+}
+
+.temple-section-label {
+    display: inline-block;
+    background: #fff0e5;
+    color: #e87527;
+    padding: 8px 18px;
+    border-radius: 30px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.3px;
+}
+
+.temple-timings-heading h2 {
+    color: #29231e;
+    font-size: 34px;
+    font-weight: 800;
+}
+
+.temple-timings-heading p {
+    color: #817a73;
+    font-size: 15px;
+}
+
+.temple-heading-divider {
+    width: 60px;
+    height: 3px;
+    background: #ed792c;
+    margin: 18px auto 0;
+    border-radius: 10px;
+}
+
+/* Category Accordion */
+
+.temple-timing-accordion {
+    margin: 0 auto;
+}
+
+.temple-category-card {
+    background: #fff;
+    border: 1px solid #eee8e1;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    overflow: hidden;
+    box-shadow: 0 4px 18px rgba(40, 30, 20, .04);
+    transition: .25s ease;
+}
+
+.temple-category-card:hover {
+    border-color: #f1c9aa;
+    box-shadow: 0 8px 24px rgba(40, 30, 20, .07);
+}
+
+/* Clickable Header */
+
+.temple-category-toggle {
+    width: 100%;
+    border: 0;
+    outline: none !important;
+    background: #fff;
+    padding: 20px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: left;
+    cursor: pointer;
+    transition: .25s ease;
+}
+
+.temple-category-toggle:hover,
+.temple-category-toggle:not(.collapsed) {
+    background: #fff9f4;
+}
+
+.temple-category-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.temple-category-icon {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    border-radius: 12px;
+    background: #fff0e4;
+    color: #e87527;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+.temple-category-info strong {
+    display: block;
+    color: #302820;
+    font-size: 17px;
+    font-weight: 750;
+}
+
+.temple-category-info small {
+    display: block;
+    color: #96908a;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+.temple-category-arrow {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #fff0e5;
+    color: #e87527;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    transition: transform .3s ease;
+}
+
+.temple-category-toggle:not(.collapsed) .temple-category-arrow {
+    transform: rotate(180deg);
+}
+
+/* Expanded Records */
+
+.temple-category-content {
+    padding: 5px 24px 12px;
+    border-top: 1px solid #f1ebe5;
+}
+
+.temple-timing-record {
+    padding: 22px 0;
+    border-bottom: 1px solid #f0ece8;
+}
+
+.temple-timing-record:last-child {
+    border-bottom: 0;
+}
+
+.temple-record-heading {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+}
+
+.temple-record-dot {
+    width: 9px;
+    height: 9px;
+    min-width: 9px;
+    background: #ed792c;
+    border-radius: 50%;
+    box-shadow: 0 0 0 4px #fff0e5;
+}
+
+.temple-record-heading h5 {
+    color: #332c26;
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.temple-record-description {
+    color: #89827b;
+    font-size: 13px;
+    margin: 12px 0 14px 20px;
+    line-height: 1.6;
+}
+
+/* Opening and Closing Time */
+
+.temple-record-times {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.temple-record-time {
+    flex: 1;
+    background: #faf8f5;
+    border: 1px solid #f0ebe5;
+    border-radius: 9px;
+    padding: 13px 15px;
+}
+
+.temple-record-time span {
+    display: block;
+    color: #89827b;
+    font-size: 11px;
+    margin-bottom: 7px;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.temple-record-time span i {
+    color: #e87527;
+    margin-right: 5px;
+}
+
+.temple-record-time strong {
+    color: #302820;
+    font-size: 16px;
+    font-weight: 750;
+}
+
+/* Days */
+
+.temple-record-days {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 13px;
+    padding: 7px 12px;
+    background: #f2f7ef;
+    color: #587b4d;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* Mobile */
+
+@media (max-width: 576px) {
+    .temple-timings-heading h2 {
+        font-size: 27px;
+    }
+
+    .temple-category-toggle {
+        padding: 16px;
+    }
+
+    .temple-category-icon {
+        width: 42px;
+        height: 42px;
+        min-width: 42px;
+    }
+
+    .temple-category-info strong {
+        font-size: 15px;
+    }
+
+    .temple-category-content {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .temple-record-times {
+        gap: 8px;
+    }
+
+    .temple-record-time {
+        padding: 11px 9px;
+    }
+
+    .temple-record-time strong {
+        font-size: 14px;
+    }
+
+    .temple-record-time span {
+        font-size: 9px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .temple-category-arrow,
+    .temple-category-card,
+    .temple-category-toggle {
+        transition: none;
+    }
+}
 </style>
 
 <div class="temple-detail-page">
@@ -1659,65 +1844,56 @@ body.ticket-modal-open {
             </div>
         </div>
     </section>
-
-<div class="ticket-modal" id="ticketBookingModal" aria-hidden="true">
-    <div class="ticket-modal-backdrop" data-close-ticket-modal></div>
-    <div class="ticket-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="ticketBookingTitle">
-        <div class="ticket-modal-header">
-            <div>
-                <h2 id="ticketBookingTitle">Book Tickets</h2>
-                <p>{{ $temple->name }} · Add visitor details to continue</p>
-            </div>
-            <button type="button" class="ticket-modal-close" aria-label="Close popup" data-close-ticket-modal>&times;</button>
-        </div>
-        <form
-            id="ticketBookingForm"
-            action="{{ route('frontend.ticket-cart.store', $temple->id) }}"
-            method="POST"
-            enctype="multipart/form-data"
-        >
-            @csrf
-            <div class="ticket-modal-body">
-                <div class="ticket-booking-top-fields">
-                    <div class="ticket-field">
-                        <label for="bookingDate">Visit Date <span>*</span></label>
-                        <input type="date" id="bookingDate" name="booking_date" required>
-                        <p class="ticket-price-note" id="ticketAvailabilityMessage">
-                            Select a visit date and time to check daily ticket availability.
-                        </p>
-                    </div>
-
-                    <div class="ticket-field">
-                        <label for="bookingTime">Visit Time <span>*</span></label>
-                        <input type="time" id="bookingTime" name="booking_time" required>
-                        <p class="ticket-price-note">
-                            Select the time you plan to visit the temple.
-                        </p>
-                    </div>
-
-                    <input type="hidden" id="memberCount" name="member_count" value="1">
-                </div>
-                <div class="ticket-member-list" id="ticketMemberList"></div>
-                <div class="ticket-add-member-row">
-                    <span class="ticket-member-count-label"><strong id="ticketMemberCountDisplay">1</strong> member added</span>
-                    <button type="button" class="ticket-add-member-button" id="addTicketMember"><i class="fa fa-plus"></i> Add Member</button>
-                </div>
-                <div class="ticket-form-message" id="ticketFormMessage" role="status"></div>
-            </div>
-            <div class="ticket-modal-footer">
+    <div class="ticket-modal" id="ticketBookingModal" aria-hidden="true">
+        <div class="ticket-modal-backdrop" data-close-ticket-modal></div>
+        <div class="ticket-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="ticketBookingTitle">
+            <div class="ticket-modal-header">
                 <div>
-                    <span class="ticket-total-label">Estimated Total</span>
-                    <strong class="ticket-total-amount" id="ticketTotalAmount">₹0.00</strong>
+                    <h2 id="ticketBookingTitle">Book Tickets</h2>
+                    <p>{{ $temple->name }} · Add visitor details to continue</p>
                 </div>
-                <div class="ticket-modal-actions">
-                    <button type="button" class="ticket-cancel-button" data-close-ticket-modal>Cancel</button>
-                    <button type="submit" class="ticket-continue-button">Continue</button>
-                </div>
+                <button type="button" class="ticket-modal-close" aria-label="Close popup" data-close-ticket-modal>&times;</button>
             </div>
-        </form>
+            <form id="ticketBookingForm" action="{{ route('frontend.ticket-cart.store', $temple->id) }}"  method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="ticket-modal-body">
+                    <div class="ticket-booking-top-fields">
+                        <div class="ticket-field">
+                            <label for="bookingDate">Visit Date <span>*</span></label>
+                            <input type="date" id="bookingDate" name="booking_date" required>
+                            <p class="ticket-price-note" id="ticketAvailabilityMessage">
+                                Select a visit date and time to check daily ticket availability.
+                            </p>
+                        </div>
+                        <div class="ticket-field">
+                            <label for="bookingTime">Visit Time <span>*</span></label>
+                            <input type="time" id="bookingTime" name="booking_time" required>
+                            <p class="ticket-price-note">
+                                Select the time you plan to visit the temple.
+                            </p>
+                        </div>
+                        <input type="hidden" id="memberCount" name="member_count" value="1">
+                    </div>
+                    <div class="ticket-member-list" id="ticketMemberList"></div>
+                    <div class="ticket-add-member-row">
+                        <span class="ticket-member-count-label"><strong id="ticketMemberCountDisplay">1</strong> member added</span>
+                        <button type="button" class="ticket-add-member-button" id="addTicketMember"><i class="fa fa-plus"></i> Add Member</button>
+                    </div>
+                    <div class="ticket-form-message" id="ticketFormMessage" role="status"></div>
+                </div>
+                <div class="ticket-modal-footer">
+                    <div>
+                        <span class="ticket-total-label">Estimated Total</span>
+                        <strong class="ticket-total-amount" id="ticketTotalAmount">₹0.00</strong>
+                    </div>
+                    <div class="ticket-modal-actions">
+                        <button type="button" class="ticket-cancel-button" data-close-ticket-modal>Cancel</button>
+                        <button type="submit" class="ticket-continue-button">Continue</button>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
-
     <section class="temple-heritage-section">
         <div class="container">
             <div class="temple-heritage-content">
@@ -1766,6 +1942,97 @@ body.ticket-modal-open {
             </div>
         </div>
     </section>
+    @if($temple->timingCategories->contains(fn($category) => $category->timings->isNotEmpty()))
+    <section class="temple-timings-section py-5">
+        <div class="container">
+            <div class="temple-timings-heading text-center mb-5">
+                <span class="temple-section-label">
+                    <i class="fas fa-clock mr-1"></i> TEMPLE SCHEDULE
+                </span>
+                <h2 class="mt-3">Temple Timings</h2>
+                <p>Explore daily temple timings and important rituals.</p>
+                <div class="temple-heading-divider"></div>
+            </div>
+            <div class="temple-timing-accordion" id="templeTimingAccordion">
+                @foreach($temple->timingCategories as $category)
+                    @if($category->timings->isNotEmpty())
+                        <div class="temple-category-card">
+                            <button type="button"
+                                class="temple-category-toggle collapsed" data-toggle="collapse"  data-target="#timingCategory{{ $category->id }}"
+                                aria-expanded="false" aria-controls="timingCategory{{ $category->id }}">
+                                <span class="temple-category-left">
+                                    <span class="temple-category-icon">
+                                    <i class="fa fa-calendar" aria-hidden="true"></i>
+                                    </span>
+                                    <span class="temple-category-info">
+                                        <strong>{{ $category->name }}</strong>
+                                        <small>
+                                            {{ $category->timings->count() }}
+                                            {{ $category->timings->count() == 1 ? 'Schedule' : 'Schedules' }}
+                                        </small>
+                                    </span>
+                                </span>
+                                <span class="temple-category-arrow">
+                                    <i class="fa fa-caret-down" aria-hidden="true"></i>
+                                </span>
+                            </button>
+                            <div id="timingCategory{{ $category->id }}" class="collapse" data-parent="#templeTimingAccordion">
+                                <div class="temple-category-content">
+                                    @foreach($category->timings as $timing)
+                                        <div class="temple-timing-record">
+                                            <div class="temple-record-heading">
+                                                <span class="temple-record-dot"></span>
+                                                <h5>{{ $timing->name }}</h5>
+                                            </div>
+                                            @if($timing->description)
+                                                <p class="temple-record-description">
+                                                    {{ $timing->description }}
+                                                </p>
+                                            @endif
+                                            <div class="temple-record-times">
+                                                <div class="temple-record-time">
+                                                    <span>
+                                                        <i class="fas fa-sun"></i>
+                                                        Opening Time
+                                                    </span>
+                                                    <strong>
+                                                        {{ $timing->opening_time
+                                                            ? \Carbon\Carbon::parse($timing->opening_time)->format('h:i A')
+                                                            : 'Not specified' }}
+                                                    </strong>
+                                                </div>
+                                                <div class="temple-record-time">
+                                                    <span>
+                                                        <i class="fas fa-moon"></i>
+                                                        Closing Time
+                                                    </span>
+                                                    <strong>
+                                                        {{ $timing->closing_time
+                                                            ? \Carbon\Carbon::parse($timing->closing_time)->format('h:i A')
+                                                            : 'Not specified' }}
+                                                    </strong>
+                                                </div>
+                                            </div>
+                                            <div class="temple-record-days">
+                                                <i class="far fa-calendar-alt"></i>
+                                                <span>
+                                                    {{ $timing->start_day }}
+                                                    @if($timing->end_day && $timing->end_day != $timing->start_day)
+                                                        - {{ $timing->end_day }}
+                                                    @endif
+                                                </span>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+                @endforeach
+            </div>
+        </div>
+    </section>
+    @endif
     <section class="temple-location-section">
         <div class="container">
             <div class="temple-location-heading">

@@ -90,4 +90,8 @@ class Temple extends Model
                     ->where('guard_name', 'web');
             });
     }
+    public function timingCategories()
+    {
+        return $this->hasMany(TempleTimingCategory::class,'temple_id');
+    }
 }
