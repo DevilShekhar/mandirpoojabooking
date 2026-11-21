@@ -9,13 +9,14 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-// Automatically mark yesterday's missed ticket bookings
+// TEST: Ticket Booking Not Reached
 Schedule::command('ticket-bookings:mark-not-reached')
-    ->dailyAt('10:00')
+    ->everyMinute()
     ->timezone('Asia/Kolkata')
     ->withoutOverlapping();
-// Automatically send Mandir Puja OTP reminder emails
+
+// TEST: Mandir Puja Not Reached
 Schedule::command('mandir-puja:not-reached')
-    ->dailyAt('10:00')
+    ->everyMinute()
     ->timezone('Asia/Kolkata')
     ->withoutOverlapping();
