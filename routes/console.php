@@ -11,11 +11,11 @@ Artisan::command('inspire', function () {
 
 // Automatically mark yesterday's missed ticket bookings
 Schedule::command('ticket-bookings:mark-not-reached')
-    ->dailyAt('11:30')
+    ->dailyAt('11:40')
     ->timezone('Asia/Kolkata')
     ->withoutOverlapping();
 // Automatically send Mandir Puja OTP reminder emails
 Schedule::command('mandir-puja:not-reached')
-    ->dailyAt('11:30')
+    ->dailyAt('11:40')
     ->timezone('Asia/Kolkata')
     ->withoutOverlapping();
