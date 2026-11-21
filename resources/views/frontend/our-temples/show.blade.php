@@ -296,7 +296,7 @@
     width: 100%;
     margin-top: 17px;
     padding: 13px 16px;
-    background: var(--temple-red);
+    background: #bb601a;
     border-radius: 7px;
     color: #fff;
     text-decoration: none;
@@ -306,7 +306,7 @@
 }
 .temple-map-button:hover {
     color: #fff;
-    background: var(--temple-dark-red);
+    background: #2c140a;
     transform: translateY(-2px);
 }
 .temple-heritage-section {
