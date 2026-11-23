@@ -131,7 +131,7 @@
                                                 <td>
                                                     <a href="{{ route('admin.customer-cancel-booking.show', $cancellation->id) }}"
                                                        class="btn btn-primary btn-sm">
-                                                        <i class="fas fa-eye"></i> View
+                                                        <i class="fas fa-eye"></i> 
                                                     </a>
                                                 </td>
                                             </tr>

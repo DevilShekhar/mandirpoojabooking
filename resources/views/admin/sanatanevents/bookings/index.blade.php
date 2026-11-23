@@ -101,7 +101,7 @@
                                                 </td>
                                                 <td>{{ $booking->created_at ? \Carbon\Carbon::parse($booking->created_at)->format('d-m-Y h:i A') : '-' }}</td>
                                                 <td>
-                                                    <a href="{{ route('customer.sanatan-event-bookings.show', $booking->id) }}" class="btn btn-primary btn-sm">View</a>
+                                                    <a href="{{ route('customer.sanatan-event-bookings.show', $booking->id) }}" class="btn btn-primary btn-sm"  title="View Details"> <i class="fas fa-eye mr-1"></i></a>
                                                 </td>
                                             </tr>
                                         @endforeach
