@@ -164,7 +164,7 @@ $creatorName = $creatorNames[$sanatan->created_by] ?? 'Sanatan Team';
         </div>
     </div>
 </section>
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const button = document.getElementById('confirm-booking-btn');
