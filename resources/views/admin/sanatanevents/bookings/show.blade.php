@@ -523,24 +523,26 @@
         </div>
         <div class="row">
             <div class="col-lg-8">
-                <div class="seb-card">
-                    <div class="seb-card-header">
-                        <h5>
-                            <span class="seb-heading-icon seb-icon-orange">
-                                <i class="fas fa-key"></i>
-                            </span>
-                            Booking OTP
-                        </h5>
-                    </div>
-                    <div class="seb-card-body">
-                        <div class="seb-info-label">
-                            <i class="fas fa-lock"></i> OTP
+                @can('sanatan-otp.show')
+                    <div class="seb-card">
+                        <div class="seb-card-header">
+                            <h5>
+                                <span class="seb-heading-icon seb-icon-orange">
+                                    <i class="fas fa-key"></i>
+                                </span>
+                                Booking OTP
+                            </h5>
                         </div>
-                        <div class="seb-info-value" style="font-size: 22px; letter-spacing: 5px;">
-                            {{ $booking->sanatan_otp ?? '-' }}
+                        <div class="seb-card-body">
+                            <div class="seb-info-label">
+                                <i class="fas fa-lock"></i> OTP
+                            </div>
+                            <div class="seb-info-value" style="font-size: 22px; letter-spacing: 5px;">
+                                {{ $booking->sanatan_otp ?? '-' }}
+                            </div>
                         </div>
                     </div>
-                </div>
+                @endcan
                 <div class="seb-card">
                     <div class="seb-card-header">
                         <h5>
