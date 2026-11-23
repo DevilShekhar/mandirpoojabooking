@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -240,6 +241,7 @@ class SanatanEventBookingController extends Controller
     /**
      * Mark a confirmed and paid booking as completed.
      */
+    
     public function complete(Request $request, $id)
     {
         $user = Auth::user();
@@ -301,14 +303,17 @@ class SanatanEventBookingController extends Controller
                     );
                 }
                 // Verify customer OTP
-                if (!hash_equals((string) $booking->sanatan_otp,(string) $validated['otp'])) {
+                if (!hash_equals(
+                    (string) $booking->sanatan_otp,
+                    (string) $validated['otp']
+                )) {
                     throw new RuntimeException(
                         'Invalid OTP. Please enter the correct customer OTP.'
                     );
                 }
-                // Use the same timestamp for completion and OTP verification
+                // Same timestamp for completion and OTP verification
                 $verifiedAt = now();
-                // Prepare booking completion data
+
                 $updateData = [
                     'booking_status' => 'completed',
                     'completed_by' => $user->id,
@@ -321,25 +326,28 @@ class SanatanEventBookingController extends Controller
                 $affectedRows = DB::table('sanatan_event_orders')
                     ->where('id', $booking->id)
                     ->update($updateData);
-                // Fetch updated booking to verify saved values
+                // Verify updated values
                 $updatedBooking = DB::table('sanatan_event_orders')
                     ->where('id', $booking->id)
                     ->first();
-                // Verify OTP information was saved
-                if (!$updatedBooking || (int) $updatedBooking->otp_verifiction_by !== (int) $user->id || empty($updatedBooking->otp_verifiction_at)) {
+
+                if (
+                    !$updatedBooking ||
+                    (int) $updatedBooking->otp_verifiction_by !== (int) $user->id ||
+                    empty($updatedBooking->otp_verifiction_at) ||
+                    $updatedBooking->booking_status !== 'completed' ||
+                    empty($updatedBooking->completed_at)
+                ) {
                     Log::error('Sanatan OTP verification details not saved.', [
                         'booking_id' => $booking->id,
                         'user_id' => $user->id,
                         'affected_rows' => $affectedRows,
                         'update_data' => $updateData,
-                        'saved_otp_verifiction_by' => $updatedBooking->otp_verifiction_by ?? null,
-                        'saved_otp_verifiction_at' => $updatedBooking->otp_verifiction_at ?? null,
                     ]);
                     throw new RuntimeException(
                         'Booking completion failed. OTP verification details were not saved.'
                     );
                 }
-                // Log successful OTP verification
                 Log::info('Sanatan booking completed with OTP verification.', [
                     'booking_id' => $booking->id,
                     'completed_by' => $user->id,
@@ -348,7 +356,56 @@ class SanatanEventBookingController extends Controller
                     'otp_verifiction_at' => $updatedBooking->otp_verifiction_at,
                 ]);
             });
-            return redirect()->route('customer.sanatan-event-bookings.show', $id)->with('success', 'Booking successfully completed after OTP verification.');
+            /*
+            |--------------------------------------------------------------------------
+            | Send Booking Completed Thank You Email
+            |--------------------------------------------------------------------------
+            |
+            | This code runs only after the database transaction commits.
+            | Email failure will not affect the completed booking.
+            |
+            */
+
+            try {
+
+                $order = DB::table('sanatan_event_orders as bookings')
+                    ->leftJoin('users as customers', 'customers.id', '=', 'bookings.user_id')
+                    ->leftJoin('sanatans as events', 'events.id', '=', 'bookings.sanatan_id')
+                    ->where('bookings.id', $id)
+                    ->where('bookings.booking_status', 'completed')
+                    ->select(
+                        'bookings.*',
+                        'customers.name as customer_name',
+                        'customers.email as customer_email',
+                        'events.name as event_name'
+                    )
+                    ->first();
+                if ($order && !empty($order->customer_email)) {
+                    Mail::to($order->customer_email)
+                        ->send(new \App\Mail\SanatanBookingCompletedMail($order));
+                    Log::info('Sanatan booking completed email sent successfully.', [
+                        'booking_id' => $id,
+                        'customer_email' => $order->customer_email,
+                    ]);
+                } else {
+                    Log::warning('Sanatan booking completed, but customer email was not found.', [
+                        'booking_id' => $id,
+                        'customer_id' => $order->user_id ?? null,
+                    ]);
+                }
+            } catch (Throwable $mailException) {
+                // Do not roll back booking if email fails.
+                Log::error('Sanatan booking completed email failed.', [
+                    'booking_id' => $id,
+                    'user_id' => $user->id,
+                    'error' => $mailException->getMessage(),
+                    'file' => $mailException->getFile(),
+                    'line' => $mailException->getLine(),
+                ]);
+            }
+            return redirect()
+                ->route('customer.sanatan-event-bookings.show', $id)
+                ->with('success', 'Booking successfully completed after OTP verification. Thank you email sent to the customer.');
         } catch (RuntimeException $e) {
             return back()->withErrors([
                 'booking' => $e->getMessage(),
