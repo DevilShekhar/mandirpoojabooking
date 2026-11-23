@@ -282,6 +282,7 @@ class PermissionSeeder extends Seeder
             'temple-timings.delete',
             'temple-timings.view',
             'temple-timings.show',
+            'sanatan-otp.show',
         ];
         foreach ($permissions as $permission) {
             Permission::firstOrCreate([
