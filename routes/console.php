@@ -21,6 +21,6 @@ Schedule::command('mandir-puja:not-reached')
     ->withoutOverlapping();
 // Automatically send Sanatan Puja not-completed emails
 Schedule::command('sanatan-orders:not-completed')
-    ->dailyAt('15:08')
+    ->dailyAt('01:00')
     ->timezone('Asia/Kolkata')
     ->withoutOverlapping();
