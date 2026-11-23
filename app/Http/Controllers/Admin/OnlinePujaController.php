@@ -74,10 +74,16 @@ class OnlinePujaController extends Controller
     }
     public function completedPujas(Request $request)
     {
-        $onlinePujas = OnlinePuja::with(['category', 'creator'])
-            ->where('status', 2)
-            ->latest()
-            ->get();
+        $user = Auth::user();
+        if (!$user) {
+            abort(403, 'Unauthorized access.');
+        }
+        $query = OnlinePuja::with(['category', 'creator'])->where('status', 2);
+        // Admin and Super Admin can see all records
+        if (!$user->hasAnyRole(['Admin', 'Super Admin'])) {
+            $query->where('created_by', $user->id);
+        }
+        $onlinePujas = $query->latest()->get();
         return view('admin.online-pujas.completed', compact('onlinePujas'));
     }
     public function create()
