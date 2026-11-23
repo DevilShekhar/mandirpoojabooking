@@ -31,7 +31,7 @@
     <div class="booking-result-card">
         <div class="booking-result-header">
             <div class="booking-result-icon">
-                <i class="fas fa-check-circle" aria-hidden="true"></i>
+                <i class="fa fa-check-circle" aria-hidden="true"></i>
             </div>
             <h2>Booking Successful!</h2>
             <p>Your payment has been verified successfully and your Sanatan Event booking is confirmed.</p>

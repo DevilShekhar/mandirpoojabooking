@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Razorpay\Api\Api;
 use Throwable;
+use App\Mail\SanatanBookingConfirmationMail;
+use App\Models\User;
+use Illuminate\Support\Facades\Mail;
 
 class PaymentSanatanController extends Controller
 {
@@ -21,7 +24,7 @@ class PaymentSanatanController extends Controller
             config('services.razorpay.secret')
         );
     }
-
+    
     public function createOrder(Request $request, string $slug)
     {
         $validated = $request->validate([
@@ -66,8 +69,10 @@ class PaymentSanatanController extends Controller
                     return ['conflict' => true];
                 }
 
+                // Generate unique Razorpay receipt
                 $receipt = 'SE' . strtoupper(Str::random(12));
 
+                // Create Razorpay order
                 $order = $this->razorpay()->order->create([
                     'receipt' => $receipt,
                     'amount' => (int) round($amount * 100),
@@ -80,10 +85,14 @@ class PaymentSanatanController extends Controller
                     ],
                 ]);
 
+                // Generate 6 digit Sanatan OTP
+                $sanatanOtp = (string) random_int(100000, 999999);
+                // Save booking with OTP
                 $bookingId = DB::table('sanatan_event_orders')->insertGetId([
                     'sanatan_id' => $lockedSanatan->id,
                     'user_id' => Auth::id(),
                     'created_by' => $lockedSanatan->created_by,
+                    'sanatan_otp' => $sanatanOtp,
                     'event_date' => $validated['event_date'],
                     'event_time' => $validated['event_time'],
                     'amount' => $amount,
@@ -138,7 +147,7 @@ class PaymentSanatanController extends Controller
             ], 500);
         }
     }
-
+    
     public function verifyPayment(Request $request)
     {
         $validated = $request->validate([
@@ -157,11 +166,7 @@ class PaymentSanatanController extends Controller
                 'message' => 'Booking order not found.',
             ], 404);
         }
-
-        if (
-            $booking->payment_status === 'paid' &&
-            $booking->booking_status === 'confirmed'
-        ) {
+        if ($booking->payment_status === 'paid' && $booking->booking_status === 'confirmed') {
             return response()->json([
                 'message' => 'This booking is already paid.',
                 'redirect_url' => route(
@@ -179,16 +184,8 @@ class PaymentSanatanController extends Controller
                 'razorpay_payment_id' => $validated['razorpay_payment_id'],
                 'razorpay_signature' => $validated['razorpay_signature'],
             ]);
-
-            $payment = $api->payment->fetch(
-                $validated['razorpay_payment_id']
-            );
-
-            if (
-                $payment['order_id'] !== $booking->razorpay_order_id ||
-                (int) $payment['amount'] !== (int) round((float) $booking->amount * 100) ||
-                $payment['currency'] !== 'INR'
-            ) {
+            $payment = $api->payment->fetch($validated['razorpay_payment_id']);
+            if ($payment['order_id'] !== $booking->razorpay_order_id || (int) $payment['amount'] !== (int) round((float) $booking->amount * 100) ||  $payment['currency'] !== 'INR') {
                 Log::warning('Sanatan payment details mismatch.', [
                     'booking_id' => $booking->id,
                     'payment_id' => $validated['razorpay_payment_id'],
@@ -234,25 +231,18 @@ class PaymentSanatanController extends Controller
                     ),
                 ], 422);
             }
-
-            DB::transaction(function () use ($booking, $validated) {
+            $bookingUpdated = DB::transaction(function () use ($booking, $validated) {
                 $currentBooking = DB::table('sanatan_event_orders')
                     ->where('id', $booking->id)
                     ->lockForUpdate()
                     ->first();
-
                 if (!$currentBooking) {
                     abort(404, 'Booking not found.');
                 }
-
-                if ($currentBooking->payment_status === 'paid') {
-                    return;
+                // Avoid duplicate confirmation and duplicate email
+                if ($currentBooking->payment_status === 'paid' &&  $currentBooking->booking_status === 'confirmed') {
+                    return false;
                 }
-
-                /*
-                 * The date is reserved when the pending booking row is created.
-                 * Do not confirm if another active booking already occupies it.
-                 */
                 $conflict = DB::table('sanatan_event_orders')
                     ->where('sanatan_id', $currentBooking->sanatan_id)
                     ->where('event_date', $currentBooking->event_date)
@@ -274,8 +264,64 @@ class PaymentSanatanController extends Controller
                         'booking_status' => 'confirmed',
                         'updated_at' => now(),
                     ]);
+                return true;
             }, 3);
-
+            if ($bookingUpdated) {
+                try {
+                    // Get customer using booking user_id
+                    $customer = User::find($booking->user_id);
+                    // Get Sanatan event details
+                    $sanatanDetails = Sanatan::find($booking->sanatan_id);
+                    // Get updated booking details
+                    $bookingDetails = DB::table('sanatan_event_orders')
+                        ->where('id', $booking->id)
+                        ->first();
+                    if (!$customer || !$sanatanDetails || !$bookingDetails) {
+                        Log::error('Sanatan booking email data missing.', [
+                            'booking_id' => $booking->id,
+                            'customer_found' => (bool) $customer,
+                            'sanatan_found' => (bool) $sanatanDetails,
+                            'booking_found' => (bool) $bookingDetails,
+                        ]);
+                    } elseif (empty($customer->email)) {
+                        Log::warning('Customer email address is empty.', [
+                            'booking_id' => $booking->id,
+                            'user_id' => $customer->id,
+                        ]);
+                    } else {
+                        Log::info('Sanatan booking email data.', [
+                            'customer_name' => $customer->name,
+                            'customer_email' => $customer->email,
+                            'event_name' => $sanatanDetails->name,
+                            'booking_id' => $bookingDetails->id,
+                            'event_date' => $bookingDetails->event_date,
+                            'event_time' => $bookingDetails->event_time,
+                            'amount' => $bookingDetails->amount,
+                            'payment_status' => $bookingDetails->payment_status,
+                            'razorpay_payment_id' => $bookingDetails->razorpay_payment_id,
+                            'sanatan_otp' => $bookingDetails->sanatan_otp ?? null,
+                        ]);
+                        Mail::to($customer->email)->send(
+                            new SanatanBookingConfirmationMail(
+                                $bookingDetails,
+                                $sanatanDetails,
+                                $customer
+                            )
+                        );
+                        Log::info('Sanatan booking confirmation email sent successfully.', [
+                            'booking_id' => $booking->id,
+                            'user_id' => $customer->id,
+                            'email' => $customer->email,
+                        ]);
+                    }
+                } catch (Throwable $mailException) {
+                    Log::error('Sanatan booking confirmation email failed.', [
+                        'booking_id' => $booking->id,
+                        'user_id' => $booking->user_id,
+                        'error' => $mailException->getMessage(),
+                    ]);
+                }
+            }
             return response()->json([
                 'message' => 'Payment verified and booking confirmed.',
                 'redirect_url' => route(

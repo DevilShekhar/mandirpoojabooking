@@ -165,35 +165,94 @@ $creatorName = $creatorNames[$sanatan->created_by] ?? 'Sanatan Team';
     </div>
 </section>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+
     const button = document.getElementById('confirm-booking-btn');
     const dateInput = document.getElementById('event_date');
     const timeInput = document.getElementById('event_time');
+
     if (!button || !dateInput || !timeInput) return;
+
     const csrfToken = @json(csrf_token());
+
     const orderUrl = @json(route('frontend.sanatanevents.payment.order', $sanatan->slug));
+
     const verifyUrl = @json(route('frontend.sanatanevents.payment.verify'));
+
+    // SweetAlert common function
+    function showAlert(icon, title, message) {
+        return Swal.fire({
+            icon: icon,
+            title: title,
+            text: message,
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#5b45e0',
+            allowOutsideClick: false,
+            allowEscapeKey: true
+        });
+    }
+
+    // Reset booking button
     function resetButton() {
         button.disabled = false;
         button.innerHTML = 'Confirm booking <i class="fa fa-arrow-right"></i>';
     }
+
+    // Loading popup
+    function showLoading(message) {
+        Swal.fire({
+            title: message,
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            showConfirmButton: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+    }
+
+    // Confirm booking click
     button.addEventListener('click', async function () {
+
+        // Validate event date and time
         if (!dateInput.value || !timeInput.value) {
-            alert('Please select the event date and time.');
+            showAlert(
+                'warning',
+                'Required Fields',
+                'Please select the event date and time.'
+            );
             return;
         }
+
         if (dateInput.value < dateInput.min) {
-            alert('Please select a valid event date.');
+            showAlert(
+                'warning',
+                'Invalid Date',
+                'Please select a valid event date.'
+            );
             return;
         }
+
+        // Check Razorpay
         if (typeof Razorpay === 'undefined') {
-            alert('Payment checkout could not load. Please refresh and try again.');
+            showAlert(
+                'error',
+                'Payment Unavailable',
+                'Payment checkout could not load. Please refresh and try again.'
+            );
             return;
         }
+
         button.disabled = true;
-        button.innerHTML = 'Preparing payment...';
+        button.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Preparing payment...';
+
+        showLoading('Preparing your booking...');
+
         try {
+
+            // Create Razorpay order
             const response = await fetch(orderUrl, {
                 method: 'POST',
                 headers: {
@@ -206,26 +265,60 @@ document.addEventListener('DOMContentLoaded', function () {
                     event_time: timeInput.value
                 })
             });
+
             const order = await response.json();
+
             if (!response.ok) {
-                const validationErrors = Object.values(order.errors || {}).flat().join('\n');
-                throw new Error(order.message || validationErrors || 'Unable to create payment order.');
+
+                const validationErrors = Object.values(order.errors || {})
+                    .flat()
+                    .join('\n');
+
+                throw new Error(
+                    order.message ||
+                    validationErrors ||
+                    'Unable to create payment order.'
+                );
             }
+
+            // Close loading popup
+            Swal.close();
+
+            // Razorpay configuration
             const options = {
+
                 key: order.key,
+
                 amount: order.amount,
+
                 currency: order.currency,
+
                 name: 'Sanatan Events',
+
                 description: order.event_name,
+
                 order_id: order.order_id,
+
                 prefill: {
                     name: order.customer_name || '',
                     email: order.customer_email || ''
                 },
-                theme: { color: '#5b45e0' },
+
+                theme: {
+                    color: '#5b45e0'
+                },
+
+                // Payment success handler
                 handler: async function (paymentResponse) {
-                    button.innerHTML = 'Verifying payment...';
+
+                    button.disabled = true;
+
+                    button.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Verifying payment...';
+
+                    showLoading('Verifying your payment...');
+
                     try {
+
                         const verifyResponse = await fetch(verifyUrl, {
                             method: 'POST',
                             headers: {
@@ -235,39 +328,97 @@ document.addEventListener('DOMContentLoaded', function () {
                             },
                             body: JSON.stringify(paymentResponse)
                         });
+
                         const result = await verifyResponse.json();
+
+                        if (!verifyResponse.ok) {
+                            throw new Error(
+                                result.message || 'Payment verification failed.'
+                            );
+                        }
+
                         if (result.redirect_url) {
+
+                            await Swal.fire({
+                                icon: 'success',
+                                title: 'Payment Successful!',
+                                text: result.message || 'Your Sanatan event booking has been confirmed successfully.',
+                                confirmButtonText: 'Continue',
+                                confirmButtonColor: '#5b45e0',
+                                allowOutsideClick: false,
+                                allowEscapeKey: false
+                            });
+
                             window.location.href = result.redirect_url;
+
                             return;
                         }
-                        if (!verifyResponse.ok) {
-                            throw new Error(result.message || 'Payment verification failed.');
-                        }
-                        throw new Error(result.message || 'Unexpected payment response.');
+
+                        throw new Error(
+                            result.message || 'Unexpected payment response.'
+                        );
+
                     } catch (error) {
-                        alert(error.message || 'Payment verification failed. If money was deducted, contact support.');
+
+                        Swal.close();
+
+                        await showAlert(
+                            'error',
+                            'Payment Verification Failed',
+                            error.message || 'Payment verification failed. If money was deducted, please contact support.'
+                        );
+
                         resetButton();
                     }
                 },
+
+                // Razorpay modal dismissed
                 modal: {
-                    ondismiss: resetButton
+                    ondismiss: function () {
+                        Swal.close();
+                        resetButton();
+                    }
                 }
             };
+
+            // Open Razorpay checkout
             const razorpay = new Razorpay(options);
-            razorpay.on('payment.failed', function (paymentError) {
-                alert(
+
+            // Payment failed handler
+            razorpay.on('payment.failed', async function (paymentError) {
+
+                Swal.close();
+
+                const message =
                     paymentError.error && paymentError.error.description
                         ? paymentError.error.description
-                        : 'Payment failed. Please try again.'
+                        : 'Payment failed. Please try again.';
+
+                await showAlert(
+                    'error',
+                    'Payment Failed',
+                    message
                 );
+
                 resetButton();
             });
+
             razorpay.open();
+
         } catch (error) {
-            alert(error.message || 'Unable to start payment.');
+
+            Swal.close();
+
+            await showAlert(
+                'error',
+                'Booking Failed',
+                error.message || 'Unable to start payment. Please try again.'
+            );
+
             resetButton();
         }
     });
 });
 </script>
+
 @endsection
