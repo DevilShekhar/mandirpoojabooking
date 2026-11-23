@@ -619,7 +619,7 @@ class SanatanEventBookingController extends Controller
     }
     /**
      * Display confirmed event bookings.
-     */
+     */    
     public function confirmed()
     {
         $user = Auth::user();
@@ -660,7 +660,8 @@ class SanatanEventBookingController extends Controller
                 abort(403, 'You are not authorized to view these bookings.');
             }
         }
-        $bookings = $query->orderByDesc('bookings.created_at')->paginate(10)->withQueryString();
-        return view('admin.sanatanevents.bookings.confirmed',compact('bookings'));
+        $bookings = $query->orderByDesc('bookings.created_at')->get();
+        return view('admin.sanatanevents.bookings.confirmed', compact('bookings'));
     }
+
 }
