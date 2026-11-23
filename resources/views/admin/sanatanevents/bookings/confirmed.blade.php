@@ -133,7 +133,7 @@
                                     <td>
                                         <a href="{{ route('customer.sanatan-event-bookings.show', $booking->id) }}"
                                            class="btn btn-sm btn-primary">
-                                            <i class="fas fa-eye"></i> View
+                                            <i class="fas fa-eye"></i>
                                         </a>
                                     </td>
                                 </tr>

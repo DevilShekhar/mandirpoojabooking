@@ -149,7 +149,7 @@
                                                         <a href="{{ route('booking-puja-order.show', $booking->id) }}"
                                                            class="btn btn-info btn-sm mr-1"
                                                            title="View Booking">
-                                                            View
+                                                            
                                                         </a>
                                                    
                                                 </div>

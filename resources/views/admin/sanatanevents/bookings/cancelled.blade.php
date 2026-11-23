@@ -97,7 +97,7 @@
                                             </td>
                                             <td>{{ $booking->cancelled_by_name ?? 'N/A' }}</td>
                                             <td>
-                                                <a href="{{ route('customer.sanatan-event-bookings.show', $booking->id) }}" class="btn btn-sm btn-primary">View</a>
+                                                <a href="{{ route('customer.sanatan-event-bookings.show', $booking->id) }}" class="btn btn-sm btn-primary"><i class="fas fa-eye"></i></a>
                                             </td>
                                         </tr>
                                     @empty

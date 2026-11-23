@@ -97,7 +97,7 @@
                                             ) }}"
                                                 class="btn btn-primary btn-sm"
                                                 title="View Details">
-                                                <i class="fas fa-eye mr-1"></i> View Details
+                                                <i class="fas fa-eye mr-1"></i>
                                             </a>
                                         </td>
                                     </tr>

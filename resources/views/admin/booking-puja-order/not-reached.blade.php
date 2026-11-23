@@ -95,7 +95,7 @@
                                 <td>
                                     <a href="{{ route('booking-puja-order.show', $booking->id) }}"
                                        class="btn btn-sm btn-info">
-                                        <i class="fas fa-eye"></i> View
+                                        <i class="fas fa-eye"></i> 
                                     </a>
                                 </td>
                             </tr>
