@@ -152,6 +152,7 @@ class SanatanEventBookingController extends Controller
             ->leftJoin('users as event_creators', 'event_creators.id', '=', 'events.created_by')
             ->leftJoin('users as cancelled_users', 'cancelled_users.id', '=', 'bookings.cancelled_by')
             ->leftJoin('users as completed_users', 'completed_users.id', '=', 'bookings.completed_by')
+            ->leftJoin('users as otp_verified_users', 'otp_verified_users.id', '=', 'bookings.otp_verifiction_by')
             ->select(
                 'bookings.*',
                 'events.name as event_name',
@@ -162,7 +163,8 @@ class SanatanEventBookingController extends Controller
                 'customers.phone as customer_phone',
                 'event_creators.name as event_creator_name',
                 'cancelled_users.name as cancelled_by_name',
-                'completed_users.name as completed_by_name'
+                'completed_users.name as completed_by_name',
+                'otp_verified_users.name as otp_verified_by_name',
             )
             ->where('bookings.id', $id);
 
@@ -238,97 +240,129 @@ class SanatanEventBookingController extends Controller
     /**
      * Mark a confirmed and paid booking as completed.
      */
-    public function complete($id)
+    public function complete(Request $request, $id)
     {
         $user = Auth::user();
-
-        if (!$user || !$user->hasAnyRole([
-            'Admin',
-            'Super Admin',
-            'Event Creator'
-        ])) {
+        if (!$user || !$user->hasAnyRole(['Admin','Super Admin','Event Creator'])) {
             abort(403, 'You are not authorized to complete bookings.');
         }
-
+        // Validate customer OTP
+        $validated = $request->validate([
+            'otp' => ['required', 'digits:6'],
+        ], [
+            'otp.required' => 'Please enter the customer OTP.',
+            'otp.digits' => 'OTP must contain exactly 6 digits.',
+        ]);
         try {
-
-            DB::transaction(function () use ($id, $user) {
-
+            DB::transaction(function () use ($id, $user, $validated) {
+                // Find booking and lock the record
                 $query = DB::table('sanatan_event_orders as bookings')
                     ->join('sanatans as events', 'events.id', '=', 'bookings.sanatan_id')
                     ->where('bookings.id', $id);
-
+                // Admin and Super Admin can complete all bookings.
                 // Event Creator can complete only their own event bookings.
-                // Admin and Super Admin can complete any booking.
                 if (!$user->hasAnyRole(['Admin', 'Super Admin'])) {
                     $query->where('events.created_by', $user->id);
                 }
-
-                $booking = $query
-                    ->select('bookings.*')
-                    ->lockForUpdate()
-                    ->first();
-
+                $booking = $query->select('bookings.*')->lockForUpdate()->first();
                 if (!$booking) {
                     throw new RuntimeException(
                         'Booking not found or you are not authorized to complete it.'
                     );
                 }
-
+                // Check booking status
                 if ($booking->booking_status !== 'confirmed') {
                     throw new RuntimeException(
                         'Only confirmed bookings can be marked as completed.'
                     );
                 }
-
+                // Check payment status
                 if ($booking->payment_status !== 'paid') {
                     throw new RuntimeException(
                         'Only successfully paid bookings can be completed.'
                     );
                 }
-
+                // Check already completed
                 if (!empty($booking->completed_at)) {
                     throw new RuntimeException(
                         'This booking has already been completed.'
                     );
                 }
-
+                // Check cancellation
                 if (!empty($booking->cancelled_at)) {
                     throw new RuntimeException(
                         'Cancelled bookings cannot be completed.'
                     );
                 }
-
-                DB::table('sanatan_event_orders')
+                // Check OTP availability
+                if (empty($booking->sanatan_otp)) {
+                    throw new RuntimeException(
+                        'OTP is not available for this booking.'
+                    );
+                }
+                // Verify customer OTP
+                if (!hash_equals((string) $booking->sanatan_otp,(string) $validated['otp'])) {
+                    throw new RuntimeException(
+                        'Invalid OTP. Please enter the correct customer OTP.'
+                    );
+                }
+                // Use the same timestamp for completion and OTP verification
+                $verifiedAt = now();
+                // Prepare booking completion data
+                $updateData = [
+                    'booking_status' => 'completed',
+                    'completed_by' => $user->id,
+                    'completed_at' => $verifiedAt,
+                    'otp_verifiction_by' => $user->id,
+                    'otp_verifiction_at' => $verifiedAt,
+                    'updated_at' => $verifiedAt,
+                ];
+                // Update booking
+                $affectedRows = DB::table('sanatan_event_orders')
                     ->where('id', $booking->id)
-                    ->update([
-                        'booking_status' => 'completed',
-                        'completed_by' => $user->id,
-                        'completed_at' => now(),
-                        'updated_at' => now(),
+                    ->update($updateData);
+                // Fetch updated booking to verify saved values
+                $updatedBooking = DB::table('sanatan_event_orders')
+                    ->where('id', $booking->id)
+                    ->first();
+                // Verify OTP information was saved
+                if (!$updatedBooking || (int) $updatedBooking->otp_verifiction_by !== (int) $user->id || empty($updatedBooking->otp_verifiction_at)) {
+                    Log::error('Sanatan OTP verification details not saved.', [
+                        'booking_id' => $booking->id,
+                        'user_id' => $user->id,
+                        'affected_rows' => $affectedRows,
+                        'update_data' => $updateData,
+                        'saved_otp_verifiction_by' => $updatedBooking->otp_verifiction_by ?? null,
+                        'saved_otp_verifiction_at' => $updatedBooking->otp_verifiction_at ?? null,
                     ]);
+                    throw new RuntimeException(
+                        'Booking completion failed. OTP verification details were not saved.'
+                    );
+                }
+                // Log successful OTP verification
+                Log::info('Sanatan booking completed with OTP verification.', [
+                    'booking_id' => $booking->id,
+                    'completed_by' => $user->id,
+                    'completed_at' => $updatedBooking->completed_at,
+                    'otp_verifiction_by' => $updatedBooking->otp_verifiction_by,
+                    'otp_verifiction_at' => $updatedBooking->otp_verifiction_at,
+                ]);
             });
-
-            return redirect()
-                ->route('customer.sanatan-event-bookings.show', $id)
-                ->with('success', 'Booking marked as completed successfully.');
-
+            return redirect()->route('customer.sanatan-event-bookings.show', $id)->with('success', 'Booking successfully completed after OTP verification.');
         } catch (RuntimeException $e) {
-
             return back()->withErrors([
                 'booking' => $e->getMessage(),
             ]);
-
         } catch (Throwable $e) {
-
             Log::error('Sanatan event booking completion failed.', [
                 'booking_id' => $id,
                 'user_id' => $user->id,
                 'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
             ]);
-
             return back()->withErrors([
-                'booking' => 'Unable to comple te this booking. Please try again.',
+                'booking' => 'Unable to complete this booking. Please try again.',
             ]);
         }
     }

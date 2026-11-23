@@ -308,8 +308,8 @@
     }
 
     .seb-page .seb-btn-complete:hover {
-        background: #117c4e;
-        color: #fff;
+        background: #117c4e !important;
+        color: #fff !important;
     }
 
     .seb-page .seb-btn-cancel {
@@ -728,14 +728,47 @@
                             The system will automatically record the completed user's name
                             and completion date and time.
                         </p>
-                        <form id="completeBookingForm" action="{{ route('customer.sanatan-event-bookings.complete', $booking->id) }}"
-                            method="POST">
+                        <form id="completeBookingForm" action="{{ route('customer.sanatan-event-bookings.complete', $booking->id) }}"  method="POST">
                             @csrf
-                            <button type="submit" id="completeBookingButton" class="btn seb-btn-complete" >
+                            <div class="form-group">
+                                <label for="completion_otp">
+                                    Customer OTP <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" name="otp" id="completion_otp" class="form-control"
+                                    placeholder="Enter 6-digit OTP"  maxlength="6" pattern="[0-9]{6}" inputmode="numeric"  required >
+                            </div>
+                            <button type="submit" id="completeBookingButton"
+                                class="btn seb-btn-complete">
                                 <i class="fas fa-check-circle mr-1"></i>
-                                Mark as Completed
+                                Verify OTP & Mark as Completed
                             </button>
                         </form>
+                    </div>
+                @else
+                    <div class="seb-action-card seb-complete-action">
+                        <div class="seb-action-title text-success">
+                            <i class="fas fa-check-circle mr-2"></i>
+                            Event Booking Completed
+                        </div>
+                        <p class="seb-action-description">
+                            This event booking has been successfully completed after OTP verification.
+                        </p>
+                        <div class="mt-3">
+                            <div class="mb-2">
+                                <strong>
+                                    <i class="fas fa-user-check text-success mr-2"></i>
+                                    OTP Verified By:
+                                </strong>
+                                {{ $booking->otp_verified_by_name ?? 'N/A' }}
+                            </div>
+                            <div>
+                                <strong>
+                                    <i class="fas fa-clock text-success mr-2"></i>
+                                    OTP Verified At:
+                                </strong>
+                                {{ $booking->otp_verifiction_at ? \Carbon\Carbon::parse($booking->otp_verifiction_at)->format('d M Y, h:i A'): 'N/A' }}
+                            </div>
+                        </div>
                     </div>
                 @endif
                 @if($isCustomerOwner && !$customerCancellationWindowOpen && $bookingStatus === 'confirmed' && $paymentStatus === 'paid' && empty($booking->cancelled_at) && empty($booking->completed_at))
