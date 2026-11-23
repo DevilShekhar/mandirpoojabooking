@@ -101,7 +101,7 @@
 
         <div class="booking-result-actions">
             <a href="{{ url('/') }}" class="booking-btn-primary">
-                <i class="fas fa-home" aria-hidden="true"></i>
+                <i class="fa fa-home" aria-hidden="true"></i>
                 Go to Home
             </a>
 
