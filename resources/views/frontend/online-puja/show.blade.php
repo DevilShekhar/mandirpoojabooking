@@ -631,7 +631,7 @@
         </div>
         <div class="package-modal-puja-info">
             <div class="modal-puja-icon">
-                <i class="fa fa-om"></i>
+                <i class="fa fa-bell" aria-hidden="true"></i>
             </div>
             <div>
                 <span>Selected Puja</span>

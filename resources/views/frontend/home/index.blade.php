@@ -781,7 +781,7 @@
         </div>
         <div class="row">
             <div class="col-12 text-center mt-25">
-                <a href="{{ route('frontend.news') }}" class="view-all-pujas">
+                <a href="{{ route('frontend.news') }}" class="view-all-pujas btn btn-outline-danger rounded-pill px-4 py-3 fw-semibold">
                     View All News
                     <i class="fa fa-arrow-right"></i>
                 </a>

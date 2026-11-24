@@ -147,7 +147,7 @@ $imageUrl = $image
                 <div class="detail-tab-card">
                     <div class="detail-tab-heading">
                         <div class="detail-tab-icon">
-                            <i class="fa fa-om"></i>
+                            <i class="fa fa-bell" aria-hidden="true"></i>
                         </div>
                         <div>
                             <h3>About {{ $puja->name }}</h3>
@@ -220,7 +220,7 @@ $imageUrl = $image
                 <div class="detail-tab-card">
                     <div class="detail-tab-heading">
                         <div class="detail-tab-icon">
-                            <i class="fa fa-star-o"></i>
+                            <i class="fa fa-gift" aria-hidden="true"></i>
                         </div>
                         <div>
                             <h3>Benefits of the Puja</h3>
@@ -242,10 +242,10 @@ $imageUrl = $image
             <div class="tab-pane fade" id="process" role="tabpanel" aria-labelledby="process-tab">
                 <div class="row">
                     @if($puja->ritual_details)
-                    <div class="col-lg-6 mb-4">
+                    <div class="col-lg-12 mb-4">
                         <div class="process-card">
                             <div class="process-card-icon">
-                                <i class="fa fa-heart-o"></i>
+                                <i class="fa fa-spinner" aria-hidden="true"></i>
                             </div>
                             <h3>Puja Process</h3>
                             <div class="process-card-content">
@@ -547,7 +547,7 @@ $imageUrl = $image
                     <div class="detail-tab-heading">
                         <div class="detail-tab-icon">
 
-                            <i class="fa fa-star-o"></i>
+                            <i class="fa fa-star-half-o" aria-hidden="true"></i>
                         </div>
                         <div>
                             <h3>Puja Reviews & Ratings</h3>

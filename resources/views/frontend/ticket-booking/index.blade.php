@@ -223,9 +223,8 @@ $(document).ready(function() {
                     </div>
                     ${priceHtml}
                     ${durationHtml}
-                    <a href="${escapeHtml(puja.url)}"
-                       class="puja-view-btn">
-                        View Details
+                    <a href="${escapeHtml(puja.url)}" class="puja-view-btn">
+                        View Puja Details
                         <i class="fa fa-arrow-right"></i>
                     </a>
                 </div>
@@ -251,7 +250,7 @@ $(document).ready(function() {
             ?
             `<a href="${escapeHtml(temple.temple_url)}"
                   class="temple-details-btn">
-                    View Temple Details
+                     View Temple & Book Tickets
                     <i class="fa fa-arrow-right"></i>
                </a>`
             :

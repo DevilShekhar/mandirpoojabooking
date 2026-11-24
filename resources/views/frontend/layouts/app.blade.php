@@ -417,6 +417,9 @@
                                                      <li>
                                                         <a href="{{ url('/my-online-pujabooking') }}">Online Puja Bookings</a>
                                                     </li>
+                                                    <li>
+                                                        <a href="{{ route('admin.my-tickit-booking') }}">My Ticket Bookings</a>
+                                                    </li>
                                                 </ul>
                                             </li>
                                         @endauth
