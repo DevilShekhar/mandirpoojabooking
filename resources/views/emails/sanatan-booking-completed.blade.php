@@ -110,7 +110,7 @@
                             This is an automatically generated email.
                             Please do not reply directly to this email.
                             <br><br>
-                            &copy; {{ date('Y') }} Sanatan Puja. All rights reserved.
+                            &copy; {{ date('Y') }} All Sanatan Puja. All rights reserved.
                         </td>
                     </tr>
                 </table>

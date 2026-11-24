@@ -168,7 +168,7 @@
 
                         <p style="font-size:14px;line-height:24px;">
                             Thank you,<br>
-                            <strong style="color:#e87522;">Sanatan Puja Team</strong>
+                            <strong style="color:#e87522;">All Sanatan</strong>
                         </p>
 
                     </td>

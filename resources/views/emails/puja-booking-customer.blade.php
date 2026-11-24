@@ -257,10 +257,7 @@
                     </td>
                     <td width="34%" valign="top" align="center" style="padding:5px;border-left:1px solid #ecd7bf;border-right:1px solid #ecd7bf;font-size:10px;line-height:1.6;color:#4f443e;">
                         <strong style="color:#873a18;">Email Support</strong><br>{{ config('mail.from.address', 'support@yourdomain.com') }}
-                    </td>
-                    <td width="33%" valign="top" align="center" style="padding:5px;font-size:10px;line-height:1.6;color:#4f443e;">
-                        <strong style="color:#873a18;">Phone Support</strong><br> +91 9767555737
-                    </td>
+                    </td>                   
                 </tr>
             </table>
             <p style="margin:12px 0 0;text-align:center;font-size:9px;line-height:1.5;color:#9a887a;">This is an automated confirmation email. Please retain your booking reference for future communication.</p>

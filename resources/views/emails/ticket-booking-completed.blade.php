@@ -38,7 +38,7 @@
 
         <p>
             Warm Regards,<br>
-            <strong>Temple Management Team</strong>
+            <strong>All Sanatan</strong>
         </p>
 
     </div>

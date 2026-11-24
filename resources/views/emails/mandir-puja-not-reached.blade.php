@@ -109,7 +109,7 @@
 
             <p>
                 Thank you,<br>
-                <strong>Mandir Puja Team</strong>
+                <strong>All Sanatan</strong>
             </p>
 
         </div>

@@ -250,7 +250,7 @@
                     <tr>
                         <td style="padding:22px 30px; background-color:#f8f9fb; border-top:1px solid #e8eaed; text-align:center;">
                             <p style="margin:0 0 8px; color:#59636e; font-size:13px; line-height:1.7;">
-                                Thank you for serving devotees through {{ config('app.name', 'Puja Booking') }}.
+                                Thank you for serving devotees through {{ config('app.name', 'All Sanatan') }}.
                             </p>
                             <p style="margin:0 0 12px; color:#59636e; font-size:13px;">
                                 May God bless you and your service.

@@ -76,11 +76,11 @@
                     <p style="margin-bottom:0;">Keep this OTP safe for your booking.</p>
                 </div>
                 <p style="margin-top:25px;">
-                    Thank you for choosing Sanatan Events.
+                    Thank you for choosing All Sanatan Events.
                 </p>
                 <p>
                     Regards,<br>
-                    <strong>Sanatan Events Team</strong>
+                    <strong>All Sanatan</strong>
                 </p>
             </td>
         </tr>
