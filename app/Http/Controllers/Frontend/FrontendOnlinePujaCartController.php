@@ -3,6 +3,8 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\OnlinePuja;
 use Illuminate\Http\Request;
+use App\Mail\OnlinePujaPaymentSuccessfulMail;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -311,6 +313,9 @@ class FrontendOnlinePujaCartController extends Controller
                     ->lockForUpdate()
                     ->first();
 
+                if (!$lockedOrder) {
+                    throw new \RuntimeException('Order not found.');
+                }
                 if ($lockedOrder->payment_status === 'paid') {
                     return 'already_paid';
                 }
@@ -319,72 +324,116 @@ class FrontendOnlinePujaCartController extends Controller
                     ->lockForUpdate()
                     ->first();
 
-                if (!$puja) {
-                    DB::table('online_puja_orders')
-                        ->where('id', $lockedOrder->id)
-                        ->update([
-                            'razorpay_payment_id' => $validated['razorpay_payment_id'],
-                            'razorpay_signature' => $validated['razorpay_signature'],
-                            'payment_status' => 'paid',
-                            'booking_status' => 'pending_review',
-                            'updated_at' => now(),
-                        ]);
+                $bookingStatus = 'pending_review';
 
-                    return 'pending_review';
+                if ($puja) {
+
+                    $package = $puja->packages()
+                        ->where('id', $lockedOrder->package_id)
+                        ->first();
+
+                    if ($package) {
+
+                        $requiredSeats = max(
+                            1,
+                            (int) $package->devotees_count
+                        );
+
+                        $totalSeats = (int) ($puja->total_seat ?? 0);
+                        $bookedSeats = (int) ($puja->booked_seat ?? 0);
+
+                        $availableSeats = max(
+                            0,
+                            $totalSeats - $bookedSeats
+                        );
+
+                        if (
+                            $totalSeats <= 0 ||
+                            $requiredSeats <= $availableSeats
+                        ) {
+                            $puja->booked_seat =
+                                $bookedSeats + $requiredSeats;
+
+                            $puja->save();
+
+                            $bookingStatus = 'confirmed';
+                        }
+                    }
                 }
-
-                $package = $puja->packages()
-                    ->where('id', $lockedOrder->package_id)
-                    ->first();
-
-                if (!$package) {
-                    DB::table('online_puja_orders')
-                        ->where('id', $lockedOrder->id)
-                        ->update([
-                            'razorpay_payment_id' => $validated['razorpay_payment_id'],
-                            'razorpay_signature' => $validated['razorpay_signature'],
-                            'payment_status' => 'paid',
-                            'booking_status' => 'pending_review',
-                            'updated_at' => now(),
-                        ]);
-
-                    return 'pending_review';
-                }
-
-                $requiredSeats = max(1, (int) $package->devotees_count);
-                $totalSeats = (int) ($puja->total_seat ?? 0);
-                $bookedSeats = (int) ($puja->booked_seat ?? 0);
-                $availableSeats = max(0, $totalSeats - $bookedSeats);
-
-                if ($totalSeats > 0 && $requiredSeats > $availableSeats) {
-                    DB::table('online_puja_orders')
-                        ->where('id', $lockedOrder->id)
-                        ->update([
-                            'razorpay_payment_id' => $validated['razorpay_payment_id'],
-                            'razorpay_signature' => $validated['razorpay_signature'],
-                            'payment_status' => 'paid',
-                            'booking_status' => 'pending_review',
-                            'updated_at' => now(),
-                        ]);
-
-                    return 'pending_review';
-                }
-
-                $puja->booked_seat = $bookedSeats + $requiredSeats;
-                $puja->save();
 
                 DB::table('online_puja_orders')
                     ->where('id', $lockedOrder->id)
                     ->update([
-                        'razorpay_payment_id' => $validated['razorpay_payment_id'],
-                        'razorpay_signature' => $validated['razorpay_signature'],
+                        'razorpay_payment_id' =>
+                            $validated['razorpay_payment_id'],
+
+                        'razorpay_signature' =>
+                            $validated['razorpay_signature'],
+
                         'payment_status' => 'paid',
-                        'booking_status' => 'confirmed',
+                        'booking_status' => $bookingStatus,
                         'updated_at' => now(),
                     ]);
 
-                return 'confirmed';
+                return $bookingStatus;
             });
+
+            /*
+            |--------------------------------------------------------------------------
+            | Send Payment Successful Email
+            |--------------------------------------------------------------------------
+            */
+
+            if ($bookingResult !== 'already_paid') {
+
+                try {
+
+                    $customer = DB::table('users')
+                        ->where('id', $order->customer_id)
+                        ->first();
+
+                    $puja = OnlinePuja::find($order->online_puja_id);
+
+                    $package = $puja
+                        ? $puja->packages()
+                            ->where('id', $order->package_id)
+                            ->first()
+                        : null;
+
+                    if ($customer && !empty($customer->email)) {
+
+                        Mail::to($customer->email)->send(
+                            new OnlinePujaPaymentSuccessfulMail(
+                                $order,
+                                $customer,
+                                $puja,
+                                $package,
+                                $validated['razorpay_payment_id'],
+                                $bookingResult
+                            )
+                        );
+
+                    } else {
+
+                        \Log::warning(
+                            'Online Puja payment email skipped: customer email not found.',
+                            [
+                                'order_number' => $order->order_number,
+                                'customer_id' => $order->customer_id,
+                            ]
+                        );
+                    }
+
+                } catch (Throwable $mailException) {
+
+                    // Do not fail payment verification if email fails.
+                    \Log::error('Online Puja Payment Email Failed', [
+                        'order_number' => $order->order_number,
+                        'customer_id' => $order->customer_id,
+                        'error' => $mailException->getMessage(),
+                    ]);
+                }
+            }
 
             session()->forget('online_puja_cart');
 
