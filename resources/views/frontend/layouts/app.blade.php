@@ -39,7 +39,7 @@
     <!-- Helper CSS -->
     <link rel="stylesheet" href="{{ asset('assets/frontend/assets/css/helper.css') }}">
     <!-- Main Style CSS -->
-    <link rel="stylesheet" href="{{ asset('assets/frontend/assets/css/style-new-custom.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/frontend/assets/css/style-all-custom.css') }}">
     <!-- Responsive CSS -->
     <link rel="stylesheet" href="{{ asset('assets/frontend/assets/css/responsive.css') }}">
     <!-- Modernizr JS -->
