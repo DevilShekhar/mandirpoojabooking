@@ -1444,7 +1444,7 @@ $(document).ready(function() {
 
     width: 100%;
 
-    margin-top: 45;
+    margin-top: 45px;
 
     padding: 0;
 
