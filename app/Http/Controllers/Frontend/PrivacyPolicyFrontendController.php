@@ -8,4 +8,20 @@ class PrivacyPolicyFrontendController extends Controller
     {   
         return view('frontend.privacy.index');
     }
+    public function bookingpolicy()
+    {   
+        return view('frontend.privacy.bookingpolicy');
+    }
+    public function cancellationrefundpolicy()
+    {   
+        return view('frontend.privacy.canellationrefundpolicy');
+    }
+    public function paymenttransactionpolicy()
+    {   
+        return view('frontend.privacy.paymenttransactionpolicy');
+    }
+    public function templedarshanpolicy()
+    {   
+        return view('frontend.privacy.templedarshanpolicy');
+    }
 }

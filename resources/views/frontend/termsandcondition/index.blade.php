@@ -1,472 +1,476 @@
 @extends('frontend.layouts.app')
-@section('title', 'Online Puja, Mandir Puja & Bhajan Kirtan Bookings')
+@section('title', 'Terms & Conditions - All Sanatan')
+@section('meta_keyword', 'All Sanatan Terms and Conditions, Temple Darshan Booking, Puja Booking, Pandit Booking, Online Puja Services')
+@section('meta_description', 'Read the Terms and Conditions for using All Sanatan services, including temple darshan, puja bookings, pandit services, online pooja and spiritual bookings.')
 @section('content')
-<div class="py-5 mb-5">
-    <div class="container py-4 text-center">
-        <h1 class="display-4 fw-bold mb-3">Divine Blessings at Your Doorstep</h1>
-        <p class="lead mb-4">Book Online Pujas, Mandir Rituals, and Live Bhajan Kirtan Events with Verified Pandits.</p>
-        <p class="text-muted mx-auto" style="max-width: 750px;">
-            Experience authentic Vedic traditions from the comfort of your home. Whether you seek spiritual peace,
-            planetary harmony, temple offerings, or devotional gatherings, we connect you directly with learned
-            Acharyas, sacred temples, and soulful Kirtan groups across India.
-        </p>
-    </div>
-</div>
-<div class="container mb-5">
-    <div class="row text-center mb-5">
-        <div class="col-12 mb-4">
-            <h2 class="fw-bold">Our Spiritual Services</h2>
-            <p class="text-muted">Choose from a wide range of sacred offerings tailored to your spiritual needs.</p>
-        </div>
-        <div class="col-md-4 mb-4">
-            <div class="card h-100 shadow-sm border-0">
-                <div class="card-body p-4">
-                    <div class="display-5 text-warning mb-3">🕉️</div>
-                    <h3 class="h5 fw-bold">Online Puja & Homam</h3>
-                    <p class="text-secondary small">Conduct personalized pujas, havans, and shanti rituals virtually
-                        with live streaming and sankalp on your name, Gotra, and Nakshatra.</p>
+<div class="privacy-policy-area pt-60 pb-60">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="li-section-title capitalize mb-25">
+                    <h2><span>Terms &</span> Conditions</h2>
                 </div>
-            </div>
-        </div>
-        <div class="col-md-4 mb-4">
-            <div class="card h-100 shadow-sm border-0">
-                <div class="card-body p-4">
-                    <div class="display-5 text-warning mb-3">🛕</div>
-                    <h3 class="h5 fw-bold">Mandir Puja & Archana</h3>
-                    <p class="text-secondary small">Special temple archana, abhishek, and chadhava offerings performed
-                        directly at renowned temples with blessed Prasad delivered home.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4 mb-4">
-            <div class="card h-100 shadow-sm border-0">
-                <div class="card-body p-4">
-                    <div class="display-5 text-warning mb-3">🎶</div>
-                    <h3 class="h5 fw-bold">Bhajan & Kirtan Events</h3>
-                    <p class="text-secondary small">Hire professional mandalis, singers, and musicians for Jagrans, Mata
-                        Ki Chowki, Sundarkand Path, Satyanarayan Katha, and spiritual events.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row mb-5">
-        <div class="col-12 text-center mb-4">
-            <h2 class="fw-bold">Popular Pujas & Sacred Ceremonies</h2>
-            <p class="text-muted">Traditional Vedic rituals performed with strict adherence to Shastra and Vidhi.</p>
-        </div>
-        <div class="col-md-3 col-sm-6 mb-3">
-            <div class="card h-100 shadow-sm border-0">
-                <div class="card-body p-3">
-                    <h3 class="h6 fw-bold mb-2">Maha Mrityunjaya Jaap</h3>
-                    <p class="text-secondary small mb-0">Dedicated to Lord Shiva for good health, longevity, protection
-                        from ailments, and overcoming life obstacles.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 col-sm-6 mb-3">
-            <div class="card h-100 shadow-sm border-0">
-                <div class="card-body p-3">
-                    <h3 class="h6 fw-bold mb-2">Rudrabhishek Puja</h3>
-                    <p class="text-secondary small mb-0">Sacred bathing of the Shiva Lingam with Panchamrit and Vedic
-                        mantras for peace, prosperity, and positive energy.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 col-sm-6 mb-3">
-            <div class="card h-100 shadow-sm border-0">
-                <div class="card-body p-3">
-                    <h3 class="h6 fw-bold mb-2">Navagraha Shanti Homam</h3>
-                    <p class="text-secondary small mb-0">Pacifies malefic planetary influences in your horoscope and
-                        brings balance, career growth, and harmony.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 col-sm-6 mb-3">
-            <div class="card h-100 shadow-sm border-0">
-                <div class="card-body p-3">
-                    <h3 class="h6 fw-bold mb-2">Satyanarayan Katha</h3>
-                    <p class="text-secondary small mb-0">Auspicious thanksgiving ritual invoking Lord Vishnu for family
-                        well-being, new beginnings, and household happiness.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 col-sm-6 mb-3">
-            <div class="card h-100 shadow-sm border-0">
-                <div class="card-body p-3">
-                    <h3 class="h6 fw-bold mb-2">Griha Pravesh & Vastu Puja</h3>
-                    <p class="text-secondary small mb-0">Purifies a new home or office space, removes Vastu doshas, and
-                        invites divine blessings before moving in.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 col-sm-6 mb-3">
-            <div class="card h-100 shadow-sm border-0">
-                <div class="card-body p-3">
-                    <h3 class="h6 fw-bold mb-2">Lakshmi Kubera Homam</h3>
-                    <p class="text-secondary small mb-0">Invokes Goddess Lakshmi and Lord Kubera to attract wealth,
-                        financial stability, and business abundance.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 col-sm-6 mb-3">
-            <div class="card h-100 shadow-sm border-0">
-                <div class="card-body p-3">
-                    <h3 class="h6 fw-bold mb-2">Kaal Sarp Dosh Nivaran</h3>
-                    <p class="text-secondary small mb-0">Specialized Vedic remedies performed at sacred tirthas to
-                        neutralize Kaal Sarp yoga effects in the birth chart.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 col-sm-6 mb-3">
-            <div class="card h-100 shadow-sm border-0">
-                <div class="card-body p-3">
-                    <h3 class="h6 fw-bold mb-2">Chandi & Durga Saptashati</h3>
-                    <p class="text-secondary small mb-0">Powerful Shakti recitation and havan for courage, victory over
-                        negativity, and divine protection for the family.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row text-center mb-5">
-        <div class="col-12 mb-4">
-            <h2 class="fw-bold">How Our Sacred Rituals Work</h2>
-            <p class="text-muted">A simple, authentic, and spiritually fulfilling process from start to finish.</p>
-        </div>
-        <div class="col-md-3 mb-3">
-            <div class="card h-100 shadow-sm border-0">
-                <div class="card-body p-4">
-                    <div class="fw-bold text-warning mb-2">Step 01</div>
-                    <h3 class="h6 fw-bold">Select Puja or Event</h3>
-                    <p class="text-secondary small mb-0">Choose your desired Online Puja, Temple Archana, or Bhajan
-                        Kirtan package based on your occasion or spiritual goal.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 mb-3">
-            <div class="card h-100 shadow-sm border-0">
-                <div class="card-body p-4">
-                    <div class="fw-bold text-warning mb-2">Step 02</div>
-                    <h3 class="h6 fw-bold">Share Sankalp Details</h3>
-                    <p class="text-secondary small mb-0">Provide your full name, Gotra, Nakshatra, and preferred
-                        auspicious date so the Pandit can personalize your Sankalp.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 mb-3">
-            <div class="card h-100 shadow-sm border-0">
-                <div class="card-body p-4">
-                    <div class="fw-bold text-warning mb-2">Step 03</div>
-                    <h3 class="h6 fw-bold">Join Live Ritual</h3>
-                    <p class="text-secondary small mb-0">Attend the puja via live stream with real-time mantra chanting,
-                        or welcome our verified Mandali at your venue.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 mb-3">
-            <div class="card h-100 shadow-sm border-0">
-                <div class="card-body p-4">
-                    <div class="fw-bold text-warning mb-2">Step 04</div>
-                    <h3 class="h6 fw-bold">Receive Sacred Prasad</h3>
-                    <p class="text-secondary small mb-0">Receive energized Raksha Sutra, Vibhuti, Kumkum, and temple
-                        Prasad safely delivered to your doorstep.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row mb-5">
-        <div class="col-12 text-center mb-4">
-            <h2 class="fw-bold">Why Choose Our Sacred Services</h2>
-            <p class="text-muted">10 commitments to ensure purity, tradition, and peace of mind in every ritual.</p>
-        </div>
-        <div class="col-lg-12 mb-3">
-            <div class="card h-100 shadow-sm border-0">
-                <div class="card-body p-4">
-                    <h4 class="h6 fw-bold mb-2">1. Certified & Experienced Vedic Pandits</h4>
-                    <p class="text-secondary small mb-0">All rituals are performed by qualified Acharyas and Pandits
-                        well-versed in Vedic scriptures, Sanskrit pronunciation, and regional traditions.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-12 mb-3">
-            <div class="card h-100 shadow-sm border-0">
-                <div class="card-body p-4">
-                    <h4 class="h6 fw-bold mb-2">2. Personalized Sankalp in Your Name</h4>
-                    <p class="text-secondary small mb-0">Every online and temple puja includes a dedicated Sankalp
-                        reciting your name, Gotra, Rashi, and specific family prayers.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-12 mb-3">
-            <div class="card h-100 shadow-sm border-0">
-                <div class="card-body p-4">
-                    <h4 class="h6 fw-bold mb-2">3. Live High-Definition Streaming</h4>
-                    <p class="text-secondary small mb-0">Participate in your ceremony in real time from anywhere in the
-                        world through clear, uninterrupted live video and audio.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-12 mb-3">
-            <div class="card h-100 shadow-sm border-0">
-                <div class="card-body p-4">
-                    <h4 class="h6 fw-bold mb-2">4. Authentic & Pure Puja Samagri</h4>
-                    <p class="text-secondary small mb-0">We use only sacred, unadulterated herbs, pure cow ghee, fresh
-                        flowers, and ritual items prepared strictly according to Shastra guidelines.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-12 mb-3">
-            <div class="card h-100 shadow-sm border-0">
-                <div class="card-body p-4">
-                    <h4 class="h6 fw-bold mb-2">5. Partnerships with Renowned Temples</h4>
-                    <p class="text-secondary small mb-0">Direct access to special Abhishekam, Archana, and Chadhava
-                        across famous Jyotirlingas, Shaktipeeths, and historic Mandirs.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-12 mb-3">
-            <div class="card h-100 shadow-sm border-0">
-                <div class="card-body p-4">
-                    <h4 class="h6 fw-bold mb-2">6. Doorstep Sacred Prasad Delivery</h4>
-                    <p class="text-secondary small mb-0">Blessed Vibhuti, Kumkum, sacred threads, and temple Prasad are
-                        carefully packed and delivered directly to your home.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-12 mb-3">
-            <div class="card h-100 shadow-sm border-0">
-                <div class="card-body p-4">
-                    <h4 class="h6 fw-bold mb-2">7. Auspicious Muhurat Consultation</h4>
-                    <p class="text-secondary small mb-0">Guidance on selecting the most favorable date, Tithi, and
-                        planetary timing based on the Hindu Panchang for maximum spiritual benefit.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-12 mb-3">
-            <div class="card h-100 shadow-sm border-0">
-                <div class="card-body p-4">
-                    <h4 class="h6 fw-bold mb-2">8. Soulful Bhajan & Kirtan Mandalis</h4>
-                    <p class="text-secondary small mb-0">Accomplished devotional singers and musicians for Mata Ki
-                        Chowki, Sundarkand Path, Jagran, Krishna Kirtan, and Bhajan Sandhya.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-12 mb-3">
-            <div class="card h-100 shadow-sm border-0">
-                <div class="card-body p-4">
-                    <h4 class="h6 fw-bold mb-2">9. Customized Rituals for Every Occasion</h4>
-                    <p class="text-secondary small mb-0">Tailored ceremonies for Griha Pravesh, Satyanarayan Katha,
-                        Rudrabhishek, Navagraha Shanti, Birthdays, Anniversaries, and Pitru Paksha.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-12 mb-3">
-            <div class="card h-100 shadow-sm border-0">
-                <div class="card-body p-4">
-                    <h4 class="h6 fw-bold mb-2">10. Complete Transparency & Devotion</h4>
-                    <p class="text-secondary small mb-0">Clear ritual procedures, step-by-step explanations during the
-                        ceremony, and dedicated support throughout your spiritual journey.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row mb-5">
-        <div class="col-12 text-center mb-4">
-            <h2 class="fw-bold">Sacred Temples & Kshetras We Serve</h2>
-            <p class="text-muted">Offer prayers and perform rituals at India's most revered spiritual centers.</p>
-        </div>
-        <div class="col-md-4 mb-3">
-            <div class="card h-100 shadow-sm border-0">
-                <div class="card-body p-4">
-                    <h3 class="h6 fw-bold mb-2">Kashi (Varanasi)</h3>
-                    <p class="text-secondary small mb-0">Perform Rudrabhishek, Ganga Aarti Sankalp, and Pitru Shanti
-                        rituals in the eternal city of Lord Vishwanath.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4 mb-3">
-            <div class="card h-100 shadow-sm border-0">
-                <div class="card-body p-4">
-                    <h3 class="h6 fw-bold mb-2">Ujjain & Omkareshwar</h3>
-                    <p class="text-secondary small mb-0">Special Mangalnath Bhaat Puja, Kaal Sarp Dosh Nivaran, and Maha
-                        Mrityunjaya Anushthan at sacred Jyotirlinga kshetras.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4 mb-3">
-            <div class="card h-100 shadow-sm border-0">
-                <div class="card-body p-4">
-                    <h3 class="h6 fw-bold mb-2">Haridwar, Rishikesh & Prayagraj</h3>
-                    <p class="text-secondary small mb-0">Sacred Triveni Sangam pujas, Shraddha karma, and Vedic homams
-                        along the holy banks of Maa Ganga.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="frequently-area pt-60 pb-50">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="frequently-content">
-                        <div class="frequently-desc">
-                            <h3>Frequently Asked Questions</h3>
-                            <p>Find clear answers regarding our Online Pujas, Mandir Archana bookings, Bhajan & Kirtan
-                                events, temple darshan tickets, Sankalp procedures, and doorstep Prasad & Samagri
-                                deliveries.</p>
-                        </div>
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body p-4">
+                        <p class="card-text mb-0">Welcome to All Sanatan. All Sanatan operates an online platform that enables users to discover, access and book religious and spiritual services across India. Please read these Terms & Conditions carefully before accessing or using our website, platform or services.</p>
                     </div>
-                    <div class="frequently-accordion">
-                        <div id="accordion">
-                            <div class="card actives">
-                                <div class="card-header" id="headingOne">
-                                    <h5 class="mb-0">
-                                        <a class="" data-toggle="collapse" data-target="#collapseOne"
-                                            aria-expanded="true" aria-controls="collapseOne">
-                                            1. How do Online Pujas and Homams work, and are they as effective as
-                                            in-person rituals?
-                                        </a>
-                                    </h5>
-                                </div>
-                                <div id="collapseOne" class="collapse show" aria-labelledby="headingOne"
-                                    data-parent="#accordion">
-                                    <div class="card-body">
-                                        In Vedic tradition, the <strong>Sankalp</strong> (sacred vow taken with your
-                                        full name, Gotra, Rashi, and Nakshatra) establishes your spiritual connection to
-                                        the ritual regardless of physical distance. Our verified Acharyas perform the
-                                        complete Vidhi with pure Samagri while you participate in real time via live
-                                        video stream.
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card">
-                                <div class="card-header" id="headingTwo">
-                                    <h5 class="mb-0">
-                                        <a class="collapsed" data-toggle="collapse" data-target="#collapseTwo"
-                                            aria-expanded="false" aria-controls="collapseTwo">
-                                            2. What details are required to book a Puja or Temple Archana?
-                                        </a>
-                                    </h5>
-                                </div>
-                                <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo"
-                                    data-parent="#accordion">
-                                    <div class="card-body">
-                                        During booking, you will be asked to provide the devotee's full name, Gotra,
-                                        Nakshatra, Rashi, and the names of family members to be included in the Sankalp,
-                                        along with your preferred date and delivery address for Prasad. If you do not
-                                        know your Gotra, <em>Kashyap Gotra</em> is traditionally recited as per Shastra.
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card">
-                                <div class="card-header" id="headingThree">
-                                    <h5 class="mb-0">
-                                        <a class="collapsed" data-toggle="collapse" data-target="#collapseThree"
-                                            aria-expanded="false" aria-controls="collapseThree">
-                                            3. Will I receive Prasad after my Mandir Puja or Online Homam?
-                                        </a>
-                                    </h5>
-                                </div>
-                                <div id="collapseThree" class="collapse" aria-labelledby="headingThree"
-                                    data-parent="#accordion">
-                                    <div class="card-body">
-                                        Yes. For eligible Mandir Puja and Online Puja packages, energized Vibhuti,
-                                        Kumkum, sacred Raksha Sutra, and blessed temple Prasad are carefully packed and
-                                        dispatched to your registered doorstep address via trusted courier partners.
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card">
-                                <div class="card-header" id="headingFour">
-                                    <h5 class="mb-0">
-                                        <a class="collapsed" data-toggle="collapse" data-target="#collapseFour"
-                                            aria-expanded="false" aria-controls="collapseFour">
-                                            4. How do I book a Bhajan Sandhya, Mata Ki Chowki, or Kirtan Mandali?
-                                        </a>
-                                    </h5>
-                                </div>
-                                <div id="collapseFour" class="collapse" aria-labelledby="headingFour"
-                                    data-parent="#accordion">
-                                    <div class="card-body">
-                                        You can select your preferred devotional event—such as Sundarkand Path,
-                                        Satyanarayan Katha, Mata Ki Chowki, or Jagran—and choose your event date, venue
-                                        city, and duration. Programs typically range from 2–3 hours for Bhajan Sandhya
-                                        to 4+ hours or overnight for Jagrans.
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card">
-                                <div class="card-header" id="headingFive">
-                                    <h5 class="mb-0">
-                                        <a class="collapsed" data-toggle="collapse" data-target="#collapseFive"
-                                            aria-expanded="false" aria-controls="collapseFive">
-                                            5. Can I book Temple Darshan Tickets and Puja Samagri on this platform?
-                                        </a>
-                                    </h5>
-                                </div>
-                                <div id="collapseFive" class="collapse" aria-labelledby="headingFive"
-                                    data-parent="#accordion">
-                                    <div class="card-body">
-                                        Yes. You can reserve temple darshan tickets subject to daily temple slot
-                                        availability, as well as order authentic, pure Puja Samagri kits and temple
-                                        store products directly through your account.
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card">
-                                <div class="card-header" id="headingSix">
-                                    <h5 class="mb-0">
-                                        <a class="collapsed" data-toggle="collapse" data-target="#collapseSix"
-                                            aria-expanded="false" aria-controls="collapseSix">
-                                            6. How can I select an auspicious Muhurat for my ceremony?
-                                        </a>
-                                    </h5>
-                                </div>
-                                <div id="collapseSix" class="collapse" aria-labelledby="headingSix"
-                                    data-parent="#accordion">
-                                    <div class="card-body">
-                                        Our experienced Acharyas check the Hindu Panchang, Tithi, and planetary
-                                        alignments based on your birth details and ritual purpose to recommend the most
-                                        favorable date and time slot for your Puja or Griha Pravesh.
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card">
-                                <div class="card-header" id="headingSeven">
-                                    <h5 class="mb-0">
-                                        <a class="collapsed" data-toggle="collapse" data-target="#collapseSeven"
-                                            aria-expanded="false" aria-controls="collapseSeven">
-                                            7. What is the cancellation and refund policy for bookings?
-                                        </a>
-                                    </h5>
-                                </div>
-                                <div id="collapseSeven" class="collapse" aria-labelledby="headingSeven"
-                                    data-parent="#accordion">
-                                    <div class="card-body">
-                                        You can request a booking cancellation from your user dashboard prior to the
-                                        scheduled ritual or ticket date, subject to our cancellation window and temple
-                                        guidelines. Approved refunds are processed back to your original payment method
-                                        within standard banking timelines.
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card">
-                                <div class="card-header" id="headingEight">
-                                    <h5 class="mb-0">
-                                        <a class="collapsed" data-toggle="collapse" data-target="#collapseEight"
-                                            aria-expanded="false" aria-controls="collapseEight">
-                                            8. Are the Pandits and Temples listed on the platform verified?
-                                        </a>
-                                    </h5>
-                                </div>
-                                <div id="collapseEight" class="collapse" aria-labelledby="headingEight"
-                                    data-parent="#accordion">
-                                    <div class="card-body">
-                                        Every Pandit, Acharya, Bhajan Mandali, and participating Temple undergoes strict
-                                        verification for Vedic qualifications, lineage, and adherence to traditional
-                                        Shastra procedures to ensure complete authenticity and devotion.
-                                    </div>
-                                </div>
-                            </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12 mb-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <h5 class="card-title font-weight-bold mb-3">1. Introduction</h5>
+                        <p class="card-text mb-2">Welcome to All Sanatan. All Sanatan operates an online platform that enables users to discover, access and book religious and spiritual services across India.</p>
+                        <p class="card-text mb-2">Through our website, customers may access services including:</p>
+                        <ul class="pl-4 mb-2" style="list-style-type: disc;">
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> Temple darshan and entry bookings.</li>
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> Pooja and religious ritual bookings.</li>
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> Pandit bookings.</li>
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> Online pooja services.</li>
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> Live pooja streaming.</li>
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> Festival and special darshan bookings.</li>
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> VIP darshan bookings, where officially available.</li>
+                        </ul>
+                        <p class="card-text mb-2">Additional services, including prasad delivery and donation facilities, may be introduced in the future under separate terms and conditions.</p>
+                        <p class="card-text mb-0">These Terms & Conditions govern your access to and use of the All Sanatan website, platform and services. By accessing our website, creating an account, making a booking or using any service offered through All Sanatan, you acknowledge that you have read and agree to these Terms & Conditions and the applicable website policies. If you do not agree with these Terms & Conditions, please do not use our website or services.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12 mb-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <h5 class="card-title font-weight-bold mb-3">2. Definitions</h5>
+                        <p class="card-text mb-2">For the purpose of these Terms & Conditions:</p>
+                        <ul class="pl-4 mb-0" style="list-style-type: disc;">
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> <strong>"All Sanatan", "We", "Us" or "Our"</strong> refers to the All Sanatan brand and the legal person or entity operating the website.</li>
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> <strong>"Website" or "Platform"</strong> refers to https://allsanatan.com and associated digital services operated under the All Sanatan brand.</li>
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> <strong>"User", "Customer", "You" or "Your"</strong> refers to any individual accessing or using our website or services.</li>
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> <strong>"Service Provider"</strong> refers to a temple, pandit, priest, religious organisation or other authorised service provider offering services through the platform.</li>
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> <strong>"Booking"</strong> refers to a request or confirmed reservation made by a customer for a service through All Sanatan.</li>
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> <strong>"Services"</strong> refers to the religious and spiritual services listed or facilitated through the platform.</li>
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> <strong>"Partner"</strong> refers to a temple, trust, pandit or other independent service provider associated with All Sanatan.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12 mb-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <h5 class="card-title font-weight-bold mb-3">3. Eligibility to Use the Platform</h5>
+                        <ol class="pl-4 mb-0" style="list-style-type: decimal !important; list-style-position: outside;">
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Users must provide accurate and complete information when accessing or using All Sanatan.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Users must have the legal capacity to enter into a binding agreement under applicable Indian law.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Individuals below 18 years of age may use the platform only with the involvement and supervision of a parent or legal guardian.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Users must not create accounts or make bookings using another person's identity without proper authorisation.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">All Sanatan reserves the right to restrict access where there is reasonable evidence of fraudulent, misleading or unlawful activity, subject to applicable law.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12 mb-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <h5 class="card-title font-weight-bold mb-3">4. Nature of All Sanatan's Services</h5>
+                        <p class="card-text mb-2">All Sanatan may operate in the following capacities:</p>
+                        <h6 class="font-weight-bold mb-2">4.1 Direct Service Provider</h6>
+                        <p class="card-text mb-3">Where a service is offered and fulfilled directly by the legal entity operating All Sanatan, All Sanatan will be responsible for its applicable service-provider obligations.</p>
+                        <h6 class="font-weight-bold mb-2">4.2 Online Platform / Booking Facilitator</h6>
+                        <p class="card-text mb-3">Where a service is provided by an independent temple, pandit, trust or other service provider, All Sanatan may facilitate the discovery, booking, payment coordination and communication process. The identity and role of the actual service provider will be disclosed to customers wherever applicable.</p>
+                        <h6 class="font-weight-bold mb-2">4.3 Partner Services</h6>
+                        <p class="card-text mb-0">Services offered by independent partners are subject to their availability, authorisation, religious customs, operational arrangements and applicable rules. All Sanatan does not claim ownership, management or official affiliation with any temple or religious organisation unless such relationship is expressly authorised and disclosed.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12 mb-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <h5 class="card-title font-weight-bold mb-3">5. Account Registration and User Information</h5>
+                        <ol class="pl-4 mb-0" style="list-style-type: decimal !important; list-style-position: outside;">
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Certain services may require users to create an account or submit booking information.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Users must provide accurate details, including name, mobile number, email address and other information requested for the relevant service.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Users are responsible for maintaining the confidentiality of their account credentials.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Users must notify All Sanatan if they suspect unauthorised access to their accounts.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">All Sanatan may verify information submitted by users where reasonably necessary for booking fulfilment, fraud prevention or legal compliance.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Users must not use false identities, misleading contact information or unauthorised payment details.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Personal information will be handled in accordance with our Privacy Policy.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12 mb-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <h5 class="card-title font-weight-bold mb-3">6. Booking Process</h5>
+                        <p class="card-text mb-2">Customers may book available services by following the booking process displayed on the website. The general booking process may include:</p>
+                        <ol class="pl-4 mb-0" style="list-style-type: decimal !important; list-style-position: outside;">
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Selecting a temple, pooja, pandit or other available service.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Selecting the required date and time, where applicable.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Providing the requested customer and service details.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Reviewing the service description, price and applicable terms.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Completing payment through the available payment method.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Receiving booking acknowledgement and confirmation, as applicable.</li>
+                        </ol>
+                        <p class="card-text mb-0">Customers are responsible for reviewing all booking details before submitting a booking request.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12 mb-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <h5 class="card-title font-weight-bold mb-3">7. Booking Confirmation and Availability</h5>
+                        <ol class="pl-4 mb-0" style="list-style-type: decimal !important; list-style-position: outside;">
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">All bookings are subject to service availability and applicable provider acceptance requirements.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">A payment acknowledgement or transaction receipt alone does not necessarily mean that a booking has been confirmed.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Booking confirmation will be communicated through the website, email, SMS, WhatsApp or another registered communication channel.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Customers should retain their booking ID and payment reference for future communication.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">All Sanatan may contact customers or service providers to verify booking information.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">If a selected service or time slot is unavailable, All Sanatan may communicate alternative arrangements or process an applicable refund.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Any changes to confirmed bookings will be communicated to customers wherever reasonably possible.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12 mb-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <h5 class="card-title font-weight-bold mb-3">8. Service Descriptions and Religious Customs</h5>
+                        <ol class="pl-4 mb-0" style="list-style-type: decimal !important; list-style-position: outside;">
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Service descriptions, inclusions, timings, locations and prices will be displayed wherever applicable.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Customers must review the service details before completing payment.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Religious rituals and customs may vary according to temple traditions, regional practices, religious beliefs and the service provider.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">The actual performance of a ritual may be subject to temple rules and the availability of the relevant pandit or authorised personnel.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Customers must communicate any special requirements before the scheduled service.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">All Sanatan does not guarantee any particular spiritual, financial, medical, personal or other outcome from any religious service.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12 mb-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <h5 class="card-title font-weight-bold mb-3">9. Pricing, Fees and Taxes</h5>
+                        <ol class="pl-4 mb-0" style="list-style-type: decimal !important; list-style-position: outside;">
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Applicable service prices will be displayed before customers complete payment.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Prices may vary depending on the service, temple, location, date, event, provider and booking category.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Applicable taxes, platform fees, convenience fees and other charges will be disclosed before payment, wherever applicable.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Customers are responsible for reviewing the final payable amount before confirming a booking.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">All Sanatan reserves the right to correct genuine pricing or display errors, subject to applicable law and appropriate customer communication.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Any change in pricing will not be applied retrospectively to a confirmed booking unless legally permissible and properly agreed.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12 mb-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <h5 class="card-title font-weight-bold mb-3">10. Payment Terms</h5>
+                        <ol class="pl-4 mb-0" style="list-style-type: decimal !important; list-style-position: outside;">
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Customers must make payments using the payment methods displayed on the All Sanatan platform.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Payments may be processed through authorised third-party payment gateways or payment service providers.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Customers must ensure that their payment information is accurate and that sufficient funds are available.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">A booking may remain pending until successful payment verification and any required service-provider confirmation.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">If an amount is debited but the booking is not confirmed, customers should contact All Sanatan with the transaction reference.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Verified duplicate payments will be investigated and any refundable excess amount will be processed in accordance with applicable law.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">All Sanatan will not request a customer's UPI PIN, card CVV, OTP or banking password to process a refund.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Refunds and payment disputes will be handled according to the applicable Payment Policy and Cancellation & Refund Policy.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12 mb-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <h5 class="card-title font-weight-bold mb-3">11. Cancellation and Refund</h5>
+                        <ol class="pl-4 mb-2" style="list-style-type: decimal !important; list-style-position: outside;">
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Customers may request cancellation through the official cancellation process or customer support channels.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Customer cancellations will be governed by the Cancellation & Refund Policy displayed on the website.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">The applicable refund percentage will depend on the time remaining before the scheduled event or service, as stated in that policy.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Where a temple or service provider cancels a confirmed booking, the customer will be eligible for a 100% refund under the stated All Sanatan policy.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Where All Sanatan cancels a confirmed booking due to platform-related reasons, the customer will be eligible for a 100% refund under the stated policy.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Approved refunds will be processed through the applicable payment method, subject to verification and payment-provider processing timelines.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Nothing in this section restricts consumer rights or remedies available under applicable Indian law.</li>
+                        </ol>
+                        <p class="card-text mb-0">Customers should read the complete Cancellation & Refund Policy before making a booking.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12 mb-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <h5 class="card-title font-weight-bold mb-3">12. Temple Darshan and Entry Conditions</h5>
+                        <ol class="pl-4 mb-0" style="list-style-type: decimal !important; list-style-position: outside;">
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Temple darshan and entry services are subject to the relevant temple's availability, rules and operational conditions.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Customers must follow temple dress codes, security checks, queue arrangements and entry instructions.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Customers may be required to carry valid identification and booking confirmation.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Temple authorities may change darshan timings, entry routes, security procedures or other arrangements.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">VIP or special darshan services will be listed only where the relevant access is genuinely available and appropriately authorised.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">A booking confirmation does not authorise customers to bypass temple security or lawful restrictions.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">If a service cannot be provided, the applicable resolution and refund terms will apply.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12 mb-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <h5 class="card-title font-weight-bold mb-3">13. Pooja and Pandit Booking Conditions</h5>
+                        <ol class="pl-4 mb-0" style="list-style-type: decimal !important; list-style-position: outside;">
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Pooja and pandit bookings are subject to the availability and acceptance of the selected service provider.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Customers must provide accurate details, including names, gotra, sankalp information and other details required for the relevant ritual.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Customers must review the service inclusions, location, duration, fees and material requirements before confirming.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Any additional services or materials must be agreed upon in advance.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Pandits and other service providers are expected to conduct themselves respectfully and professionally.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">All Sanatan may investigate complaints relating to service quality, misconduct or unauthorised charges.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Changes or cancellations will be handled under the applicable booking and refund policies.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12 mb-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <h5 class="card-title font-weight-bold mb-3">14. Online Pooja and Live Streaming</h5>
+                        <ol class="pl-4 mb-0" style="list-style-type: decimal !important; list-style-position: outside;">
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Online pooja and live streaming services will be provided through the communication method or streaming facility specified at booking.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Customers must provide accurate contact details and remain available at the scheduled time.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Customers are responsible for maintaining a suitable internet connection and compatible device.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Streaming availability may be affected by temple operations, religious customs, technical failures or third-party network conditions.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">All Sanatan will make reasonable efforts to provide the advertised service.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Customers must not reproduce, redistribute, commercially exploit or publicly broadcast protected streaming content without appropriate permission.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">If a paid service is not delivered, customers may contact support for an appropriate resolution under the applicable policy.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12 mb-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <h5 class="card-title font-weight-bold mb-3">15. Customer Responsibilities</h5>
+                        <p class="card-text mb-2">By using All Sanatan, customers agree to:</p>
+                        <ol class="pl-4 mb-0" style="list-style-type: decimal !important; list-style-position: outside;">
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Provide genuine, accurate and complete information.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Use the platform only for lawful purposes.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Follow the relevant temple's rules and religious instructions.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Respect temples, pandits, service providers, employees and other customers.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Avoid abusive, threatening, discriminatory or unlawful behaviour.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Avoid duplicate, fraudulent or unauthorised bookings.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Not misuse another person's personal or payment information.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Not attempt to access restricted areas of the website or interfere with its operations.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Not resell bookings or use them for unauthorised commercial purposes.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Follow the applicable booking, payment and cancellation policies.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12 mb-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <h5 class="card-title font-weight-bold mb-3">16. Prohibited Activities</h5>
+                        <p class="card-text mb-2">Users must not:</p>
+                        <ul class="pl-4 mb-2" style="list-style-type: disc;">
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> Submit false or misleading information.</li>
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> Impersonate another person, temple, pandit or All Sanatan representative.</li>
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> Attempt payment fraud or manipulate booking transactions.</li>
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> Upload unlawful, defamatory, threatening or harmful content.</li>
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> Harass or threaten other users or service providers.</li>
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> Attempt unauthorised access to the platform or its systems.</li>
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> Copy, reproduce or misuse website content without permission.</li>
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> Misrepresent their authority to book services for another person.</li>
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> Use the platform in violation of applicable Indian laws.</li>
+                        </ul>
+                        <p class="card-text mb-0">All Sanatan may investigate suspected violations and take appropriate action in accordance with applicable law.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12 mb-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <h5 class="card-title font-weight-bold mb-3">17. Third-Party Service Providers</h5>
+                        <ol class="pl-4 mb-0" style="list-style-type: decimal !important; list-style-position: outside;">
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Certain services may be fulfilled by independent temples, trusts, pandits or other authorised partners.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">The actual service provider's role will be disclosed wherever applicable.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Independent providers may have their own operational requirements, religious customs and service conditions.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">All Sanatan will make reasonable efforts to coordinate confirmed bookings and address customer complaints.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">All Sanatan remains responsible for its own platform representations, contractual obligations and liabilities imposed by applicable law.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Nothing in these Terms removes any consumer right available against All Sanatan or an applicable service provider.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12 mb-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <h5 class="card-title font-weight-bold mb-3">18. Website Content and Intellectual Property</h5>
+                        <ol class="pl-4 mb-0" style="list-style-type: decimal !important; list-style-position: outside;">
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Website content, original text, graphics, branding, software, design elements and other materials belonging to All Sanatan are protected by applicable intellectual property laws.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Users must not copy, reproduce, modify, distribute or commercially exploit protected materials without written permission.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Temple names, photographs, logos and other third-party materials remain the property of their respective owners.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Use of a temple's name or other third-party material does not imply ownership or official affiliation by All Sanatan.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Any use of third-party intellectual property will be subject to applicable permissions and legal requirements.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12 mb-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <h5 class="card-title font-weight-bold mb-3">19. Reviews, Feedback and User-Generated Content</h5>
+                        <ol class="pl-4 mb-0" style="list-style-type: decimal !important; list-style-position: outside;">
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Users may submit genuine reviews, ratings and feedback about services they have used.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Reviews should reflect actual experiences and must not be misleading.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Fake, manipulated, fraudulent or unlawful reviews are prohibited.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Users must not publish another person's private information without proper authority.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">All Sanatan may moderate or remove content that violates applicable law or platform policies.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Sponsored listings, where used, will be identified appropriately.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">By submitting content, users grant All Sanatan permission to display and use that content for legitimate platform-related purposes, subject to applicable law.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12 mb-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <h5 class="card-title font-weight-bold mb-3">20. Privacy and Personal Information</h5>
+                        <p class="card-text mb-2">All Sanatan may collect and process personal information to manage bookings, coordinate services, process payments, provide customer support, prevent fraud and meet legal obligations.</p>
+                        <p class="card-text mb-2">Personal information may be shared with relevant service providers, payment gateways and other authorised service partners where necessary for service delivery or legal compliance.</p>
+                        <p class="card-text mb-2">Further information about personal data collection, usage, sharing, retention and user rights is available in our Privacy Policy.</p>
+                        <p class="card-text mb-0">By using the platform, customers acknowledge that their personal information will be handled in accordance with the Privacy Policy and applicable data protection law.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12 mb-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <h5 class="card-title font-weight-bold mb-3">21. Service Interruptions and Force Majeure</h5>
+                        <p class="card-text mb-2">Services may be affected by circumstances beyond reasonable control, including:</p>
+                        <ul class="pl-4 mb-2" style="list-style-type: disc;">
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> Natural disasters, floods or earthquakes.</li>
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> Severe weather conditions.</li>
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> Government orders or restrictions.</li>
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> Public emergencies.</li>
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> Temple closures.</li>
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> Security incidents.</li>
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> Strikes or transport disruptions.</li>
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> Internet or telecommunications failures.</li>
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> Other unavoidable events.</li>
+                        </ul>
+                        <p class="card-text mb-0">All Sanatan will make reasonable efforts to communicate relevant changes and provide available alternatives, including rescheduling or refunds where applicable. Nothing in this section removes any mandatory consumer rights or obligations under applicable law.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12 mb-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <h5 class="card-title font-weight-bold mb-3">22. Limitation of Liability</h5>
+                        <ol class="pl-4 mb-0" style="list-style-type: decimal !important; list-style-position: outside;">
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">All Sanatan will exercise reasonable care in operating its platform and coordinating services.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">All Sanatan does not guarantee uninterrupted website availability or error-free technical operations.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Religious services may be subject to independent temple rules, service-provider availability and unavoidable operational changes.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">All Sanatan does not guarantee specific spiritual, financial, medical or personal outcomes.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">All Sanatan will remain responsible for its own representations, services and obligations under applicable law.</li>
+                            <li class="mb-2" style="display: list-item; list-style-type: decimal !important;">Nothing in these Terms excludes or restricts liability that cannot lawfully be excluded under Indian law, including applicable consumer protection rights.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12 mb-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <h5 class="card-title font-weight-bold mb-3">23. Suspension or Termination of Access</h5>
+                        <p class="card-text mb-2">All Sanatan may restrict, suspend or terminate a user's access to the platform where reasonably necessary due to:</p>
+                        <ul class="pl-4 mb-2" style="list-style-type: disc;">
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> Suspected fraudulent activity.</li>
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> Material violation of these Terms.</li>
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> Unlawful use of the platform.</li>
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> Security risks.</li>
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> Misuse of customer or partner information.</li>
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> Other legitimate operational or legal reasons.</li>
+                        </ul>
+                        <p class="card-text mb-0">Where appropriate, All Sanatan may communicate the reason for the restriction and provide an opportunity to resolve the issue. Any pending booking, payment or refund will be handled in accordance with applicable policies and law.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12 mb-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <h5 class="card-title font-weight-bold mb-3">24. Changes to These Terms</h5>
+                        <p class="card-text mb-2">All Sanatan may update these Terms & Conditions from time to time to reflect changes in:</p>
+                        <ul class="pl-4 mb-2" style="list-style-type: disc;">
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> Services and platform functionality.</li>
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> Business operations.</li>
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> Legal and regulatory requirements.</li>
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> Security and customer protection practices.</li>
+                        </ul>
+                        <p class="card-text mb-0">Updated Terms will be published on the website with the revised effective date or last updated date. Where required by law, users will be notified or asked to provide fresh consent for material changes.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12 mb-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <h5 class="card-title font-weight-bold mb-3">25. Governing Law and Jurisdiction</h5>
+                        <p class="card-text mb-2">These Terms & Conditions will be governed by the laws of India.</p>
+                        <p class="card-text mb-2">Disputes arising from the use of All Sanatan will be addressed through appropriate communication and resolution procedures wherever possible. Subject to applicable law, disputes may be brought before courts having competent jurisdiction.</p>
+                        <p class="card-text mb-0">Nothing in this section limits the rights of consumers to approach the appropriate consumer commission or other competent authority under applicable Indian law.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12 mb-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <h5 class="card-title font-weight-bold mb-3">26. Grievance Redressal and Customer Support</h5>
+                        <p class="card-text mb-2">For questions, complaints, booking issues, payment concerns or other grievances, customers may contact All Sanatan through the following details:</p>
+                        <div class="mb-3">
+                            <p class="card-text mb-2"><strong>Platform / Brand:</strong> All Sanatan</p>
+                            <p class="card-text mb-2"><strong>Website:</strong> <a href="https://allsanatan.com" target="_blank" rel="noopener">https://allsanatan.com</a></p>
+                            <p class="card-text mb-2"><strong>Email:</strong> <a href="mailto:allsanatan@gmail.com">allsanatan@gmail.com</a></p>
+                            <p class="card-text mb-2"><strong>Phone:</strong> <a href="tel:9970711238">9970711238</a></p>
+                            <p class="card-text mb-2"><strong>Business Address:</strong> [Insert Complete Business Address]</p>
+                            <p class="card-text mb-2"><strong>Grievance Officer:</strong> [Insert Full Name]</p>
+                            <p class="card-text mb-2"><strong>Designation:</strong> Grievance Officer</p>
+                            <p class="card-text mb-2"><strong>Grievance Email:</strong> [Insert Grievance Email]</p>
+                            <p class="card-text mb-0"><strong>Contact Number:</strong> [Insert Contact Number]</p>
                         </div>
+                        <p class="card-text mb-2">Customers are requested to provide their booking ID, registered mobile number, transaction reference and a clear description of the issue.</p>
+                        <p class="card-text mb-0">All Sanatan will acknowledge and address grievances within the timelines prescribed under applicable Indian law.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12 mb-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <h5 class="card-title font-weight-bold mb-3">27. Related Policies</h5>
+                        <p class="card-text mb-2">These Terms & Conditions should be read together with the following policies published on the All Sanatan website:</p>
+                        <ul class="pl-4 mb-2" style="list-style-type: disc;">
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> Privacy Policy</li>
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> Booking & Confirmation Policy</li>
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> Cancellation & Refund Policy</li>
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> Payment & Transaction Policy</li>
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> Temple Darshan & Entry Booking Policy</li>
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> Pooja Booking Policy</li>
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> Pandit Booking Policy</li>
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> Online Pooja Policy</li>
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> Live Pooja & Streaming Policy</li>
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> Festival & VIP Darshan Policy</li>
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> Disclaimer & Limitation of Liability</li>
+                            <li class="mb-2"><i class="fa fa-dot-circle-o" aria-hidden="true"></i> Grievance Redressal Policy</li>
+                        </ul>
+                        <p class="card-text mb-0">Where a specific service policy provides additional details for that service, customers should read that policy before making a booking. Applicable statutory rights will prevail over any inconsistent contractual term.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12 mb-4">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <h5 class="card-title font-weight-bold mb-3">Thank You for Choosing All Sanatan</h5>
+                        <p class="card-text mb-2">We appreciate your trust and look forward to helping you access religious and spiritual services across India.</p>
+                        <p class="card-text mb-2"><strong>All Sanatan</strong></p>
+                        <p class="card-text mb-2"><strong>Website:</strong> <a href="https://allsanatan.com" target="_blank" rel="noopener">https://allsanatan.com</a></p>
+                        <p class="card-text mb-2"><strong>Email:</strong> <a href="mailto:allsanatan@gmail.com">allsanatan@gmail.com</a></p>
+                        <p class="card-text mb-2"><strong>Phone:</strong> <a href="tel:9970711238">9970711238</a></p>
+                        <p class="card-text mb-0">© All Sanatan. All Rights Reserved.</p>
                     </div>
                 </div>
             </div>
