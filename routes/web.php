@@ -129,6 +129,10 @@ Route::get('/tickit-booking/view-puja/{puja}', [TickitBookingfillterController::
 Route::get('/news', [NewsFrontendController::class, 'index'])->name('frontend.news');
 Route::get('/about-us', [AboutusFrontendController::class, 'index'])->name('frontend.about-us');
 Route::get('/privacy-policy', [PrivacyPolicyFrontendController::class, 'index'])->name('frontend.privacy-policy');
+Route::get('/booking-policy', [PrivacyPolicyFrontendController::class, 'bookingpolicy'])->name('frontend.booking-policy');
+Route::get('/cancellation-refund-policy', [PrivacyPolicyFrontendController::class, 'cancellationrefundpolicy'])->name('frontend.cancellation-refund-policy');
+Route::get('/payment-transaction-policy', [PrivacyPolicyFrontendController::class, 'paymenttransactionpolicy'])->name('frontend.payment-transaction-policy');
+Route::get('/temple-darshan-policy', [PrivacyPolicyFrontendController::class, 'templedarshanpolicy'])->name('frontend.temple-darshan-policy');
 Route::get('/terms-and-conditions', [TermsandConditionFrontendController::class, 'index'])->name('frontend.terms-and-conditions');
 Route::get('/disclaimer', [DisclaimerConditionFrontendController::class, 'index'])->name('frontend.disclaimer');
 Route::get('/news/{slug}', [NewsFrontendController::class, 'show'])->name('frontend.news.show');
