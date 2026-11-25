@@ -82,10 +82,13 @@ use App\Http\Controllers\Admin\OnlinePujaCategoryController;
 use App\Http\Controllers\Admin\OnlinePujaController;
 use App\Http\Controllers\Frontend\FrontendOnlinePujaController;
 use App\Http\Controllers\Frontend\FrontendOnlinePujaCartController;
+use App\Http\Controllers\Frontend\ContactUsFrontendController;
 use App\Http\Controllers\Admin\MyOnlinePujaBookingController;
 use App\Http\Controllers\Admin\OnlinePujaReportController;
 use App\Http\Controllers\Admin\OnlinePujaDetailedReportController;
 use App\Http\Controllers\Admin\DarshanVerificationOfficerController;
+use App\Http\Controllers\Frontend\FaqFrontendController;
+use App\Http\Controllers\Frontend\HelpSupportFrontendController;
 
 Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
 Route::get('our-temples', [OurTemplesContoller::class, 'index'])->name('frontend.our-temples');
@@ -145,6 +148,9 @@ Route::get('/fraud-prevention-security-policy', [PrivacyPolicyFrontendController
 Route::get('/force-majeure-policy', [PrivacyPolicyFrontendController::class, 'forcemajeurepolicy'])->name('frontend.force-majeure-policy');
 Route::get('/cookie-tracking-policy', [PrivacyPolicyFrontendController::class, 'cookietrackingpolicy'])->name('frontend.cookie-tracking-policy');
 Route::get('/intellectual-property-policy', [PrivacyPolicyFrontendController::class, 'intellectualpropertypolicy'])->name('frontend.intellectual-property-policy');
+Route::get('/contact-us', [ContactUsFrontendController::class, 'index'])->name('frontend.contact-us');
+Route::get('/faq', [FaqFrontendController::class, 'index'])->name('frontend.faq');
+Route::get('/help-support', [HelpSupportFrontendController::class, 'index'])->name('frontend.help-support');
 Route::get('/terms-and-conditions', [TermsandConditionFrontendController::class, 'index'])->name('frontend.terms-and-conditions');
 Route::get('/disclaimer', [DisclaimerConditionFrontendController::class, 'index'])->name('frontend.disclaimer');
 Route::get('/news/{slug}', [NewsFrontendController::class, 'show'])->name('frontend.news.show');
