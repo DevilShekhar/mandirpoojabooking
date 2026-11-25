@@ -135,7 +135,16 @@ Route::get('/payment-transaction-policy', [PrivacyPolicyFrontendController::clas
 Route::get('/temple-darshan-policy', [PrivacyPolicyFrontendController::class, 'templedarshanpolicy'])->name('frontend.temple-darshan-policy');
 Route::get('/puja-booking-policy', [PrivacyPolicyFrontendController::class, 'pujabookingpolicy'])->name('frontend.puja-booking-policy');
 Route::get('/pandit-booking-policy', [PrivacyPolicyFrontendController::class, 'panditbookingpolicy'])->name('frontend.pandit-booking-policy');
-
+Route::get('/online-puja-booking-policy', [PrivacyPolicyFrontendController::class, 'onlinepujabookingpolicy'])->name('frontend.online-puja-booking-policy');
+Route::get('/live-puja-streaming-policy', [PrivacyPolicyFrontendController::class, 'livepujastreamingpolicy'])->name('frontend.live-puja-streaming-policy');
+Route::get('/grievance-redressal-policy', [PrivacyPolicyFrontendController::class, 'grievanceredressalpolicy'])->name('frontend.grievance-redressal-policy');
+Route::get('/festival-vip-darshan-policy', [PrivacyPolicyFrontendController::class, 'festivalvipdarshanpolicy'])->name('frontend.festival-vip-darshan-policy');
+Route::get('/user-conduct-policy', [PrivacyPolicyFrontendController::class, 'userconductpolicy'])->name('frontend.user-conduct-policy');
+Route::get('/reviews-ratings-policy', [PrivacyPolicyFrontendController::class, 'reviewsratingspolicy'])->name('frontend.reviews-ratings-policy');
+Route::get('/fraud-prevention-security-policy', [PrivacyPolicyFrontendController::class, 'fraudpreventionsecuritypolicy'])->name('frontend.fraud-prevention-security-policy');
+Route::get('/force-majeure-policy', [PrivacyPolicyFrontendController::class, 'forcemajeurepolicy'])->name('frontend.force-majeure-policy');
+Route::get('/cookie-tracking-policy', [PrivacyPolicyFrontendController::class, 'cookietrackingpolicy'])->name('frontend.cookie-tracking-policy');
+Route::get('/intellectual-property-policy', [PrivacyPolicyFrontendController::class, 'intellectualpropertypolicy'])->name('frontend.intellectual-property-policy');
 Route::get('/terms-and-conditions', [TermsandConditionFrontendController::class, 'index'])->name('frontend.terms-and-conditions');
 Route::get('/disclaimer', [DisclaimerConditionFrontendController::class, 'index'])->name('frontend.disclaimer');
 Route::get('/news/{slug}', [NewsFrontendController::class, 'show'])->name('frontend.news.show');

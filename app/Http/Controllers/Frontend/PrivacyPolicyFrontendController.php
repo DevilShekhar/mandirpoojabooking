@@ -32,4 +32,44 @@ class PrivacyPolicyFrontendController extends Controller
     {   
         return view('frontend.privacy.panditbookingpolicy');
     }
+    public function onlinepujabookingpolicy()
+    {   
+        return view('frontend.privacy.onlinepujabookingpolicy');
+    }
+    public function livepujastreamingpolicy()
+    {   
+        return view('frontend.privacy.livepujastreamingpolicy');
+    }
+    public function grievanceredressalpolicy()
+    {   
+        return view('frontend.privacy.grievanceredressalpolicy');
+    }
+    public function festivalvipdarshanpolicy()
+    {   
+        return view('frontend.privacy.festivalvipdarshanpolicy');
+    }
+    public function userconductpolicy()
+    {   
+        return view('frontend.privacy.userconductpolicy');
+    }
+    public function reviewsratingspolicy()
+    {   
+        return view('frontend.privacy.reviewsratingspolicy');
+    }
+    public function fraudpreventionsecuritypolicy()
+    {   
+        return view('frontend.privacy.fraudpreventionsecuritypolicy');
+    }
+    public function forcemajeurepolicy()
+    {   
+        return view('frontend.privacy.forcemajeurepolicy');
+    }
+    public function cookietrackingpolicy()
+    {   
+        return view('frontend.privacy.cookietrackingpolicy');
+    }
+    public function intellectualpropertypolicy()
+    {   
+        return view('frontend.privacy.intellectualpropertypolicy');
+    }
 }
