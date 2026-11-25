@@ -24,4 +24,12 @@ class PrivacyPolicyFrontendController extends Controller
     {   
         return view('frontend.privacy.templedarshanpolicy');
     }
+    public function pujabookingpolicy()
+    {   
+        return view('frontend.privacy.pujabookingpolicy');
+    }
+    public function panditbookingpolicy()
+    {   
+        return view('frontend.privacy.panditbookingpolicy');
+    }
 }

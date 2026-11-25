@@ -133,6 +133,9 @@ Route::get('/booking-policy', [PrivacyPolicyFrontendController::class, 'bookingp
 Route::get('/cancellation-refund-policy', [PrivacyPolicyFrontendController::class, 'cancellationrefundpolicy'])->name('frontend.cancellation-refund-policy');
 Route::get('/payment-transaction-policy', [PrivacyPolicyFrontendController::class, 'paymenttransactionpolicy'])->name('frontend.payment-transaction-policy');
 Route::get('/temple-darshan-policy', [PrivacyPolicyFrontendController::class, 'templedarshanpolicy'])->name('frontend.temple-darshan-policy');
+Route::get('/puja-booking-policy', [PrivacyPolicyFrontendController::class, 'pujabookingpolicy'])->name('frontend.puja-booking-policy');
+Route::get('/pandit-booking-policy', [PrivacyPolicyFrontendController::class, 'panditbookingpolicy'])->name('frontend.pandit-booking-policy');
+
 Route::get('/terms-and-conditions', [TermsandConditionFrontendController::class, 'index'])->name('frontend.terms-and-conditions');
 Route::get('/disclaimer', [DisclaimerConditionFrontendController::class, 'index'])->name('frontend.disclaimer');
 Route::get('/news/{slug}', [NewsFrontendController::class, 'show'])->name('frontend.news.show');
